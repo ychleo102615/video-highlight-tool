@@ -561,6 +561,8 @@ watch([currentTime, currentSentenceTime], ([video, sentence]) => {
 ## Active Technologies
 - TypeScript ^5.0.0 + 無（Domain Layer 不依賴任何外部框架，僅使用 TypeScript 標準庫） (001-domain-layer)
 - N/A（儲存由 Infrastructure Layer 負責，此層僅定義 Repository 介面） (001-domain-layer)
+- TypeScript ^5.0.0 + 僅依賴 Domain Layer（無外部框架依賴） (002-application-layer)
+- N/A（Application Layer 定義 Repository 介面，由 Infrastructure Layer 實作） (002-application-layer)
 
 ## Recent Changes
 - 001-domain-layer: Added TypeScript ^5.0.0 + 無（Domain Layer 不依賴任何外部框架，僅使用 TypeScript 標準庫）
