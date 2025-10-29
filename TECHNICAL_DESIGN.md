@@ -12,7 +12,7 @@
 | 狀態管理 | Pinia | ^2.2.0 | Vue 3 官方推薦，簡潔的 API |
 | UI 框架 | Naive UI | ^2.40.0 | TypeScript 友好，組件豐富，設計現代 |
 | 視頻處理 | video.js | ^8.0.0 | 功能完整，跨瀏覽器兼容性好 |
-| 樣式方案 | SCSS | - | 支援變數和嵌套，易於維護 |
+| 樣式方案 | Tailwind | v4 |  |
 
 ### 開發工具
 
@@ -623,63 +623,6 @@ function setupHighlightPlayback() {
     }
   }
 }
-```
-
-## 響應式設計策略
-
-### 斷點設計
-
-```scss
-$breakpoint-mobile: 768px;
-$breakpoint-tablet: 1024px;
-
-// Desktop: > 1024px - 左右分屏
-// Tablet: 768px - 1024px - 左右分屏，但比例調整
-// Mobile: < 768px - 上下堆疊
-```
-
-### 佈局策略
-
-```vue
-<template>
-  <div class="split-layout" :class="{ 'mobile': isMobile }">
-    <div class="editing-area">
-      <!-- ... -->
-    </div>
-    <div class="preview-area">
-      <!-- ... -->
-    </div>
-  </div>
-</template>
-
-<style lang="scss" scoped>
-.split-layout {
-  display: flex;
-  height: 100vh;
-
-  &:not(.mobile) {
-    flex-direction: row;
-
-    .editing-area {
-      width: 40%;
-    }
-
-    .preview-area {
-      width: 60%;
-    }
-  }
-
-  &.mobile {
-    flex-direction: column;
-
-    .editing-area,
-    .preview-area {
-      width: 100%;
-      height: 50%;
-    }
-  }
-}
-</style>
 ```
 
 ## 依賴注入配置
