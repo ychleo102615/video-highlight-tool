@@ -163,11 +163,11 @@
 - [ ] 配置 Pinia 狀態管理
 
 ### Phase 2: Domain Layer 開發
-- [ ] 定義 Video Entity
-- [ ] 定義 Transcript Entity (Section, Sentence)
-- [ ] 定義 Highlight Entity
-- [ ] 定義 Value Objects (TimeStamp, TimeRange)
-- [ ] 定義 Repository Interfaces
+- [x] 定義 Video Entity
+- [x] 定義 Transcript Entity (Section, Sentence)
+- [x] 定義 Highlight Entity
+- [x] 定義 Value Objects (TimeStamp, TimeRange)
+- [x] 定義 Repository Interfaces
 
 ### Phase 3: Application Layer 開發
 - [ ] 定義 Port 介面 (ITranscriptGenerator, IFileStorage)
