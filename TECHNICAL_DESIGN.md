@@ -119,364 +119,203 @@ Application Layer
 ### Entities
 
 #### Video Entity
-```typescript
-export class Video {
-  constructor(
-    public readonly id: string,
-    public readonly file: File,
-    public readonly metadata: VideoMetadata,
-    public url?: string
-  ) {}
+**核心屬性**:
+- `id: string` - 唯一識別碼
+- `file: File` - 視頻文件
+- `metadata: VideoMetadata` - 視頻元數據
+- `url?: string` - 視頻 URL（可選）
 
-  get duration(): number {
-    return this.metadata.duration;
-  }
-
-  get isReady(): boolean {
-    return !!this.url;
-  }
-}
-```
+**核心方法**:
+- `get duration(): number` - 獲取視頻時長
+- `get isReady(): boolean` - 檢查視頻是否已準備好播放
 
 #### Transcript Entity
-```typescript
-export class Transcript {
-  constructor(
-    public readonly id: string,
-    public readonly videoId: string,
-    public readonly sections: Section[],
-    public readonly fullText: string
-  ) {}
+**核心屬性**:
+- `id: string` - 轉錄 ID
+- `videoId: string` - 關聯的視頻 ID
+- `sections: Section[]` - 段落列表
+- `fullText: string` - 完整轉錄文字
 
-  getSentenceById(sentenceId: string): Sentence | undefined {
-    for (const section of this.sections) {
-      const sentence = section.sentences.find(s => s.id === sentenceId);
-      if (sentence) return sentence;
-    }
-    return undefined;
-  }
-
-  getAllSentences(): Sentence[] {
-    return this.sections.flatMap(section => section.sentences);
-  }
-}
-```
+**核心方法**:
+- `getSentenceById(sentenceId: string): Sentence | undefined` - 根據 ID 查找句子
+- `getAllSentences(): Sentence[]` - 獲取所有句子（扁平化）
 
 #### Section Entity
-```typescript
-export class Section {
-  constructor(
-    public readonly id: string,
-    public readonly title: string,
-    public readonly sentences: Sentence[]
-  ) {}
+**核心屬性**:
+- `id: string` - 段落 ID
+- `title: string` - 段落標題
+- `sentences: Sentence[]` - 句子列表
 
-  get timeRange(): TimeRange {
-    const startTime = this.sentences[0]?.timeRange.start || new TimeStamp(0);
-    const endTime = this.sentences[this.sentences.length - 1]?.timeRange.end || new TimeStamp(0);
-    return new TimeRange(startTime, endTime);
-  }
-}
-```
+**核心方法**:
+- `get timeRange(): TimeRange` - 獲取段落的時間範圍
 
 #### Sentence Entity
-```typescript
-export class Sentence {
-  constructor(
-    public readonly id: string,
-    public readonly text: string,
-    public readonly timeRange: TimeRange,
-    public isSelected: boolean = false,
-    public readonly isHighlightSuggestion: boolean = false
-  ) {}
+**核心屬性**:
+- `id: string` - 句子 ID
+- `text: string` - 句子文字
+- `timeRange: TimeRange` - 時間範圍
+- `isSelected: boolean` - 是否被選中
+- `isHighlightSuggestion: boolean` - 是否為 AI 建議的高光句子
 
-  select(): void {
-    this.isSelected = true;
-  }
-
-  deselect(): void {
-    this.isSelected = false;
-  }
-
-  toggle(): void {
-    this.isSelected = !this.isSelected;
-  }
-}
-```
+**核心方法**:
+- `select(): void` - 選中句子
+- `deselect(): void` - 取消選中
+- `toggle(): void` - 切換選中狀態
 
 #### Highlight Entity
-```typescript
-export class Highlight {
-  constructor(
-    public readonly id: string,
-    public readonly videoId: string,
-    public readonly sentences: Sentence[]
-  ) {}
+**核心屬性**:
+- `id: string` - 高光 ID
+- `videoId: string` - 關聯的視頻 ID
+- `sentences: Sentence[]` - 選中的句子列表
 
-  get duration(): number {
-    return this.sentences.reduce(
-      (total, s) => total + s.timeRange.duration,
-      0
-    );
-  }
-
-  get timeRanges(): TimeRange[] {
-    return this.sentences.map(s => s.timeRange);
-  }
-}
-```
+**核心方法**:
+- `get duration(): number` - 計算高光總時長
+- `get timeRanges(): TimeRange[]` - 獲取所有時間範圍
 
 ### Value Objects
 
 #### TimeStamp
-```typescript
-export class TimeStamp {
-  constructor(public readonly seconds: number) {
-    if (seconds < 0) {
-      throw new Error('TimeStamp cannot be negative');
-    }
-  }
+**屬性**:
+- `seconds: number` - 秒數（必須 >= 0）
 
-  toString(): string {
-    const minutes = Math.floor(this.seconds / 60);
-    const secs = Math.floor(this.seconds % 60);
-    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  }
+**方法**:
+- `toString(): string` - 格式化為 "MM:SS"
+- `static fromString(timeString: string): TimeStamp` - 從字串解析
 
-  static fromString(timeString: string): TimeStamp {
-    const [minutes, seconds] = timeString.split(':').map(Number);
-    return new TimeStamp(minutes * 60 + seconds);
-  }
-}
-```
+**驗證規則**:
+- seconds 不可為負數
 
 #### TimeRange
-```typescript
-export class TimeRange {
-  constructor(
-    public readonly start: TimeStamp,
-    public readonly end: TimeStamp
-  ) {
-    if (end.seconds < start.seconds) {
-      throw new Error('End time cannot be before start time');
-    }
-  }
+**屬性**:
+- `start: TimeStamp` - 起始時間
+- `end: TimeStamp` - 結束時間
 
-  get duration(): number {
-    return this.end.seconds - this.start.seconds;
-  }
+**方法**:
+- `get duration(): number` - 計算時長
+- `contains(timestamp: TimeStamp): boolean` - 檢查時間是否在範圍內
 
-  contains(timestamp: TimeStamp): boolean {
-    return timestamp.seconds >= this.start.seconds &&
-           timestamp.seconds <= this.end.seconds;
-  }
-}
-```
+**驗證規則**:
+- end 不可早於 start
 
 ## Application Layer 設計
 
 ### Use Cases
 
 #### UploadVideoUseCase
-```typescript
-export class UploadVideoUseCase {
-  constructor(private videoRepository: IVideoRepository) {}
+**依賴**:
+- `IVideoRepository` - 視頻儲存庫
 
-  async execute(file: File): Promise<Video> {
-    // 驗證文件
-    this.validateFile(file);
+**輸入**: `File` - 視頻文件
 
-    // 建立 Video Entity
-    const video = new Video(
-      generateId(),
-      file,
-      await this.extractMetadata(file)
-    );
+**輸出**: `Promise<Video>` - 建立的視頻實體
 
-    // 保存到 Repository
-    await this.videoRepository.save(video);
+**職責**:
+1. 驗證視頻文件格式和大小
+2. 提取視頻元數據（時長、尺寸等）
+3. 建立 Video Entity
+4. 儲存至 Repository
 
-    return video;
-  }
-
-  private validateFile(file: File): void {
-    const allowedTypes = ['video/mp4', 'video/mov', 'video/webm'];
-    const maxSize = 100 * 1024 * 1024; // 100MB
-
-    if (!allowedTypes.includes(file.type)) {
-      throw new Error('Unsupported video format');
-    }
-
-    if (file.size > maxSize) {
-      throw new Error('File size exceeds 100MB limit');
-    }
-  }
-}
-```
+**驗證規則**:
+- 允許格式: `video/mp4`, `video/mov`, `video/webm`
+- 最大大小: 100MB
 
 #### ProcessTranscriptUseCase
-```typescript
-export class ProcessTranscriptUseCase {
-  constructor(
-    private transcriptGenerator: ITranscriptGenerator,
-    private transcriptRepository: ITranscriptRepository
-  ) {}
+**依賴**:
+- `ITranscriptGenerator` - 轉錄生成服務（Mock AI）
+- `ITranscriptRepository` - 轉錄儲存庫
 
-  async execute(videoId: string): Promise<Transcript> {
-    // 調用 Mock AI Service
-    const transcriptData = await this.transcriptGenerator.generate(videoId);
+**輸入**: `videoId: string` - 視頻 ID
 
-    // 建立 Transcript Entity
-    const transcript = this.buildTranscript(videoId, transcriptData);
+**輸出**: `Promise<Transcript>` - 建立的轉錄實體
 
-    // 保存
-    await this.transcriptRepository.save(transcript);
-
-    return transcript;
-  }
-}
-```
+**職責**:
+1. 調用 Mock AI Service 生成轉錄
+2. 將 DTO 轉換為 Domain Entity
+3. 儲存至 Repository
 
 #### SelectSentenceUseCase
-```typescript
-export class SelectSentenceUseCase {
-  constructor(private transcriptRepository: ITranscriptRepository) {}
+**依賴**:
+- `ITranscriptRepository` - 轉錄儲存庫
 
-  async execute(sentenceId: string, selected: boolean): Promise<void> {
-    const transcript = await this.transcriptRepository.getByCurrentVideo();
-    const sentence = transcript.getSentenceById(sentenceId);
+**輸入**:
+- `sentenceId: string` - 句子 ID
+- `selected: boolean` - 選中狀態
 
-    if (!sentence) {
-      throw new Error('Sentence not found');
-    }
+**輸出**: `Promise<void>`
 
-    if (selected) {
-      sentence.select();
-    } else {
-      sentence.deselect();
-    }
+**職責**:
+1. 從 Repository 獲取 Transcript
+2. 查找指定 Sentence
+3. 更新選中狀態
+4. 儲存變更
 
-    await this.transcriptRepository.update(transcript);
-  }
-}
-```
+**錯誤處理**:
+- 句子不存在時拋出錯誤
 
 ## Adapter Layer 設計
 
 ### Mock AI Service
 
+**實作介面**: `ITranscriptGenerator`
+
+**職責**:
+- 模擬 AI 轉錄生成過程
+- 返回預設的轉錄數據
+
+**實作要點**:
+- 模擬 1.5 秒網絡延遲（`setTimeout`）
+- 準備 2-3 組不同主題的 Mock 數據
+- 數據格式符合 `TranscriptDTO` 規範
+
+**Mock 數據結構**:
 ```typescript
-export class MockAIService implements ITranscriptGenerator {
-  async generate(videoId: string): Promise<TranscriptDTO> {
-    // 模擬網絡延遲
-    await this.delay(1500);
-
-    // 返回 Mock 數據
-    return this.getMockTranscript();
-  }
-
-  private getMockTranscript(): TranscriptDTO {
-    return {
-      fullText: "...",
-      sections: [
+TranscriptDTO {
+  fullText: string
+  sections: [
+    {
+      id: string
+      title: string
+      sentences: [
         {
-          id: "section_1",
-          title: "開場介紹",
-          sentences: [
-            {
-              id: "sent_1",
-              text: "大家好，歡迎來到今天的分享。",
-              startTime: 0.0,
-              endTime: 3.2,
-              isHighlight: true
-            },
-            // ... more sentences
-          ]
-        },
-        // ... more sections
+          id: string
+          text: string
+          startTime: number
+          endTime: number
+          isHighlight: boolean
+        }
       ]
-    };
-  }
-
-  private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
+    }
+  ]
 }
 ```
 
 ### Pinia Stores
 
-#### Video Store
-```typescript
-export const useVideoStore = defineStore('video', () => {
-  const video = ref<Video | null>(null);
-  const isUploading = ref(false);
-  const uploadProgress = ref(0);
+#### Video Store (videoStore.ts)
+**狀態**:
+- `video: Video | null` - 當前視頻
+- `isUploading: boolean` - 上傳中狀態
+- `uploadProgress: number` - 上傳進度（0-100）
 
-  const uploadVideoUseCase = new UploadVideoUseCase(
-    inject<IVideoRepository>(VideoRepositoryToken)!
-  );
+**Actions**:
+- `uploadVideo(file: File): Promise<void>` - 上傳視頻
 
-  async function uploadVideo(file: File) {
-    isUploading.value = true;
-    try {
-      video.value = await uploadVideoUseCase.execute(file);
-    } finally {
-      isUploading.value = false;
-      uploadProgress.value = 0;
-    }
-  }
+**依賴**:
+- `UploadVideoUseCase` - 注入自 DI Container
 
-  return {
-    video,
-    isUploading,
-    uploadProgress,
-    uploadVideo
-  };
-});
-```
+#### Transcript Store (transcriptStore.ts)
+**狀態**:
+- `transcript: Transcript | null` - 當前轉錄
+- `isProcessing: boolean` - 處理中狀態
+- `currentSentenceId: string | null` - 當前播放的句子 ID
 
-#### Transcript Store
-```typescript
-export const useTranscriptStore = defineStore('transcript', () => {
-  const transcript = ref<Transcript | null>(null);
-  const isProcessing = ref(false);
-  const currentSentenceId = ref<string | null>(null);
+**Actions**:
+- `processVideo(videoId: string): Promise<void>` - 處理視頻轉錄
+- `toggleSentence(sentenceId: string): Promise<void>` - 切換句子選中狀態
 
-  const processTranscriptUseCase = new ProcessTranscriptUseCase(
-    inject<ITranscriptGenerator>(TranscriptGeneratorToken)!,
-    inject<ITranscriptRepository>(TranscriptRepositoryToken)!
-  );
-
-  const selectSentenceUseCase = new SelectSentenceUseCase(
-    inject<ITranscriptRepository>(TranscriptRepositoryToken)!
-  );
-
-  async function processVideo(videoId: string) {
-    isProcessing.value = true;
-    try {
-      transcript.value = await processTranscriptUseCase.execute(videoId);
-    } finally {
-      isProcessing.value = false;
-    }
-  }
-
-  async function toggleSentence(sentenceId: string) {
-    const sentence = transcript.value?.getSentenceById(sentenceId);
-    if (sentence) {
-      await selectSentenceUseCase.execute(sentenceId, !sentence.isSelected);
-    }
-  }
-
-  return {
-    transcript,
-    isProcessing,
-    currentSentenceId,
-    processVideo,
-    toggleSentence
-  };
-});
-```
+**依賴**:
+- `ProcessTranscriptUseCase`
+- `SelectSentenceUseCase`
 
 ## Framework Layer 設計
 
@@ -499,78 +338,33 @@ export const useTranscriptStore = defineStore('transcript', () => {
 ### 關鍵 Composables
 
 #### useVideoPlayer
-```typescript
-export function useVideoPlayer() {
-  const videoElement = ref<HTMLVideoElement | null>(null);
-  const currentTime = ref(0);
-  const isPlaying = ref(false);
-  const duration = ref(0);
+**職責**: 封裝視頻播放器控制邏輯
 
-  function seekTo(time: number) {
-    if (videoElement.value) {
-      videoElement.value.currentTime = time;
-    }
-  }
+**返回值**:
+- `videoElement: Ref<HTMLVideoElement | null>` - 視頻 DOM 元素
+- `currentTime: Ref<number>` - 當前播放時間
+- `isPlaying: Ref<boolean>` - 播放狀態
+- `duration: Ref<number>` - 視頻總時長
+- `seekTo(time: number): void` - 跳轉到指定時間
+- `play(): void` - 播放
+- `pause(): void` - 暫停
 
-  function play() {
-    videoElement.value?.play();
-    isPlaying.value = true;
-  }
-
-  function pause() {
-    videoElement.value?.pause();
-    isPlaying.value = false;
-  }
-
-  // 監聽 timeupdate 事件
-  onMounted(() => {
-    if (videoElement.value) {
-      videoElement.value.addEventListener('timeupdate', () => {
-        currentTime.value = videoElement.value!.currentTime;
-      });
-    }
-  });
-
-  return {
-    videoElement,
-    currentTime,
-    isPlaying,
-    duration,
-    seekTo,
-    play,
-    pause
-  };
-}
-```
+**實作要點**:
+- 監聽 `timeupdate` 事件更新 `currentTime`
+- 監聽 `loadedmetadata` 事件獲取 `duration`
 
 #### useHighlight
-```typescript
-export function useHighlight() {
-  const transcriptStore = useTranscriptStore();
+**職責**: 管理高光片段相關邏輯
 
-  const selectedSentences = computed(() => {
-    return transcriptStore.transcript
-      ?.getAllSentences()
-      .filter(s => s.isSelected) || [];
-  });
+**返回值**:
+- `selectedSentences: ComputedRef<Sentence[]>` - 所有選中的句子
+- `highlightRanges: ComputedRef<TimeRange[]>` - 高光時間範圍
+- `getCurrentSentence(currentTime: number): Sentence | undefined` - 獲取當前時間對應的句子
 
-  const highlightRanges = computed(() => {
-    return selectedSentences.value.map(s => s.timeRange);
-  });
-
-  function getCurrentSentence(currentTime: number): Sentence | undefined {
-    return selectedSentences.value.find(sentence =>
-      sentence.timeRange.contains(new TimeStamp(currentTime))
-    );
-  }
-
-  return {
-    selectedSentences,
-    highlightRanges,
-    getCurrentSentence
-  };
-}
-```
+**實作要點**:
+- 從 `transcriptStore` 獲取數據
+- 使用 `computed` 計算選中句子
+- 使用 `TimeRange.contains()` 判斷時間範圍
 
 ## 視頻片段播放實現
 
@@ -578,218 +372,78 @@ export function useHighlight() {
 
 由於需要只播放選中的片段，有以下幾種實現方案：
 
-1. **使用 Media Source Extensions (MSE)** - 複雜但性能好
-2. **使用 timeupdate 事件 + seek** - 簡單但可能有卡頓
-3. **使用 video.js 的 Playlist 功能** - 平衡方案
+| 方案 | 優點 | 缺點 | 評估 |
+|------|------|------|------|
+| Media Source Extensions (MSE) | 性能最佳，無卡頓 | 實作複雜，開發成本高 | ❌ 不適合展示專案 |
+| timeupdate + seek | 實作簡單，易於理解 | 可能有輕微卡頓 | ⚠️ 需優化體驗 |
+| video.js Playlist | 功能完整，兼容性好 | 需學習 API | ✅ **採用此方案** |
 
-**選擇方案 3**：使用 video.js，在 timeupdate 中檢測並跳轉到下一個片段。
+**最終選擇**: 使用 video.js 結合 `timeupdate` 事件監聽，在時間超出當前片段時跳轉到下一個片段。
 
-### 實現邏輯
+### 核心實現邏輯
 
-```typescript
-function setupHighlightPlayback() {
-  const { highlightRanges } = useHighlight();
-  let currentRangeIndex = 0;
+**片段切換機制**:
+1. 監聽 `timeupdate` 事件
+2. 檢查當前時間是否超出當前片段的 `endTime`
+3. 如果超出，跳轉到下一個片段的 `startTime`
+4. 如果是最後一個片段，暫停播放
 
-  function onTimeUpdate() {
-    const currentRange = highlightRanges.value[currentRangeIndex];
+**處理用戶手動拖動**:
+- 檢測時間是否在任何片段範圍內
+- 如果不在，跳轉到最近的片段起始時間
 
-    if (!currentRange) return;
-
-    // 如果超過當前片段結束時間
-    if (currentTime.value >= currentRange.end.seconds) {
-      currentRangeIndex++;
-
-      // 跳轉到下一個片段
-      if (currentRangeIndex < highlightRanges.value.length) {
-        const nextRange = highlightRanges.value[currentRangeIndex];
-        seekTo(nextRange.start.seconds);
-      } else {
-        // 播放完畢
-        pause();
-        currentRangeIndex = 0;
-      }
-    }
-
-    // 如果當前時間不在任何片段範圍內（用戶手動拖動）
-    const inAnyRange = highlightRanges.value.some(range =>
-      range.contains(new TimeStamp(currentTime.value))
-    );
-
-    if (!inAnyRange && highlightRanges.value.length > 0) {
-      // 跳轉到最近的片段
-      const nearestRange = findNearestRange(currentTime.value);
-      seekTo(nearestRange.start.seconds);
-    }
-  }
-}
-```
+**優化要點**:
+- 添加短暫的淡入淡出過渡效果
+- 使用 `requestAnimationFrame` 優化 seek 時機
+- 考慮添加 loading 狀態提升體驗
 
 ## 依賴注入配置
 
 ### DI Container Setup
 
+**檔案**: `di-container.ts`
+
+**Injection Tokens**:
 ```typescript
-// di-container.ts
-import { InjectionKey } from 'vue';
-
-// Tokens
-export const VideoRepositoryToken = Symbol('VideoRepository') as InjectionKey<IVideoRepository>;
-export const TranscriptRepositoryToken = Symbol('TranscriptRepository') as InjectionKey<ITranscriptRepository>;
-export const TranscriptGeneratorToken = Symbol('TranscriptGenerator') as InjectionKey<ITranscriptGenerator>;
-
-// Setup
-export function setupDependencies(app: App) {
-  // Repositories
-  app.provide(VideoRepositoryToken, new VideoRepositoryImpl());
-  app.provide(TranscriptRepositoryToken, new TranscriptRepositoryImpl());
-
-  // Services
-  app.provide(TranscriptGeneratorToken, new MockAIService());
-}
+VideoRepositoryToken: InjectionKey<IVideoRepository>
+TranscriptRepositoryToken: InjectionKey<ITranscriptRepository>
+TranscriptGeneratorToken: InjectionKey<ITranscriptGenerator>
 ```
 
-### 在 main.ts 中使用
+**註冊的實作**:
+- `VideoRepositoryImpl` → `VideoRepositoryToken`
+- `TranscriptRepositoryImpl` → `TranscriptRepositoryToken`
+- `MockAIService` → `TranscriptGeneratorToken`
 
-```typescript
-// main.ts
-import { createApp } from 'vue';
-import App from './App.vue';
-import { setupDependencies } from './di-container';
-
-const app = createApp(App);
-
-setupDependencies(app);
-
-app.mount('#app');
-```
-
-## 性能優化策略
-
-### 1. 虛擬滾動
-- 當句子數量超過 100 時，使用虛擬滾動減少 DOM 節點
-
-### 2. 防抖與節流
-- 視頻 timeupdate 事件節流（100ms）
-- 滾動事件節流（50ms）
-- 搜索輸入防抖（300ms）
-
-### 3. 懶加載
-- 視頻文件按需加載
-- 組件動態導入
-
-### 4. 記憶化計算
-```typescript
-const highlightDuration = computed(() => {
-  return selectedSentences.value.reduce(
-    (total, s) => total + s.timeRange.duration,
-    0
-  );
-});
-```
-
-## 錯誤處理策略
-
-### 錯誤類型
-
-```typescript
-export class VideoUploadError extends Error {
-  constructor(message: string, public code: string) {
-    super(message);
-    this.name = 'VideoUploadError';
-  }
-}
-
-export class TranscriptProcessError extends Error {
-  constructor(message: string, public code: string) {
-    super(message);
-    this.name = 'TranscriptProcessError';
-  }
-}
-```
-
-### 全局錯誤處理
-
-```typescript
-export function setupErrorHandling(app: App) {
-  app.config.errorHandler = (err, instance, info) => {
-    console.error('Global error:', err);
-
-    // 顯示用戶友好的錯誤訊息
-    if (err instanceof VideoUploadError) {
-      showNotification('視頻上傳失敗', err.message);
-    } else if (err instanceof TranscriptProcessError) {
-      showNotification('轉錄處理失敗', err.message);
-    } else {
-      showNotification('系統錯誤', '請稍後再試');
-    }
-  };
-}
-```
+**使用方式**:
+在 `main.ts` 中調用 `setupDependencies(app)` 完成依賴注入配置。
 
 ## 測試策略
 
 ### 單元測試重點
-- Domain Entities 的業務邏輯
-- Use Cases 的執行流程
-- Value Objects 的驗證邏輯
+- **Domain Entities**: 業務邏輯（如 `Sentence.toggle()`, `TimeRange.contains()`）
+- **Use Cases**: 執行流程和錯誤處理
+- **Value Objects**: 驗證邏輯（如時間範圍檢查）
 
 ### 組件測試重點
-- SentenceItem 的選擇交互
-- VideoPlayer 的播放控制
-- Timeline 的視覺呈現
+- **SentenceItem**: 選擇/取消選擇交互
+- **VideoPlayer**: 播放、暫停、跳轉控制
+- **Timeline**: 視覺呈現和同步行為
 
-### 測試範例
-
-```typescript
-// Sentence.spec.ts
-describe('Sentence', () => {
-  it('should toggle selection state', () => {
-    const sentence = new Sentence(
-      '1',
-      'Test sentence',
-      new TimeRange(new TimeStamp(0), new TimeStamp(5)),
-      false
-    );
-
-    expect(sentence.isSelected).toBe(false);
-    sentence.toggle();
-    expect(sentence.isSelected).toBe(true);
-    sentence.toggle();
-    expect(sentence.isSelected).toBe(false);
-  });
-});
-```
+### 測試工具
+- Vitest（單元測試）
+- Vue Test Utils（組件測試）
 
 ## 部署方案
 
 ### 建議平台
-1. **Vercel** - 首選，自動部署，性能好
+1. **Vercel** - 首選（自動部署、性能優異）
 2. **Netlify** - 備選方案
-3. **GitHub Pages** - 簡單但功能有限
+3. **GitHub Pages** - 簡單靜態部署
 
-### 環境變數
-```env
-VITE_API_BASE_URL=https://api.example.com
-VITE_MAX_VIDEO_SIZE=104857600  # 100MB
-```
-
-### 構建優化
-```typescript
-// vite.config.ts
-export default defineConfig({
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'video-vendor': ['video.js'],
-          'ui-vendor': ['naive-ui']
-        }
-      }
-    }
-  }
-});
-```
+### 環境配置
+- 視頻大小限制: 100MB（透過環境變數配置）
+- 構建優化: 分離 video.js 和 UI 框架到不同 chunk
 
 ## 技術風險與應對
 
@@ -812,12 +466,3 @@ export default defineConfig({
 | Phase 6: 整合與優化 | 2 天 |
 | Phase 7: 測試與部署 | 1.5 天 |
 | **總計** | **11 天** |
-
-## 後續擴展可能性
-
-1. **真實 AI 整合** - 替換 Mock Service 為真實 AI API
-2. **多語言支援** - i18n 整合
-3. **視頻編輯功能** - 裁切、濾鏡等
-4. **導出功能** - 導出編輯後的視頻
-5. **協作功能** - 多用戶同時編輯
-6. **歷史記錄** - 編輯歷史和撤銷/重做
