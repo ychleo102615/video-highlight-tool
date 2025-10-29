@@ -1,16 +1,23 @@
 <!--
 Sync Impact Report:
-Version Change: Initial → 1.0.0
-Modified Principles: N/A (Initial creation)
-Added Sections:
-  - Core Principles (7 principles)
-  - Architecture Constraints
-  - Development Workflow
-  - Governance
+Version Change: 1.0.0 → 1.1.0
+Modified Principles:
+  - Core Principle I: 架構調整為 Domain → Application → Infrastructure/Presentation
+  - Architecture Constraints: 資料夾結構更新
+  - Governance: 合規審查項目更新
+Reason: Infrastructure 和 Presentation 同層，職責分離，通過 Port 解耦
+Impact:
+  - 新增 IFileStorage Port
+  - Infrastructure 負責技術基礎設施（Repository、API、Storage）
+  - Presentation 負責 UI 展示（Components、State、Composables）
 Templates Status:
-  ✅ plan-template.md - Reviewed, constitution check section compatible
-  ✅ spec-template.md - Reviewed, requirements alignment verified
-  ✅ tasks-template.md - Reviewed, task categorization matches principles
+  ✅ plan-template.md - Compatible with new architecture
+  ✅ spec-template.md - Compatible with new architecture
+  ✅ tasks-template.md - Compatible with new architecture
+Related Updates:
+  ✅ CLAUDE.md - Updated
+  ✅ TECHNICAL_DESIGN.md - Updated
+  ✅ REQUIREMENTS.md - Updated
 Follow-up TODOs: None
 -->
 
@@ -20,9 +27,19 @@ Follow-up TODOs: None
 
 ### I. Clean Architecture (NON-NEGOTIABLE)
 
-採用嚴格的四層架構組織程式碼：Domain → Application → Adapter → Framework。內層不得依賴外層；外層可依賴內層；層間透過介面解耦。Domain Layer 不得引用 UI 框架、狀態管理或 HTTP 客戶端。
+採用嚴格的分層架構組織程式碼：
+- **Domain Layer**: 核心業務邏輯
+- **Application Layer**: 應用服務層，定義 Use Case 和 Port（介面）
+- **Infrastructure Layer**: 技術基礎設施（Repository 實作、API 服務、檔案儲存）
+- **Presentation Layer**: UI 展示層（組件、狀態管理、Composables）
 
-**理由**: 確保業務邏輯獨立於框架，提高可測試性、可維護性與可擴展性。當需要替換 UI 框架或外部服務時，核心邏輯不受影響。
+**依賴規則**:
+- 內層不得依賴外層
+- Infrastructure 和 Presentation 同層，職責不同，彼此不應直接依賴
+- 通過 Application Layer 定義的 Port（介面）解耦
+- Domain Layer 不得引用 UI 框架、狀態管理或 HTTP 客戶端
+
+**理由**: 確保業務邏輯獨立於框架，提高可測試性、可維護性與可擴展性。Infrastructure 和 Presentation 分離使技術基礎設施與 UI 層各自演進，互不影響。
 
 ### II. Domain-Driven Development (DDD)
 
@@ -66,17 +83,33 @@ TypeScript 型別覆蓋率必須 > 90%。禁止使用 `any` 型別（除非有�
 
 ```
 src/
-├── domain/          # 🔴 核心業務邏輯，不依賴任何外層
-├── application/     # 🟡 應用服務層，編排 domain
-├── adapter/         # 🟢 適配器層，連接外部
-└── framework/       # 🔵 UI 層，Vue 組件
+├── domain/              # 🔴 核心業務邏輯，不依賴任何外層
+├── application/         # 🟡 應用服務層，定義 Use Case 和 Port
+├── infrastructure/      # 🟢 技術基礎設施層
+│   ├── api/            # API 服務（實作 Port）
+│   ├── repositories/   # Repository 實作
+│   └── storage/        # 檔案儲存服務
+└── presentation/        # 🔵 UI 展示層
+    ├── components/     # Vue 組件
+    ├── composables/    # Composables
+    └── state/          # Pinia Stores
+```
+
+**依賴方向**:
+```
+Infrastructure Layer          Presentation Layer
+      ↓                             ↓
+      └─────────→ Application Layer ←────────┘
+                        ↓
+                   Domain Layer
 ```
 
 **強制規則**:
-- Domain Layer: 只能使用 TypeScript 標準庫與純函式工具庫（需最小化）
-- Application Layer: 可依賴 Domain，定義 Use Case 與 DTO
-- Adapter Layer: 可依賴 Application 與 Domain，實作 Repository、API、State Management
-- Framework Layer: 可依賴所有層，包含 Vue 組件與 Composables
+- **Domain Layer**: 只能使用 TypeScript 標準庫與純函式工具庫（需最小化）
+- **Application Layer**: 可依賴 Domain，定義 Use Case、DTO 和 Port（介面）
+- **Infrastructure Layer**: 可依賴 Application 與 Domain，實作 Repository、API 服務、檔案儲存等 Port
+- **Presentation Layer**: 可依賴 Application 與 Domain，包含 Vue 組件、Composables、Pinia Stores
+- **Infrastructure 和 Presentation 不得相互依賴**
 
 ### 命名規範 (MUST FOLLOW)
 
@@ -167,7 +200,9 @@ Mock 數據必須滿足：
 ### 合規審查
 
 每個 feature 的 `/speckit.plan` 輸出必須包含 Constitution Check 區塊，驗證：
-- ✅ 遵循 Clean Architecture 四層架構
+- ✅ 遵循 Clean Architecture 分層架構（Domain → Application → Infrastructure/Presentation）
+- ✅ Infrastructure 和 Presentation 職責分離，不相互依賴
+- ✅ 通過 Application Layer 的 Port（介面）解耦
 - ✅ 使用 DDD 模式組織業務邏輯
 - ✅ TypeScript 型別覆蓋率 > 90%
 - ✅ 支援 RWD（Desktop & Mobile）
@@ -184,4 +219,4 @@ Mock 數據必須滿足：
 - Mock 數據範例
 - 除錯與部署檢查清單
 
-**Version**: 1.0.0 | **Ratified**: 2025-10-29 | **Last Amended**: 2025-10-29
+**Version**: 1.1.0 | **Ratified**: 2025-10-29 | **Last Amended**: 2025-10-29

@@ -172,29 +172,40 @@
 - [ ] 定義 Repository Interfaces
 
 ### Phase 3: Application Layer 開發
+- [ ] 定義 Port 介面 (ITranscriptGenerator, IFileStorage)
 - [ ] 實作 UploadVideo Use Case
-- [ ] 實作 ProcessTranscript Use Case (Mock API)
-- [ ] 實作 SelectSentence Use Case
+- [ ] 實作 ProcessTranscript Use Case
+- [ ] 實作 CreateHighlight Use Case
+- [ ] 實作 ToggleSentenceInHighlight Use Case
 - [ ] 實作 GenerateHighlight Use Case
-- [ ] 實作 SyncPlayback Use Case
 
-### Phase 4: Adapter Layer 開發
-- [ ] 實作 Mock API Adapter
-- [ ] 實作 Video Repository Implementation
-- [ ] 實作 Transcript Repository Implementation
+### Phase 4: Infrastructure Layer 開發
+- [ ] 實作 Repository Implementations
+- [ ] VideoRepositoryImpl
+- [ ] TranscriptRepositoryImpl
+- [ ] HighlightRepositoryImpl
+- [ ] 實作 MockAIService (ITranscriptGenerator)
+- [ ] 實作 FileStorageService (IFileStorage)
+
+### Phase 5: Presentation Layer 開發
 - [ ] 設置 Pinia Stores
-- [ ] 實作 Video Player Adapter (考慮使用 video.js 或原生 HTML5)
-
-### Phase 5: Framework Layer (UI Components)
-- [ ] 實作 VideoUpload Component
-- [ ] 實作 Layout Component (分屏佈局)
-- [ ] 實作 EditingArea Component
-  - [ ] SectionList Component
-  - [ ] SentenceItem Component
-- [ ] 實作 PreviewArea Component
-  - [ ] VideoPlayer Component
-  - [ ] TranscriptOverlay Component
-  - [ ] Timeline Component
+- [ ] videoStore
+- [ ] transcriptStore
+- [ ] highlightStore
+- [ ] 實作 Composables
+- [ ] useVideoPlayer
+- [ ] useHighlight
+- [ ] useTranscript
+- [ ] 實作 UI Components
+- [ ] VideoUpload Component
+- [ ] Layout Component (分屏佈局)
+- [ ] EditingArea Component
+- [ ] SectionList Component
+- [ ] SentenceItem Component
+- [ ] PreviewArea Component
+- [ ] VideoPlayer Component
+- [ ] TranscriptOverlay Component
+- [ ] Timeline Component
 - [ ] 實作雙向同步邏輯
 
 ### Phase 6: 功能整合與優化

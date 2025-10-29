@@ -42,7 +42,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # 架構
 採用 Clean Architecture、Domain Driven Development (DDD) 原則來組織程式碼。
 
-  - 四層架構（Domain → Application → Adapter → Framework）
+  - 四層架構（Domain, Application, Infrastracture, Presentation）
   - Use Case 設計原則
   - 依賴注入配置
 
@@ -164,8 +164,8 @@ Vue 3 + TypeScript + Tailwind v4 + Vite + Pinia + Naive UI + video.js
    ```bash
    # 1. 從 Domain Layer 開始，定義 Entity 或 Value Object
    # 2. 建立對應的 Use Case (Application Layer)
-   # 3. 實作 Repository 或 Adapter (Adapter Layer)
-   # 4. 建立 UI 組件 (Framework Layer)
+   # 3. 實作 Repository  (Infrastructure Layer)
+   # 4. 建立 UI 組件 (Presentation Layer)
    # 5. 撰寫測試
    ```
 
@@ -181,8 +181,8 @@ Vue 3 + TypeScript + Tailwind v4 + Vite + Pinia + Naive UI + video.js
 src/
 ├── domain/          # 🔴 核心業務邏輯，不依賴任何外層
 ├── application/     # 🟡 應用服務層，編排 domain
-├── adapter/         # 🟢 適配器層，連接外部
-└── framework/       # 🔵 UI 層，Vue 組件
+├── infrastructure/  # 🟢 適配器層，連接外部
+└── presentation/    # 🔵 UI 層，Vue 組件
 ```
 
 **記憶口訣**: 紅 → 黃 → 綠 → 藍（由內到外）
@@ -403,9 +403,9 @@ src/
 │   └── entities/Video.ts          # 第一個要建立
 ├── application/
 │   └── use-cases/UploadVideoUseCase.ts
-├── adapter/
+├── infrastructure/
 │   └── api/MockAIService.ts       # 包含 Mock 數據
-└── framework/
+└── presentation/
     └── components/VideoUpload.vue # 第一個 UI 組件
 ```
 

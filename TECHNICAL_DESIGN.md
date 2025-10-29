@@ -60,21 +60,17 @@ src/
 │       ├── IVideoProcessor.ts
 │       └── ITranscriptGenerator.ts
 │
-├── adapter/                  # Adapter Layer - 適配器
+├── infrastructure/          # Infrastructure Layer - 技術基礎設施
 │   ├── api/                 # API 適配器
 │   │   └── MockAIService.ts
 │   ├── repositories/        # 儲存庫實作
 │   │   ├── VideoRepositoryImpl.ts
 │   │   ├── TranscriptRepositoryImpl.ts
 │   │   └── HighlightRepositoryImpl.ts
-│   ├── state/               # 狀態管理
-│   │   ├── videoStore.ts
-│   │   ├── transcriptStore.ts
-│   │   └── highlightStore.ts
-│   └── video-player/        # 視頻播放器適配器
-│       └── VideoPlayerAdapter.ts
+│   └── storage/             # 文件儲存服務
+│       └── FileStorageService.ts
 │
-└── framework/                # Framework Layer - UI 框架
+└── presentation/            # Presentation Layer - 展示層
     ├── components/          # Vue 組件
     │   ├── layout/
     │   │   └── SplitLayout.vue
@@ -94,8 +90,10 @@ src/
     │   ├── useTranscript.ts
     │   ├── useHighlight.ts
     │   └── useVideoPlayer.ts
-    ├── router/              # 路由配置
-    │   └── index.ts
+    ├── state/               # 狀態管理
+    │   ├── videoStore.ts
+    │   ├── transcriptStore.ts
+    │   └── highlightStore.ts
     ├── App.vue              # 根組件
     └── main.ts              # 應用入口
 ```
@@ -103,19 +101,22 @@ src/
 ### 依賴方向規則
 
 ```
-Framework Layer (UI, Web API, File System)
-       ↓
-  Adapter Layer
-       ↓
-Application Layer
-       ↓
-  Domain Layer
+Infrastructure Layer          Presentation Layer
+(技術基礎設施)                    (UI 展示層)
+      ↓                             ↓
+      └─────────→ Application Layer ←────────┘
+                        ↓
+                   Domain Layer
 ```
 
 **核心原則**：
 - 內層不依賴外層
 - 外層可以依賴內層
-- 通過介面（Interface）解耦
+- Infrastructure 和 Presentation 同層，職責不同
+  - **Infrastructure**: 負責技術基礎設施（Repository 實作、API 服務、檔案儲存等）
+  - **Presentation**: 負責 UI 展示（組件、狀態管理、Composables 等）
+- 通過 Port（介面）解耦，Application Layer 定義 Port，Infrastructure 和 Presentation 實作
+- Infrastructure 和 Presentation 之間不應直接依賴
 
 ## Domain Layer 設計
 
@@ -374,11 +375,43 @@ Transcript (Root)
 
 ## Application Layer 設計
 
+### Port 定義
+
+Application Layer 定義了以下 Port（介面），供 Infrastructure 和 Presentation 層實作：
+
+#### 輸出 Port（由 Infrastructure 實作）
+
+**ITranscriptGenerator**
+```typescript
+export interface ITranscriptGenerator {
+  generate(videoId: string): Promise<TranscriptDTO>;
+}
+```
+- **用途**: 生成視頻轉錄
+- **實作者**: `MockAIService` (infrastructure/api/)
+
+**IFileStorage**
+```typescript
+export interface IFileStorage {
+  save(file: File): Promise<string>; // 返回文件 URL
+  delete(url: string): Promise<void>;
+}
+```
+- **用途**: 視頻文件儲存
+- **實作者**: `FileStorageService` (infrastructure/storage/)
+
+#### Repository 介面（在 Domain Layer 定義，由 Infrastructure 實作）
+
+**IVideoRepository**, **ITranscriptRepository**, **IHighlightRepository**
+- 已在 `domain/repositories/` 中定義
+- 由 `infrastructure/repositories/` 中的實作類別實作
+
 ### Use Cases
 
 #### UploadVideoUseCase
 **依賴**:
-- `IVideoRepository` - 視頻儲存庫
+- `IVideoRepository` - 視頻儲存庫（Domain Layer）
+- `IFileStorage` - 文件儲存服務（Application Port）
 
 **輸入**: `File` - 視頻文件
 
@@ -386,9 +419,10 @@ Transcript (Root)
 
 **職責**:
 1. 驗證視頻文件格式和大小
-2. 提取視頻元數據（時長、尺寸等）
-3. 建立 Video Entity
-4. 儲存至 Repository
+2. 透過 IFileStorage 儲存視頻文件
+3. 提取視頻元數據（時長、尺寸等）
+4. 建立 Video Entity
+5. 儲存至 Repository
 
 **驗證規則**:
 - 允許格式: `video/mp4`, `video/mov`, `video/webm`
@@ -396,8 +430,8 @@ Transcript (Root)
 
 #### ProcessTranscriptUseCase
 **依賴**:
-- `ITranscriptGenerator` - 轉錄生成服務（Mock AI）
-- `ITranscriptRepository` - 轉錄儲存庫
+- `ITranscriptGenerator` - 轉錄生成服務（Application Port）
+- `ITranscriptRepository` - 轉錄儲存庫（Domain Layer）
 
 **輸入**: `videoId: string` - 視頻 ID
 
@@ -412,8 +446,8 @@ Transcript (Root)
 
 #### CreateHighlightUseCase
 **依賴**:
-- `IHighlightRepository` - 高光儲存庫
-- `IVideoRepository` - 視頻儲存庫（用於驗證 Video 存在）
+- `IHighlightRepository` - 高光儲存庫（Domain Layer）
+- `IVideoRepository` - 視頻儲存庫（Domain Layer，用於驗證 Video 存在）
 
 **輸入**:
 - `videoId: string` - 關聯的視頻 ID
@@ -437,7 +471,7 @@ Transcript (Root)
 
 #### ToggleSentenceInHighlightUseCase
 **依賴**:
-- `IHighlightRepository` - 高光儲存庫
+- `IHighlightRepository` - 高光儲存庫（Domain Layer）
 
 **輸入**:
 - `highlightId: string` - 高光 ID
@@ -461,8 +495,8 @@ Transcript (Root)
 
 #### GenerateHighlightUseCase
 **依賴**:
-- `IHighlightRepository` - 高光儲存庫
-- `ITranscriptRepository` - 轉錄儲存庫
+- `IHighlightRepository` - 高光儲存庫（Domain Layer）
+- `ITranscriptRepository` - 轉錄儲存庫（Domain Layer）
 
 **輸入**:
 - `highlightId: string` - 高光 ID
@@ -492,7 +526,49 @@ Promise<{
 - 這個 Use Case 協調兩個 Aggregate（Highlight 和 Transcript）
 - 展示了跨聚合查詢的模式
 
-## Adapter Layer 設計
+## Infrastructure Layer 設計
+
+Infrastructure Layer 負責實作 Application Layer 定義的輸出 Port 和 Domain Layer 定義的 Repository 介面，提供技術基礎設施支援。
+
+### Repository 實作
+
+#### VideoRepositoryImpl
+**實作介面**: `IVideoRepository` (domain/repositories/)
+
+**職責**:
+- 實作視頻的儲存和查詢
+- 使用 Map 或 IndexedDB 進行本地儲存
+
+**實作要點**:
+```typescript
+export class VideoRepositoryImpl implements IVideoRepository {
+  private videos = new Map<string, Video>();
+
+  async save(video: Video): Promise<void> {
+    this.videos.set(video.id, video);
+  }
+
+  async findById(id: string): Promise<Video | null> {
+    return this.videos.get(id) || null;
+  }
+}
+```
+
+#### TranscriptRepositoryImpl
+**實作介面**: `ITranscriptRepository` (domain/repositories/)
+
+**職責**:
+- 實作轉錄的儲存和查詢
+- 維護 Transcript 與 Video 的關聯
+
+#### HighlightRepositoryImpl
+**實作介面**: `IHighlightRepository` (domain/repositories/)
+
+**職責**:
+- 實作高光的儲存和查詢
+- 支援一個視頻多個高光版本的查詢
+
+---
 
 ### Mock AI Service
 
@@ -528,6 +604,43 @@ TranscriptDTO {
   ]
 }
 ```
+
+---
+
+### File Storage Service
+
+**實作介面**: `IFileStorage` (application/ports/)
+
+**職責**:
+- 儲存視頻文件
+- 生成可訪問的文件 URL
+- 管理文件的刪除
+
+**實作要點**:
+```typescript
+export class FileStorageService implements IFileStorage {
+  async save(file: File): Promise<string> {
+    // 使用 URL.createObjectURL 建立本地 URL
+    const url = URL.createObjectURL(file);
+    return url;
+  }
+
+  async delete(url: string): Promise<void> {
+    // 釋放 URL 資源
+    URL.revokeObjectURL(url);
+  }
+}
+```
+
+**設計說明**:
+- 本專案使用瀏覽器本地 URL，不上傳至伺服器
+- 生產環境可替換為雲端儲存服務（如 AWS S3）
+
+---
+
+## Presentation Layer 設計
+
+Presentation Layer 負責 UI 展示和用戶交互，包括 Vue 組件、Composables 和狀態管理。
 
 ### Pinia Stores
 
@@ -590,7 +703,7 @@ TranscriptDTO {
 - 支援多個高光版本的管理
 - 提供 UI 需要的計算屬性（`selectedSentenceIds`）
 
-## Framework Layer 設計
+---
 
 ### 組件結構
 
@@ -685,17 +798,24 @@ TranscriptDTO {
 
 **Injection Tokens**:
 ```typescript
+// Repository Tokens (Domain Layer 介面)
 VideoRepositoryToken: InjectionKey<IVideoRepository>
 TranscriptRepositoryToken: InjectionKey<ITranscriptRepository>
 HighlightRepositoryToken: InjectionKey<IHighlightRepository>
+
+// Port Tokens (Application Layer 介面)
 TranscriptGeneratorToken: InjectionKey<ITranscriptGenerator>
+FileStorageToken: InjectionKey<IFileStorage>
 ```
 
 **註冊的實作**:
-- `VideoRepositoryImpl` → `VideoRepositoryToken`
-- `TranscriptRepositoryImpl` → `TranscriptRepositoryToken`
-- `HighlightRepositoryImpl` → `HighlightRepositoryToken`
-- `MockAIService` → `TranscriptGeneratorToken`
+
+Infrastructure Layer 實作：
+- `VideoRepositoryImpl` → `VideoRepositoryToken` (infrastructure/repositories/)
+- `TranscriptRepositoryImpl` → `TranscriptRepositoryToken` (infrastructure/repositories/)
+- `HighlightRepositoryImpl` → `HighlightRepositoryToken` (infrastructure/repositories/)
+- `MockAIService` → `TranscriptGeneratorToken` (infrastructure/api/)
+- `FileStorageService` → `FileStorageToken` (infrastructure/storage/)
 
 **使用方式**:
 在 `main.ts` 中調用 `setupDependencies(app)` 完成依賴注入配置。
@@ -749,8 +869,8 @@ TranscriptGeneratorToken: InjectionKey<ITranscriptGenerator>
 | Phase 1: 專案設置 | 0.5 天 |
 | Phase 2: Domain Layer | 1 天 |
 | Phase 3: Application Layer | 1.5 天 |
-| Phase 4: Adapter Layer | 1.5 天 |
-| Phase 5: UI Components | 3 天 |
+| Phase 4: Infrastructure Layer | 1.5 天 |
+| Phase 5: Presentation Layer (UI Components & State) | 3 天 |
 | Phase 6: 整合與優化 | 2 天 |
 | Phase 7: 測試與部署 | 1.5 天 |
 | **總計** | **11 天** |
