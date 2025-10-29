@@ -161,8 +161,6 @@
 - [ ] 設置 TypeScript 配置
 - [ ] 設置 Clean Architecture 資料夾結構
 - [ ] 配置 Pinia 狀態管理
-- [ ] 設置 UI 框架（考慮 Element Plus 或 Naive UI）
-- [ ] 配置路由（如需要）
 
 ### Phase 2: Domain Layer 開發
 - [ ] 定義 Video Entity
