@@ -30,27 +30,29 @@
 ```
 src/
 ├── domain/                    # Domain Layer - 核心業務邏輯
-│   ├── entities/             # 實體
-│   │   ├── Video.ts
-│   │   ├── Transcript.ts
-│   │   ├── Section.ts
-│   │   ├── Sentence.ts
-│   │   └── Highlight.ts
+│   ├── aggregates/           # 聚合
+│   │   ├── Video.ts         # Video Aggregate Root
+│   │   ├── Transcript/      # Transcript Aggregate
+│   │   │   ├── Transcript.ts
+│   │   │   ├── Section.ts
+│   │   │   └── Sentence.ts
+│   │   └── Highlight.ts     # Highlight Aggregate Root
 │   ├── value-objects/        # 值物件
 │   │   ├── TimeStamp.ts
 │   │   ├── TimeRange.ts
 │   │   └── VideoMetadata.ts
 │   └── repositories/         # 儲存庫介面
 │       ├── IVideoRepository.ts
-│       └── ITranscriptRepository.ts
+│       ├── ITranscriptRepository.ts
+│       └── IHighlightRepository.ts
 │
 ├── application/              # Application Layer - 應用服務
 │   ├── use-cases/           # 用例
 │   │   ├── UploadVideoUseCase.ts
 │   │   ├── ProcessTranscriptUseCase.ts
-│   │   ├── SelectSentenceUseCase.ts
-│   │   ├── GenerateHighlightUseCase.ts
-│   │   └── SyncPlaybackUseCase.ts
+│   │   ├── CreateHighlightUseCase.ts
+│   │   ├── ToggleSentenceInHighlightUseCase.ts
+│   │   └── GenerateHighlightUseCase.ts
 │   ├── dto/                 # 數據傳輸物件
 │   │   ├── VideoDTO.ts
 │   │   └── TranscriptDTO.ts
@@ -63,7 +65,8 @@ src/
 │   │   └── MockAIService.ts
 │   ├── repositories/        # 儲存庫實作
 │   │   ├── VideoRepositoryImpl.ts
-│   │   └── TranscriptRepositoryImpl.ts
+│   │   ├── TranscriptRepositoryImpl.ts
+│   │   └── HighlightRepositoryImpl.ts
 │   ├── state/               # 狀態管理
 │   │   ├── videoStore.ts
 │   │   ├── transcriptStore.ts
@@ -116,61 +119,233 @@ Application Layer
 
 ## Domain Layer 設計
 
-### Entities
+### Aggregate 設計原則
 
-#### Video Entity
+本專案採用 Domain-Driven Design (DDD) 的 Aggregate 模式來組織 Domain Layer。
+
+#### 什麼是 Aggregate？
+- **Aggregate（聚合）** 是一組相關物件的集合，作為數據變更的單位
+- **Aggregate Root（聚合根）** 是聚合的入口點，外部只能通過它來訪問聚合內的物件
+- **聚合邊界** 定義了一致性邊界，確保業務規則在邊界內得到保證
+
+#### 為何需要 Aggregate？
+1. **一致性保證**: 聚合內的業務規則由 Aggregate Root 統一管理
+2. **封裝複雜性**: 隱藏內部結構，提供清晰的操作介面
+3. **明確職責**: 每個 Aggregate Root 負責管理自己的聚合邊界
+4. **事務邊界**: 一個 Repository 操作影響一個 Aggregate
+
+#### Repository 與 Aggregate 的關係
+> 原則：**只有 Aggregate Root 才有 Repository**
+
+這意味著：
+- ✅ `IVideoRepository` - Video 是 Aggregate Root
+- ✅ `ITranscriptRepository` - Transcript 是 Aggregate Root
+- ✅ `IHighlightRepository` - Highlight 是 Aggregate Root
+- ❌ `ISectionRepository` - Section 屬於 Transcript 聚合，不應有獨立 Repository
+- ❌ `ISentenceRepository` - Sentence 屬於 Transcript 聚合，不應有獨立 Repository
+
+### 三個 Aggregate 設計
+
+#### 1. Video Aggregate
+
+**Aggregate Root**: `Video`
+
+**聚合邊界**: 僅包含 Video 本身（單一實體聚合）
+
+**職責**:
+- 管理視頻文件的生命週期
+- 提供視頻元數據查詢
+- 驗證視頻狀態（是否準備好播放）
+
+**為何是獨立聚合？**
+- Video 的生命週期與 Transcript、Highlight 獨立
+- Video 是其他聚合的參照對象（通過 `videoId` 關聯）
+- 簡化設計，避免聚合過大
+
+---
+
+#### 2. Transcript Aggregate（唯讀數據源）
+
+**Aggregate Root**: `Transcript`
+
+**聚合邊界**:
+```
+Transcript (Root)
+  └─ Section[] (Entity)
+      └─ Sentence[] (Entity)
+```
+
+**職責**:
+- 提供視頻轉錄內容的查詢
+- 管理 Section 和 Sentence 的組織結構
+- 確保轉錄數據的完整性
+
+**關鍵特性**:
+- **唯讀性**: Transcript 由 AI 生成後不可修改
+- **對外可見性**: Section 和 Sentence 以 `readonly` 形式對外暴露
+- **查詢導向**: 提供多種查詢方法（`getSentenceById`, `getAllSentences`）
+
+**為何 Section 和 Sentence 是聚合內的 Entity？**
+- 它們有唯一識別（`id`），但生命週期完全由 Transcript 管理
+- 無法獨立存在，必須屬於某個 Transcript
+- 不需要獨立的 Repository
+
+**業務規則**:
+- Transcript 生成後內容不可變
+- Section 和 Sentence 的結構由 AI 決定
+- 對外提供唯讀訪問
+
+---
+
+#### 3. Highlight Aggregate（可編輯的選擇）
+
+**Aggregate Root**: `Highlight`
+
+**聚合邊界**: 僅包含 Highlight 本身（單一實體聚合）
+
+**職責**:
+- 管理「哪些 Sentence 被選中」的關係
+- 記錄選擇順序（`selectionOrder`）
+- 提供排序功能（按選擇順序 vs 時間順序）
+- 計算高光的總時長和時間範圍
+
+**關鍵設計決策**:
+
+**Q: 為何 `isSelected` 不在 Sentence 中？**
+**A**: 因為「選中」是 Highlight 和 Sentence 之間的**關係**，不是 Sentence 的內在屬性。
+- 同一個 Sentence 可能在多個不同的 Highlight 中有不同的選中狀態
+- 例如：「精華版」Highlight 選中了句子 A，「完整版」Highlight 沒有選中句子 A
+- 如果把 `isSelected` 放在 Sentence，就無法支援多個 Highlight 版本
+
+**Q: 為何 Highlight 只存 `sentenceIds` 而不存 `Sentence[]`？**
+**A**: 避免跨聚合的直接引用
+- Sentence 屬於 Transcript 聚合
+- Highlight 通過 ID 引用，保持聚合獨立性
+- 需要實際 Sentence 數據時，通過 Transcript 查詢
+
+**Q: 為何記錄 `selectionOrder`？**
+**A**: 支援兩種排序方式
+- **時間順序**: 按 Sentence 的時間範圍排序（自然播放順序）
+- **選擇順序**: 按用戶選擇的先後順序排序（用戶可能想要不同的敘事順序）
+
+**業務規則**:
+- 一個 Video 可以有多個 Highlight（不同版本）
+- 每個 Highlight 有獨立的名稱（`name`）
+- Highlight 的選擇可以隨時修改（add/remove）
+- Highlight 必須關聯到有效的 Video
+
+---
+
+### Entities 詳細設計
+
+#### Video Entity (Aggregate Root)
+
 **核心屬性**:
 - `id: string` - 唯一識別碼
 - `file: File` - 視頻文件
-- `metadata: VideoMetadata` - 視頻元數據
-- `url?: string` - 視頻 URL（可選）
+- `metadata: VideoMetadata` - 視頻元數據（Value Object）
+- `url?: string` - 視頻 URL（可選，載入後生成）
 
-**核心方法**:
+**查詢方法**:
 - `get duration(): number` - 獲取視頻時長
 - `get isReady(): boolean` - 檢查視頻是否已準備好播放
 
-#### Transcript Entity
-**核心屬性**:
-- `id: string` - 轉錄 ID
-- `videoId: string` - 關聯的視頻 ID
-- `sections: Section[]` - 段落列表
-- `fullText: string` - 完整轉錄文字
+**設計意圖**:
+- 作為簡單的 Aggregate Root，管理視頻文件本身
+- 提供視頻元數據的查詢介面
+- 不包含轉錄或高光相關的業務邏輯
 
-**核心方法**:
+---
+
+#### Transcript Entity (Aggregate Root)
+
+**核心屬性**:
+- `readonly id: string` - 轉錄 ID
+- `readonly videoId: string` - 關聯的視頻 ID
+- `readonly sections: ReadonlyArray<Section>` - 段落列表（唯讀）
+- `readonly fullText: string` - 完整轉錄文字
+
+**查詢方法**:
 - `getSentenceById(sentenceId: string): Sentence | undefined` - 根據 ID 查找句子
 - `getAllSentences(): Sentence[]` - 獲取所有句子（扁平化）
+- `getSectionById(sectionId: string): Section | undefined` - 根據 ID 查找段落
 
-#### Section Entity
+**設計意圖**:
+- 作為唯讀數據源，提供轉錄內容查詢
+- Section 和 Sentence 以 `readonly` 形式對外暴露，確保不可變性
+- 不包含「選擇」相關的邏輯（由 Highlight Aggregate 管理）
+
+**可見性規則**:
+- 外部可以讀取 `sections` 和 `sentences`
+- 外部**不可以**直接修改 Section 或 Sentence
+
+---
+
+#### Section Entity（屬於 Transcript Aggregate）
+
 **核心屬性**:
-- `id: string` - 段落 ID
-- `title: string` - 段落標題
-- `sentences: Sentence[]` - 句子列表
+- `readonly id: string` - 段落 ID
+- `readonly title: string` - 段落標題
+- `readonly sentences: ReadonlyArray<Sentence>` - 句子列表（唯讀）
 
-**核心方法**:
-- `get timeRange(): TimeRange` - 獲取段落的時間範圍
+**計算屬性**:
+- `get timeRange(): TimeRange` - 計算段落的時間範圍（從第一個到最後一個句子）
 
-#### Sentence Entity
+**設計意圖**:
+- 組織和分組 Sentence
+- 不可獨立存在，必須屬於 Transcript
+- 生命週期由 Transcript 管理
+
+---
+
+#### Sentence Entity（屬於 Transcript Aggregate）
+
 **核心屬性**:
-- `id: string` - 句子 ID
-- `text: string` - 句子文字
-- `timeRange: TimeRange` - 時間範圍
-- `isSelected: boolean` - 是否被選中
-- `isHighlightSuggestion: boolean` - 是否為 AI 建議的高光句子
+- `readonly id: string` - 句子 ID
+- `readonly text: string` - 句子文字
+- `readonly timeRange: TimeRange` - 時間範圍（Value Object）
+- `readonly isHighlightSuggestion: boolean` - 是否為 AI 建議的高光句子
 
-**核心方法**:
-- `select(): void` - 選中句子
-- `deselect(): void` - 取消選中
-- `toggle(): void` - 切換選中狀態
+**設計意圖**:
+- 代表轉錄中的一個句子
+- 不包含 `isSelected` 狀態（由 Highlight Aggregate 管理）
+- 不包含 `select()` / `deselect()` 方法（違反聚合原則）
 
-#### Highlight Entity
+**為何移除 `isSelected`？**
+- 「選中」是 Highlight 和 Sentence 的**關係**，不是 Sentence 的屬性
+- 同一個 Sentence 可能在不同的 Highlight 中有不同的選中狀態
+
+---
+
+#### Highlight Entity (Aggregate Root)
+
 **核心屬性**:
-- `id: string` - 高光 ID
-- `videoId: string` - 關聯的視頻 ID
-- `sentences: Sentence[]` - 選中的句子列表
+- `readonly id: string` - 高光 ID
+- `readonly videoId: string` - 關聯的視頻 ID
+- `readonly name: string` - 高光名稱（例如：「精華版」、「完整版」）
+- `private selectedSentenceIds: Set<string>` - 選中的句子 ID 集合
+- `private selectionOrder: string[]` - 選擇順序記錄
 
-**核心方法**:
-- `get duration(): number` - 計算高光總時長
-- `get timeRanges(): TimeRange[]` - 獲取所有時間範圍
+**選擇管理方法**:
+- `addSentence(sentenceId: string): void` - 添加句子到選擇
+- `removeSentence(sentenceId: string): void` - 從選擇中移除句子
+- `toggleSentence(sentenceId: string): void` - 切換句子選中狀態
+- `isSelected(sentenceId: string): boolean` - 檢查句子是否被選中
+
+**查詢方法（需要 Transcript 協助）**:
+- `getSelectedSentences(transcript: Transcript, sortBy: 'selection' | 'time'): Sentence[]` - 獲取選中的句子
+- `getTimeRanges(transcript: Transcript, sortBy: 'selection' | 'time'): TimeRange[]` - 獲取時間範圍
+- `getTotalDuration(transcript: Transcript): number` - 計算總時長
+
+**設計意圖**:
+- 管理「哪些句子被選中」的關係
+- 支援一個視頻多個高光版本
+- 提供靈活的排序方式（選擇順序 vs 時間順序）
+
+**為何查詢方法需要傳入 Transcript？**
+- Highlight 只存 `sentenceIds`（ID 引用）
+- 需要實際的 Sentence 數據時，通過 Transcript 查詢
+- 避免跨聚合的直接引用，保持聚合獨立性
 
 ### Value Objects
 
@@ -233,24 +408,89 @@ Application Layer
 2. 將 DTO 轉換為 Domain Entity
 3. 儲存至 Repository
 
-#### SelectSentenceUseCase
+---
+
+#### CreateHighlightUseCase
 **依賴**:
-- `ITranscriptRepository` - 轉錄儲存庫
+- `IHighlightRepository` - 高光儲存庫
+- `IVideoRepository` - 視頻儲存庫（用於驗證 Video 存在）
 
 **輸入**:
+- `videoId: string` - 關聯的視頻 ID
+- `name: string` - 高光名稱
+
+**輸出**: `Promise<Highlight>` - 建立的高光實體
+
+**職責**:
+1. 驗證 Video 存在
+2. 建立 Highlight Entity（初始狀態：沒有選中任何句子）
+3. 儲存至 Repository
+
+**驗證規則**:
+- Video 必須存在
+- 名稱不可為空
+
+**錯誤處理**:
+- Video 不存在時拋出 `VideoNotFoundError`
+
+---
+
+#### ToggleSentenceInHighlightUseCase
+**依賴**:
+- `IHighlightRepository` - 高光儲存庫
+
+**輸入**:
+- `highlightId: string` - 高光 ID
 - `sentenceId: string` - 句子 ID
-- `selected: boolean` - 選中狀態
 
 **輸出**: `Promise<void>`
 
 **職責**:
-1. 從 Repository 獲取 Transcript
-2. 查找指定 Sentence
-3. 更新選中狀態
-4. 儲存變更
+1. 從 Repository 獲取 Highlight
+2. 調用 `highlight.toggleSentence(sentenceId)` 切換選中狀態
+3. 儲存變更至 Repository
 
 **錯誤處理**:
-- 句子不存在時拋出錯誤
+- Highlight 不存在時拋出 `HighlightNotFoundError`
+
+**設計說明**:
+- 不需要 `ITranscriptRepository`，因為只是管理 ID 關係
+- 通過 Aggregate Root 操作，確保聚合一致性
+
+---
+
+#### GenerateHighlightUseCase
+**依賴**:
+- `IHighlightRepository` - 高光儲存庫
+- `ITranscriptRepository` - 轉錄儲存庫
+
+**輸入**:
+- `highlightId: string` - 高光 ID
+- `sortBy: 'selection' | 'time'` - 排序方式
+
+**輸出**:
+```typescript
+Promise<{
+  sentences: Sentence[];
+  timeRanges: TimeRange[];
+  totalDuration: number;
+}>
+```
+
+**職責**:
+1. 從 Repository 獲取 Highlight
+2. 從 Repository 獲取對應的 Transcript
+3. 調用 `highlight.getSelectedSentences(transcript, sortBy)` 獲取選中的句子
+4. 計算時間範圍和總時長
+5. 返回生成結果
+
+**錯誤處理**:
+- Highlight 不存在時拋出 `HighlightNotFoundError`
+- Transcript 不存在時拋出 `TranscriptNotFoundError`
+
+**設計說明**:
+- 這個 Use Case 協調兩個 Aggregate（Highlight 和 Transcript）
+- 展示了跨聚合查詢的模式
 
 ## Adapter Layer 設計
 
@@ -307,15 +547,48 @@ TranscriptDTO {
 **狀態**:
 - `transcript: Transcript | null` - 當前轉錄
 - `isProcessing: boolean` - 處理中狀態
-- `currentSentenceId: string | null` - 當前播放的句子 ID
+- `playingSentenceId: string | null` - 當前播放的句子 ID（用於同步高亮）
 
 **Actions**:
 - `processVideo(videoId: string): Promise<void>` - 處理視頻轉錄
-- `toggleSentence(sentenceId: string): Promise<void>` - 切換句子選中狀態
 
 **依賴**:
 - `ProcessTranscriptUseCase`
-- `SelectSentenceUseCase`
+
+**設計說明**:
+- 此 Store 只負責管理 Transcript 數據
+- 不再包含 `toggleSentence` 方法（移至 highlightStore）
+- `playingSentenceId` 用於視頻播放同步，不是業務狀態
+
+---
+
+#### Highlight Store (highlightStore.ts)
+**狀態**:
+- `currentHighlight: Highlight | null` - 當前編輯的高光
+- `highlights: Highlight[]` - 所有高光版本（一個視頻可能有多個）
+- `isLoading: boolean` - 載入狀態
+
+**Getters**:
+- `hasHighlight: boolean` - 是否有當前高光
+- `selectedSentenceIds: string[]` - 當前高光選中的句子 ID（用於 UI 渲染）
+
+**Actions**:
+- `createHighlight(videoId: string, name: string): Promise<void>` - 建立新的高光
+- `loadHighlights(videoId: string): Promise<void>` - 載入視頻的所有高光版本
+- `switchHighlight(highlightId: string): void` - 切換當前編輯的高光
+- `toggleSentence(sentenceId: string): Promise<void>` - 切換句子選中狀態
+- `generatePreview(sortBy: 'selection' | 'time'): Promise<PreviewData>` - 生成預覽數據
+
+**依賴**:
+- `CreateHighlightUseCase`
+- `ToggleSentenceInHighlightUseCase`
+- `GenerateHighlightUseCase`
+- `IHighlightRepository`
+
+**設計說明**:
+- 管理 Highlight 相關的所有操作
+- 支援多個高光版本的管理
+- 提供 UI 需要的計算屬性（`selectedSentenceIds`）
 
 ## Framework Layer 設計
 
@@ -354,17 +627,24 @@ TranscriptDTO {
 - 監聽 `loadedmetadata` 事件獲取 `duration`
 
 #### useHighlight
-**職責**: 管理高光片段相關邏輯
+**職責**: 封裝高光相關的 UI 邏輯
 
 **返回值**:
-- `selectedSentences: ComputedRef<Sentence[]>` - 所有選中的句子
+- `currentHighlight: ComputedRef<Highlight | null>` - 當前高光
+- `selectedSentences: ComputedRef<Sentence[]>` - 選中的句子列表
 - `highlightRanges: ComputedRef<TimeRange[]>` - 高光時間範圍
-- `getCurrentSentence(currentTime: number): Sentence | undefined` - 獲取當前時間對應的句子
+- `isSentenceSelected: (sentenceId: string) => boolean` - 檢查句子是否被選中
+- `toggleSentence: (sentenceId: string) => Promise<void>` - 切換句子選中狀態
+- `getCurrentSentence: (currentTime: number) => Sentence | undefined` - 獲取當前時間對應的句子
 
 **實作要點**:
-- 從 `transcriptStore` 獲取數據
-- 使用 `computed` 計算選中句子
-- 使用 `TimeRange.contains()` 判斷時間範圍
+- 從 `highlightStore` 和 `transcriptStore` 獲取數據
+- 使用 `computed` 計算選中句子和時間範圍
+- 封裝常用的查詢和操作方法
+
+**設計說明**:
+- 作為 UI 層和 Store 層的橋接
+- 簡化組件中的邏輯
 
 ## 視頻片段播放實現
 
@@ -407,12 +687,14 @@ TranscriptDTO {
 ```typescript
 VideoRepositoryToken: InjectionKey<IVideoRepository>
 TranscriptRepositoryToken: InjectionKey<ITranscriptRepository>
+HighlightRepositoryToken: InjectionKey<IHighlightRepository>
 TranscriptGeneratorToken: InjectionKey<ITranscriptGenerator>
 ```
 
 **註冊的實作**:
 - `VideoRepositoryImpl` → `VideoRepositoryToken`
 - `TranscriptRepositoryImpl` → `TranscriptRepositoryToken`
+- `HighlightRepositoryImpl` → `HighlightRepositoryToken`
 - `MockAIService` → `TranscriptGeneratorToken`
 
 **使用方式**:
@@ -421,14 +703,20 @@ TranscriptGeneratorToken: InjectionKey<ITranscriptGenerator>
 ## 測試策略
 
 ### 單元測試重點
-- **Domain Entities**: 業務邏輯（如 `Sentence.toggle()`, `TimeRange.contains()`）
-- **Use Cases**: 執行流程和錯誤處理
-- **Value Objects**: 驗證邏輯（如時間範圍檢查）
+- **Domain Entities**:
+  - `Highlight`: `addSentence()`, `removeSentence()`, `toggleSentence()` 邏輯
+  - `TimeRange`: `contains()`, `duration` 計算
+  - `Transcript`: 查詢方法（`getSentenceById`, `getAllSentences`）
+- **Use Cases**:
+  - `CreateHighlightUseCase`: 驗證流程
+  - `ToggleSentenceInHighlightUseCase`: 聚合操作
+  - `GenerateHighlightUseCase`: 跨聚合協調
+- **Value Objects**: 驗證邏輯（如時間範圍檢查、TimeStamp 格式化）
 
 ### 組件測試重點
-- **SentenceItem**: 選擇/取消選擇交互
+- **SentenceItem**: 選擇/取消選擇交互（調用 `highlightStore.toggleSentence`）
 - **VideoPlayer**: 播放、暫停、跳轉控制
-- **Timeline**: 視覺呈現和同步行為
+- **Timeline**: 視覺呈現和同步行為（基於 `highlightRanges`）
 
 ### 測試工具
 - Vitest（單元測試）
