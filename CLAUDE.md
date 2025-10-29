@@ -557,3 +557,10 @@ watch([currentTime, currentSentenceTime], ([video, sentence]) => {
 - [ ] 控制台無錯誤
 - [ ] 效能符合目標
 
+
+## Active Technologies
+- TypeScript ^5.0.0 + 無（Domain Layer 不依賴任何外部框架，僅使用 TypeScript 標準庫） (001-domain-layer)
+- N/A（儲存由 Infrastructure Layer 負責，此層僅定義 Repository 介面） (001-domain-layer)
+
+## Recent Changes
+- 001-domain-layer: Added TypeScript ^5.0.0 + 無（Domain Layer 不依賴任何外部框架，僅使用 TypeScript 標準庫）
