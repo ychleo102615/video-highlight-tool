@@ -34,8 +34,8 @@ export class Section {
    * @returns 從第一個句子的 start 到最後一個句子的 end
    */
   get timeRange(): TimeRange {
-    const first = this.sentences[0];
-    const last = this.sentences[this.sentences.length - 1];
+    const first = this.sentences[0]!; // Safe: constructor ensures at least one sentence
+    const last = this.sentences[this.sentences.length - 1]!; // Safe: constructor ensures at least one sentence
     return new TimeRange(first.timeRange.start, last.timeRange.end);
   }
 }

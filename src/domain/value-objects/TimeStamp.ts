@@ -86,9 +86,9 @@ export class TimeStamp {
     }
 
     const minutes = Number(parts[0]);
-    const secondsParts = parts[1].split('.');
+    const secondsParts = parts[1]!.split('.');
     const seconds = Number(secondsParts[0]);
-    const ms = secondsParts.length > 1 ? Number(secondsParts[1].padEnd(3, '0')) : 0;
+    const ms = secondsParts.length > 1 ? Number(secondsParts[1]!.padEnd(3, '0')) : 0;
 
     if (isNaN(minutes) || isNaN(seconds) || isNaN(ms)) {
       throw new Error('Invalid time format. Expected MM:SS or MM:SS.mmm');

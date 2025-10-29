@@ -82,8 +82,8 @@
 
 ### 實作 User Story 3
 
-- [ ] T010 [US3] 實作 Highlight 聚合根 in src/domain/aggregates/Highlight.ts（包含 id, videoId, name 屬性，私有屬性 selectedSentenceIds: Set<string> 和 selectionOrder: string[]，提供 addSentence、removeSentence、toggleSentence、isSelected、getSelectedSentenceIds、getSelectedSentenceCount 方法，**不包含需要傳入 Transcript 的方法**，addSentence 自動去重且不重複記錄在 selectionOrder）
-- [ ] T011 [US3] 實作 HighlightService Domain Service in src/domain/services/HighlightService.ts（提供 getSelectedSentences(highlight, transcript, sortBy: 'selection' | 'time')、getTimeRanges(highlight, transcript, sortBy)、getTotalDuration(highlight, transcript) 方法，處理 Highlight 和 Transcript 之間的跨聚合查詢，sortBy='time' 時按 timeRange.start.milliseconds 排序，sortBy='selection' 時保持 selectionOrder 順序）
+- [X] T010 [US3] 實作 Highlight 聚合根 in src/domain/aggregates/Highlight.ts（包含 id, videoId, name 屬性，私有屬性 selectedSentenceIds: Set<string> 和 selectionOrder: string[]，提供 addSentence、removeSentence、toggleSentence、isSelected、getSelectedSentenceIds、getSelectedSentenceCount 方法，**不包含需要傳入 Transcript 的方法**，addSentence 自動去重且不重複記錄在 selectionOrder）
+- [X] T011 [US3] 實作 HighlightService Domain Service in src/domain/services/HighlightService.ts（提供 getSelectedSentences(highlight, transcript, sortBy: 'selection' | 'time')、getTimeRanges(highlight, transcript, sortBy)、getTotalDuration(highlight, transcript) 方法，處理 Highlight 和 Transcript 之間的跨聚合查詢，sortBy='time' 時按 timeRange.start.milliseconds 排序，sortBy='selection' 時保持 selectionOrder 順序）
 
 **Checkpoint**: User Story 3 完成 - Highlight 聚合和 HighlightService 可獨立運作，完整的高光選擇管理功能已實作
 
@@ -97,9 +97,9 @@
 
 ### 實作 User Story 5
 
-- [ ] T012 [P] [US5] 定義 IVideoRepository 介面 in src/domain/repositories/IVideoRepository.ts（包含 save(video: Video): Promise<void>、findById(id: string): Promise<Video | null> 方法）
-- [ ] T013 [P] [US5] 定義 ITranscriptRepository 介面 in src/domain/repositories/ITranscriptRepository.ts（包含 save(transcript: Transcript): Promise<void>、findById(id: string): Promise<Transcript | null>、findByVideoId(videoId: string): Promise<Transcript | null> 方法）
-- [ ] T014 [P] [US5] 定義 IHighlightRepository 介面 in src/domain/repositories/IHighlightRepository.ts（包含 save(highlight: Highlight): Promise<void>、findById(id: string): Promise<Highlight | null>、findByVideoId(videoId: string): Promise<Highlight[]> 方法，注意一個視頻可能有多個高光版本）
+- [X] T012 [P] [US5] 定義 IVideoRepository 介面 in src/domain/repositories/IVideoRepository.ts（包含 save(video: Video): Promise<void>、findById(id: string): Promise<Video | null> 方法）
+- [X] T013 [P] [US5] 定義 ITranscriptRepository 介面 in src/domain/repositories/ITranscriptRepository.ts（包含 save(transcript: Transcript): Promise<void>、findById(id: string): Promise<Transcript | null>、findByVideoId(videoId: string): Promise<Transcript | null> 方法）
+- [X] T014 [P] [US5] 定義 IHighlightRepository 介面 in src/domain/repositories/IHighlightRepository.ts（包含 save(highlight: Highlight): Promise<void>、findById(id: string): Promise<Highlight | null>、findByVideoId(videoId: string): Promise<Highlight[]> 方法，注意一個視頻可能有多個高光版本）
 
 **Checkpoint**: User Story 5 完成 - 所有 Repository 介面已定義，Infrastructure Layer 可以開始實作
 
@@ -109,13 +109,13 @@
 
 **目的**: 跨多個 User Story 的改進和驗證
 
-- [ ] T015 [P] 建立 index.ts 導出檔案 in src/domain/aggregates/index.ts（導出 Video, Transcript, Section, Sentence, Highlight）
-- [ ] T016 [P] 建立 index.ts 導出檔案 in src/domain/value-objects/index.ts（導出 TimeStamp, TimeRange, VideoMetadata）
-- [ ] T017 [P] 建立 index.ts 導出檔案 in src/domain/repositories/index.ts（導出 IVideoRepository, ITranscriptRepository, IHighlightRepository）
-- [ ] T018 [P] 建立 index.ts 導出檔案 in src/domain/services/index.ts（導出 HighlightService）
-- [ ] T019 執行 TypeScript 型別檢查：npm run type-check（確保 100% 型別覆蓋率，無 any 型別）
-- [ ] T020 執行 ESLint 檢查：npm run lint（確保程式碼符合專案規範）
-- [ ] T021 驗證 quickstart.md 中的範例程式碼可正常執行
+- [X] T015 [P] 建立 index.ts 導出檔案 in src/domain/aggregates/index.ts（導出 Video, Transcript, Section, Sentence, Highlight）
+- [X] T016 [P] 建立 index.ts 導出檔案 in src/domain/value-objects/index.ts（導出 TimeStamp, TimeRange, VideoMetadata）
+- [X] T017 [P] 建立 index.ts 導出檔案 in src/domain/repositories/index.ts（導出 IVideoRepository, ITranscriptRepository, IHighlightRepository）
+- [X] T018 [P] 建立 index.ts 導出檔案 in src/domain/services/index.ts（導出 HighlightService）
+- [X] T019 執行 TypeScript 型別檢查：npm run type-check（確保 100% 型別覆蓋率，無 any 型別）
+- [X] T020 執行 ESLint 檢查：npm run lint（確保程式碼符合專案規範）
+- [X] T021 驗證 quickstart.md 中的範例程式碼可正常執行
 
 ---
 
