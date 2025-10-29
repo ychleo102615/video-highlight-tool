@@ -23,8 +23,8 @@
 
 **目的**: 建立 Domain Layer 的資料夾結構
 
-- [ ] T001 建立 Domain Layer 資料夾結構：src/domain/aggregates/, src/domain/value-objects/, src/domain/services/, src/domain/repositories/
-- [ ] T002 建立 Transcript 聚合子資料夾：src/domain/aggregates/Transcript/
+- [X] T001 建立 Domain Layer 資料夾結構：src/domain/aggregates/, src/domain/value-objects/, src/domain/services/, src/domain/repositories/
+- [X] T002 建立 Transcript 聚合子資料夾：src/domain/aggregates/Transcript/
 
 ---
 
@@ -36,9 +36,9 @@
 
 **對應**: User Story 4 - 時間值物件 (Priority: P2)
 
-- [ ] T003 [P] 實作 TimeStamp 值物件 in src/domain/value-objects/TimeStamp.ts（包含 milliseconds 屬性、seconds/minutes getters、toString(format?)、fromSeconds、fromMilliseconds、fromString 靜態方法，**支援毫秒精度**，驗證 milliseconds >= 0）
-- [ ] T004 [P] 實作 VideoMetadata 值物件 in src/domain/value-objects/VideoMetadata.ts（包含 duration, width, height, format 屬性，驗證 duration > 0, width > 0, height > 0, format 以 "video/" 開頭，提供 aspectRatio getter）
-- [ ] T005 實作 TimeRange 值物件 in src/domain/value-objects/TimeRange.ts（包含 start, end 屬性，驗證 end.milliseconds >= start.milliseconds，提供 duration getter（毫秒）、durationInSeconds getter、contains(timestamp) 方法）
+- [X] T003 [P] 實作 TimeStamp 值物件 in src/domain/value-objects/TimeStamp.ts（包含 milliseconds 屬性、seconds/minutes getters、toString(format?)、fromSeconds、fromMilliseconds、fromString 靜態方法，**支援毫秒精度**，驗證 milliseconds >= 0）
+- [X] T004 [P] 實作 VideoMetadata 值物件 in src/domain/value-objects/VideoMetadata.ts（包含 duration, width, height, format 屬性，驗證 duration > 0, width > 0, height > 0, format 以 "video/" 開頭，提供 aspectRatio getter）
+- [X] T005 實作 TimeRange 值物件 in src/domain/value-objects/TimeRange.ts（包含 start, end 屬性，驗證 end.milliseconds >= start.milliseconds，提供 duration getter（毫秒）、durationInSeconds getter、contains(timestamp) 方法）
 
 **Checkpoint**: 值物件完成 - User Story 4 的核心部分已實作，實體實作可以開始
 
@@ -52,7 +52,7 @@
 
 ### 實作 User Story 1
 
-- [ ] T006 [US1] 實作 Video 聚合根 in src/domain/aggregates/Video.ts（包含 id, file, metadata, url 屬性，提供 duration getter（從 metadata 提取）、isReady getter（檢查 url 是否存在），所有屬性使用 readonly，url 為 optional）
+- [X] T006 [US1] 實作 Video 聚合根 in src/domain/aggregates/Video.ts（包含 id, file, metadata, url 屬性，提供 duration getter（從 metadata 提取）、isReady getter（檢查 url 是否存在），所有屬性使用 readonly，url 為 optional）
 
 **Checkpoint**: User Story 1 完成 - Video 聚合根可獨立運作並測試
 
@@ -66,9 +66,9 @@
 
 ### 實作 User Story 2
 
-- [ ] T007 [P] [US2] 實作 Sentence 實體 in src/domain/aggregates/Transcript/Sentence.ts（包含 id, text, timeRange, isHighlightSuggestion 屬性，所有屬性使用 readonly，**不包含** isSelected 狀態）
-- [ ] T008 [US2] 實作 Section 實體 in src/domain/aggregates/Transcript/Section.ts（包含 id, title, sentences 屬性，sentences 宣告為 ReadonlyArray<Sentence>，驗證 sentences.length > 0，提供 timeRange getter 計算從第一個到最後一個句子的時間範圍）
-- [ ] T009 [US2] 實作 Transcript 聚合根 in src/domain/aggregates/Transcript/Transcript.ts（包含 id, videoId, sections, fullText 屬性，sections 宣告為 ReadonlyArray<Section>，提供 getSentenceById(sentenceId: string)、getAllSentences()、getSectionById(sectionId: string) 查詢方法，使用 flatMap 實作 getAllSentences）
+- [X] T007 [P] [US2] 實作 Sentence 實體 in src/domain/aggregates/Transcript/Sentence.ts（包含 id, text, timeRange, isHighlightSuggestion 屬性，所有屬性使用 readonly，**不包含** isSelected 狀態）
+- [X] T008 [US2] 實作 Section 實體 in src/domain/aggregates/Transcript/Section.ts（包含 id, title, sentences 屬性，sentences 宣告為 ReadonlyArray<Sentence>，驗證 sentences.length > 0，提供 timeRange getter 計算從第一個到最後一個句子的時間範圍）
+- [X] T009 [US2] 實作 Transcript 聚合根 in src/domain/aggregates/Transcript/Transcript.ts（包含 id, videoId, sections, fullText 屬性，sections 宣告為 ReadonlyArray<Section>，提供 getSentenceById(sentenceId: string)、getAllSentences()、getSectionById(sectionId: string) 查詢方法，使用 flatMap 實作 getAllSentences）
 
 **Checkpoint**: User Story 2 完成 - Transcript 聚合可獨立運作，提供完整的轉錄內容查詢功能
 

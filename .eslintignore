@@ -1,0 +1,8 @@
+node_modules/
+dist/
+coverage/
+.eslintcache
+*.min.js
+test-results/
+playwright-report/
+__screenshots__/

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+coverage/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+test-results/
+playwright-report/
+__screenshots__/
+*.min.js
+*.min.css
