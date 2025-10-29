@@ -377,7 +377,7 @@ export class MockAIService implements ITranscriptGenerator {
 
   private getMockTranscript(): TranscriptDTO {
     return {
-      fullTranscript: "...",
+      fullText: "...",
       sections: [
         {
           id: "section_1",
