@@ -1,6 +1,6 @@
 # Feature Specification: Application Layer Development
 
-**Feature Branch**: `001-application-layer`
+**Feature Branch**: `002-application-layer`
 **Created**: 2025-10-29
 **Status**: Draft
 **Input**: User description: "實作 Application Layer 開發：定義 Port 介面、實作 5 個 Use Cases"
@@ -107,33 +107,35 @@
 
 - **FR-001**: 系統 MUST 提供 ITranscriptGenerator Port 介面，定義 `generate(videoId: string): Promise<TranscriptDTO>` 方法
 - **FR-002**: 系統 MUST 提供 IFileStorage Port 介面，定義 `save(file: File): Promise<string>` 和 `delete(url: string): Promise<void>` 方法
-- **FR-003**: UploadVideoUseCase MUST 驗證視頻文件格式（僅允許 video/mp4, video/mov, video/webm）
-- **FR-004**: UploadVideoUseCase MUST 驗證視頻文件大小（最大 100MB）
-- **FR-005**: UploadVideoUseCase MUST 透過 IFileStorage 儲存視頻文件並獲取 URL
-- **FR-006**: UploadVideoUseCase MUST 提取視頻元數據（時長、尺寸）並建立 Video Entity
-- **FR-007**: ProcessTranscriptUseCase MUST 調用 ITranscriptGenerator 生成轉錄
-- **FR-008**: ProcessTranscriptUseCase MUST 將 TranscriptDTO 轉換為 Transcript Domain Entity（包含 Section 和 Sentence）
-- **FR-009**: ProcessTranscriptUseCase MUST 驗證視頻存在性，不存在時拋出 VideoNotFoundError
-- **FR-010**: CreateHighlightUseCase MUST 驗證視頻存在性，不存在時拋出 VideoNotFoundError
-- **FR-011**: CreateHighlightUseCase MUST 驗證高光名稱不為空
-- **FR-012**: CreateHighlightUseCase MUST 建立初始狀態的 Highlight Entity（selectedSentenceIds 為空）
-- **FR-013**: ToggleSentenceInHighlightUseCase MUST 從 repository 獲取 Highlight 實體
-- **FR-014**: ToggleSentenceInHighlightUseCase MUST 調用 `highlight.toggleSentence(sentenceId)` 方法切換狀態
-- **FR-015**: ToggleSentenceInHighlightUseCase MUST 將變更持久化至 repository
-- **FR-016**: ToggleSentenceInHighlightUseCase MUST 在 Highlight 不存在時拋出 HighlightNotFoundError
-- **FR-017**: GenerateHighlightUseCase MUST 從 repository 獲取 Highlight 和對應的 Transcript
-- **FR-018**: GenerateHighlightUseCase MUST 調用 `highlight.getSelectedSentences(transcript, sortBy)` 獲取選中的句子
-- **FR-019**: GenerateHighlightUseCase MUST 支援兩種排序方式：'selection'（選擇順序）和 'time'（時間順序）
-- **FR-020**: GenerateHighlightUseCase MUST 計算時間範圍（TimeRange[]）和總時長（number）
-- **FR-021**: GenerateHighlightUseCase MUST 在 Highlight 不存在時拋出 HighlightNotFoundError
-- **FR-022**: GenerateHighlightUseCase MUST 在 Transcript 不存在時拋出 TranscriptNotFoundError
-- **FR-023**: 所有 Use Cases MUST 透過依賴注入接收 repositories 和 ports
+- **FR-003**: 系統 MUST 提供 IVideoProcessor Port 介面，定義 `extractMetadata(file: File): Promise<VideoMetadataDTO>` 方法，用於提取視頻元數據（時長、寬度、高度、格式）
+- **FR-004**: UploadVideoUseCase MUST 驗證視頻文件格式（僅允許 video/mp4, video/mov, video/webm）
+- **FR-005**: UploadVideoUseCase MUST 驗證視頻文件大小（最大 100MB）
+- **FR-006**: UploadVideoUseCase MUST 透過 IFileStorage 儲存視頻文件並獲取 URL
+- **FR-007**: UploadVideoUseCase MUST 透過 IVideoProcessor 提取視頻元數據（時長、寬度、高度、格式）並建立 Video Entity
+- **FR-008**: ProcessTranscriptUseCase MUST 調用 ITranscriptGenerator 生成轉錄
+- **FR-009**: ProcessTranscriptUseCase MUST 將 TranscriptDTO 轉換為 Transcript Domain Entity（包含 Section 和 Sentence）
+- **FR-010**: ProcessTranscriptUseCase MUST 驗證視頻存在性，不存在時拋出 VideoNotFoundError
+- **FR-011**: CreateHighlightUseCase MUST 驗證視頻存在性，不存在時拋出 VideoNotFoundError
+- **FR-012**: CreateHighlightUseCase MUST 驗證高光名稱不為空
+- **FR-013**: CreateHighlightUseCase MUST 建立初始狀態的 Highlight Entity（selectedSentenceIds 為空）
+- **FR-014**: ToggleSentenceInHighlightUseCase MUST 從 repository 獲取 Highlight 實體
+- **FR-015**: ToggleSentenceInHighlightUseCase MUST 調用 `highlight.toggleSentence(sentenceId)` 方法切換狀態
+- **FR-016**: ToggleSentenceInHighlightUseCase MUST 將變更持久化至 repository
+- **FR-017**: ToggleSentenceInHighlightUseCase MUST 在 Highlight 不存在時拋出 HighlightNotFoundError
+- **FR-018**: GenerateHighlightUseCase MUST 從 repository 獲取 Highlight 和對應的 Transcript
+- **FR-019**: GenerateHighlightUseCase MUST 調用 `highlight.getSelectedSentences(transcript, sortBy)` 獲取選中的句子
+- **FR-020**: GenerateHighlightUseCase MUST 支援兩種排序方式：'selection'（選擇順序）和 'time'（時間順序）
+- **FR-021**: GenerateHighlightUseCase MUST 計算時間範圍（TimeRange[]）和總時長（number）
+- **FR-022**: GenerateHighlightUseCase MUST 在 Highlight 不存在時拋出 HighlightNotFoundError
+- **FR-023**: GenerateHighlightUseCase MUST 在 Transcript 不存在時拋出 TranscriptNotFoundError
+- **FR-024**: 所有 Use Cases MUST 透過依賴注入接收 repositories 和 ports
 
 ### Key Entities
 
 - **TranscriptDTO**: 數據傳輸物件，包含 fullText（完整文字）、sections（段落陣列，包含 id, title, sentences）
 - **VideoDTO**: 數據傳輸物件，包含視頻元數據（duration, width, height, format）
-- **Port Interfaces**: ITranscriptGenerator（轉錄生成服務）、IFileStorage（文件儲存服務）
+- **VideoMetadataDTO**: 數據傳輸物件，包含視頻元數據（duration, width, height, format）
+- **Port Interfaces**: ITranscriptGenerator（轉錄生成服務）、IFileStorage（文件儲存服務）、IVideoProcessor（視頻處理服務）
 - **Use Cases**: UploadVideoUseCase, ProcessTranscriptUseCase, CreateHighlightUseCase, ToggleSentenceInHighlightUseCase, GenerateHighlightUseCase
 
 ## Success Criteria *(mandatory)*
@@ -149,7 +151,7 @@
 
 ## Assumptions
 
-- 視頻元數據提取使用瀏覽器原生 API（HTMLVideoElement）即可完成
+- 視頻元數據提取透過 IVideoProcessor Port 介面完成，Infrastructure Layer 實作可使用瀏覽器原生 API（HTMLVideoElement）
 - 文件格式驗證透過 MIME type 檢查即可，不需要深度檔案內容驗證
 - Mock AI Service 的延遲時間設定為 1.5 秒，模擬真實 API 回應時間
 - Use Cases 執行期間不考慮並發控制（由 Infrastructure Layer 處理）
