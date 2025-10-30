@@ -78,12 +78,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T022 [US1] Create UploadVideoUseCase in src/application/use-cases/UploadVideoUseCase.ts
-- [ ] T023 [US1] Implement validateInput private method in UploadVideoUseCase (format and size validation)
-- [ ] T024 [US1] Implement execute method in UploadVideoUseCase (orchestrate validation, IFileStorage.save(), IVideoProcessor.extractMetadata(), Video Entity creation, repository save)
-- [ ] T025 [US1] Add JSDoc documentation to UploadVideoUseCase
+- [X] T022 [US1] Create UploadVideoUseCase in src/application/use-cases/UploadVideoUseCase.ts
+- [X] T023 [US1] Implement validateInput private method in UploadVideoUseCase (format and size validation)
+- [X] T024 [US1] Implement execute method in UploadVideoUseCase (orchestrate validation, IFileStorage.save(), IVideoProcessor.extractMetadata(), Video Entity creation, repository save)
+- [X] T025 [US1] Add JSDoc documentation to UploadVideoUseCase
 
-**Checkpoint**: At this point, User Story 1 should be fully functional - developers can upload videos with proper validation
+**Checkpoint**: At this point, User Story 1 should be fully functional - developers can upload videos with proper validation ✅
 
 ---
 
@@ -95,14 +95,14 @@
 
 ### Implementation for User Story 2
 
-- [ ] T027 [US2] Create ProcessTranscriptUseCase in src/application/use-cases/ProcessTranscriptUseCase.ts
-- [ ] T028 [US2] Implement convertToEntity private method in ProcessTranscriptUseCase (DTO → Domain Entity conversion)
-- [ ] T029 [US2] Implement convertSectionToEntity private helper method in ProcessTranscriptUseCase
-- [ ] T030 [US2] Implement convertSentenceToEntity private helper method in ProcessTranscriptUseCase
-- [ ] T031 [US2] Implement execute method in ProcessTranscriptUseCase (video validation, transcript generation, DTO conversion, persistence)
-- [ ] T032 [US2] Add JSDoc documentation to ProcessTranscriptUseCase
+- [X] T027 [US2] Create ProcessTranscriptUseCase in src/application/use-cases/ProcessTranscriptUseCase.ts
+- [X] T028 [US2] Implement convertToEntity private method in ProcessTranscriptUseCase (DTO → Domain Entity conversion)
+- [X] T029 [US2] Implement convertSectionToEntity private helper method in ProcessTranscriptUseCase
+- [X] T030 [US2] Implement convertSentenceToEntity private helper method in ProcessTranscriptUseCase
+- [X] T031 [US2] Implement execute method in ProcessTranscriptUseCase (video validation, transcript generation, DTO conversion, persistence)
+- [X] T032 [US2] Add JSDoc documentation to ProcessTranscriptUseCase
 
-**Checkpoint**: At this point, User Stories 1 AND 2 should both work independently - developers can upload videos and process transcripts
+**Checkpoint**: At this point, User Stories 1 AND 2 should both work independently - developers can upload videos and process transcripts ✅
 
 ---
 
