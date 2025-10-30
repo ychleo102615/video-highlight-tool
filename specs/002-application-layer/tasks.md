@@ -114,12 +114,12 @@
 
 ### Implementation for User Story 3
 
-- [ ] T033 [US3] Create CreateHighlightUseCase in src/application/use-cases/CreateHighlightUseCase.ts
-- [ ] T034 [US3] Implement validateInput private method in CreateHighlightUseCase (video existence and name validation)
-- [ ] T035 [US3] Implement execute method in CreateHighlightUseCase (validation, highlight creation, persistence)
-- [ ] T036 [US3] Add JSDoc documentation to CreateHighlightUseCase
+- [X] T033 [US3] Create CreateHighlightUseCase in src/application/use-cases/CreateHighlightUseCase.ts
+- [X] T034 [US3] Implement validateInput private method in CreateHighlightUseCase (video existence and name validation)
+- [X] T035 [US3] Implement execute method in CreateHighlightUseCase (validation, highlight creation, persistence)
+- [X] T036 [US3] Add JSDoc documentation to CreateHighlightUseCase
 
-**Checkpoint**: User Stories 1, 2, AND 3 should all work independently - full upload → transcript → highlight creation flow available
+**Checkpoint**: User Stories 1, 2, AND 3 should all work independently - full upload → transcript → highlight creation flow available ✅
 
 ---
 
@@ -131,11 +131,11 @@
 
 ### Implementation for User Story 4
 
-- [ ] T037 [US4] Create ToggleSentenceInHighlightUseCase in src/application/use-cases/ToggleSentenceInHighlightUseCase.ts
-- [ ] T038 [US4] Implement execute method in ToggleSentenceInHighlightUseCase (fetch highlight, toggle sentence, persist)
-- [ ] T039 [US4] Add JSDoc documentation to ToggleSentenceInHighlightUseCase
+- [X] T037 [US4] Create ToggleSentenceInHighlightUseCase in src/application/use-cases/ToggleSentenceInHighlightUseCase.ts
+- [X] T038 [US4] Implement execute method in ToggleSentenceInHighlightUseCase (fetch highlight, toggle sentence, persist)
+- [X] T039 [US4] Add JSDoc documentation to ToggleSentenceInHighlightUseCase
 
-**Checkpoint**: Highlight editing workflow complete - developers can create highlights and toggle sentence selections
+**Checkpoint**: Highlight editing workflow complete - developers can create highlights and toggle sentence selections ✅
 
 ---
 
@@ -147,11 +147,11 @@
 
 ### Implementation for User Story 5
 
-- [ ] T040 [US5] Create GenerateHighlightUseCase in src/application/use-cases/GenerateHighlightUseCase.ts
-- [ ] T041 [US5] Implement execute method in GenerateHighlightUseCase (fetch aggregates, coordinate highlight and transcript, calculate time ranges and duration)
-- [ ] T042 [US5] Add JSDoc documentation to GenerateHighlightUseCase
+- [X] T040 [US5] Create GenerateHighlightUseCase in src/application/use-cases/GenerateHighlightUseCase.ts
+- [X] T041 [US5] Implement execute method in GenerateHighlightUseCase (fetch aggregates, coordinate highlight and transcript, calculate time ranges and duration)
+- [X] T042 [US5] Add JSDoc documentation to GenerateHighlightUseCase
 
-**Checkpoint**: All user stories complete - full application workflow from upload to highlight preview generation is available
+**Checkpoint**: All user stories complete - full application workflow from upload to highlight preview generation is available ✅
 
 ---
 
@@ -159,13 +159,13 @@
 
 **Purpose**: Improvements that affect multiple user stories and ensure code quality
 
-- [ ] T043 [P] Create barrel export in src/application/use-cases/index.ts (export all Use Cases)
-- [ ] T044 [P] Add TypeScript strict mode checks to all Use Cases
-- [ ] T045 [P] Verify no circular dependencies between Application and Domain layers
+- [X] T043 [P] Create barrel export in src/application/use-cases/index.ts (export all Use Cases)
+- [X] T044 [P] Add TypeScript strict mode checks to all Use Cases
+- [X] T045 [P] Verify no circular dependencies between Application and Domain layers
 - [ ] T046 Review and update documentation in specs/002-application-layer/ if implementation differs from plan
-- [ ] T047 [P] Run type checking: npm run type-check
-- [ ] T048 [P] Run linting: npm run lint
-- [ ] T049 Verify all Use Cases follow single responsibility principle (< 100 lines per execute method)
+- [X] T047 [P] Run type checking: npm run type-check
+- [X] T048 [P] Run linting: npm run lint
+- [X] T049 Verify all Use Cases follow single responsibility principle (< 100 lines per execute method)
 
 ---
 

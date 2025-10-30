@@ -6,8 +6,6 @@
 
 export * from './UploadVideoUseCase';
 export * from './ProcessTranscriptUseCase';
-
-// TODO: Export remaining Use Cases when implemented
-// export * from './CreateHighlightUseCase';
-// export * from './ToggleSentenceInHighlightUseCase';
-// export * from './GenerateHighlightUseCase';
+export * from './CreateHighlightUseCase';
+export * from './ToggleSentenceInHighlightUseCase';
+export * from './GenerateHighlightUseCase';
