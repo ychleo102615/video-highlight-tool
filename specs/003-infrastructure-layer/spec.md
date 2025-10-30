@@ -139,31 +139,33 @@
 #### Video Repository
 
 - **FR-011**: VideoRepositoryImpl MUST 實作 IVideoRepository 介面，提供 save() 和 findById() 方法
-- **FR-012**: Repository MUST 使用 Map<string, Video> 作為記憶體儲存結構
+- **FR-012**: Repository MUST 使用 Map<string, Video> 作為記憶體儲存結構，僅負責運行時的 CRUD 操作，不直接寫入 IndexedDB
 - **FR-013**: save() 方法 MUST 覆蓋已存在的相同 ID 的 Video Entity
 - **FR-014**: findById() 方法 MUST 在查詢不存在的 ID 時返回 null
 
 #### Transcript Repository
 
 - **FR-015**: TranscriptRepositoryImpl MUST 實作 ITranscriptRepository 介面
-- **FR-016**: Repository MUST 使用 Map<string, Transcript> 作為記憶體儲存結構
+- **FR-016**: Repository MUST 使用 Map<string, Transcript> 作為記憶體儲存結構，僅負責運行時的 CRUD 操作，不直接寫入 IndexedDB
 - **FR-017**: Repository MUST 提供 findByVideoId(videoId: string) 方法，支援按視頻 ID 查詢
 
 #### Highlight Repository
 
 - **FR-018**: HighlightRepositoryImpl MUST 實作 IHighlightRepository 介面
-- **FR-019**: Repository MUST 使用 Map<string, Highlight> 作為記憶體儲存結構
+- **FR-019**: Repository MUST 使用 Map<string, Highlight> 作為記憶體儲存結構，僅負責運行時的 CRUD 操作，不直接寫入 IndexedDB
 - **FR-020**: Repository MUST 提供 findByVideoId(videoId: string) 方法，返回所有關聯到該視頻的 Highlight Entity 陣列
 
 #### Persistence Service
 
-- **FR-021**: PersistenceService MUST 使用 IndexedDB 儲存小於或等於 50MB 的視頻檔案
+- **FR-021**: PersistenceService MUST 使用 IndexedDB 儲存小於或等於 50MB 的視頻檔案，檔案以 Blob 格式儲存（保留 MIME type 和完整二進位資料），恢復時可直接用於 URL.createObjectURL() 或重建 File 物件
 - **FR-022**: PersistenceService MUST 使用 SessionStorage 儲存應用狀態（視頻元資料、轉錄 ID、高光選擇）
 - **FR-023**: 刷新頁面時 MUST 自動檢測 SessionStorage 中的狀態並嘗試恢復
 - **FR-024**: 對於大於 50MB 的視頻，MUST 提示用戶重新上傳，但保留轉錄和高光選擇狀態
 - **FR-025**: 當 IndexedDB 儲存失敗（配額不足）時，MUST 優雅降級為僅 SessionStorage 模式
 - **FR-026**: PersistenceService MUST 在應用啟動時初始化 IndexedDB（建立 'videos'、'transcripts'、'highlights' 物件儲存庫）
-- **FR-027**: Tab 關閉時，MUST 自動清理 IndexedDB 中的臨時資料（可透過 beforeunload 事件或下次啟動時檢查時間戳）
+- **FR-027**: PersistenceService MUST 在應用啟動時檢查 SessionStorage，若為空（表示會話已結束），則清理 IndexedDB 中時間戳超過 1 小時的臨時資料
+- **FR-028**: PersistenceService.saveState() MUST 從各 Repository 讀取記憶體資料，將 Domain Entities 轉換為 Plain Objects（JSON-serializable DTO）後序列化到 IndexedDB；restoreState() MUST 從 IndexedDB 讀取 Plain Objects，重建 Domain Entities（呼叫建構子恢復方法和 getters），再呼叫 Repository.save() 重建記憶體狀態
+- **FR-029**: PersistenceService.saveState() MUST 在關鍵用戶操作完成後自動觸發，包括：視頻上傳完成（UploadVideoUseCase）、轉錄處理完成（ProcessTranscriptUseCase）、高光選擇變更（ToggleSentenceInHighlightUseCase）
 
 ### Key Entities
 
@@ -175,6 +177,7 @@
 - **ITranscriptRepository**: Domain Layer 定義的儲存庫介面，由 TranscriptRepositoryImpl 實作
 - **IHighlightRepository**: Domain Layer 定義的儲存庫介面，由 HighlightRepositoryImpl 實作
 - **AppState**: 應用狀態資料結構，包含 videoId、videoMetadata（name, size）、transcriptId、selectedSentenceIds、timestamp，用於 SessionStorage 序列化
+- **PersistenceDTO**: 用於 IndexedDB 儲存的 Plain Objects，包含 VideoDTO、TranscriptDTO、HighlightDTO，對應 Domain Entities 的可序列化表示（無方法，僅資料屬性）
 
 ## Success Criteria *(mandatory)*
 
@@ -193,7 +196,7 @@
 ## Assumptions
 
 - Mock 資料將以 TypeScript 常數或 JSON 檔案形式存在於 `infrastructure/api/mock-data/` 目錄
-- 記憶體 Map 用於運行時資料存取，IndexedDB 用於刷新恢復，兩者配合使用
+- 記憶體 Map 用於運行時資料存取，IndexedDB 用於刷新恢復；Repository 僅操作記憶體 Map，PersistenceService 負責協調持久化（讀取 Repository 資料寫入 IndexedDB，或從 IndexedDB 恢復並呼叫 Repository.save()）
 - Mock AI 延遲時間設為 1.5 秒，足以模擬真實 API 體驗但不會讓用戶感到明顯卡頓
 - 視頻檔案儲存使用瀏覽器原生 URL.createObjectURL()，無需實作上傳至伺服器的功能
 - 所有 Repository 使用 Map 作為儲存結構，提供 O(1) 的查詢性能
@@ -204,7 +207,7 @@
 - 50MB 作為視頻大小閾值，能涵蓋大部分 demo 用途的視頻（2-5 分鐘 1080p 視頻約 30-40MB）
 - SessionStorage 容量限制（5-10MB）足以儲存元資料和選擇狀態（序列化後通常 < 100KB）
 - 用戶不會在同一瀏覽器的多個 Tab 中同時編輯（不實作跨 Tab 同步）
-- 持久化僅用於防止誤刷新，不作為長期儲存方案（Tab 關閉後清理資料）
+- 持久化僅用於防止誤刷新，不作為長期儲存方案（應用啟動時檢測會話結束並清理超過 1 小時的臨時資料）
 - 使用 `idb` 函式庫（Jake Archibald 的 IndexedDB Promise 包裝）簡化 IndexedDB 操作
 
 ## Out of Scope
@@ -220,3 +223,13 @@
 - 多租戶支援和資料隔離
 - 視頻檔案壓縮和優化
 - 離線存取和 Service Worker 快取
+
+## Clarifications
+
+### Session 2025-10-30
+
+- Q: IndexedDB 中的視頻檔案儲存策略（應以何種格式儲存視頻 File 物件以確保刷新後可恢復播放？） → A: 儲存為 Blob（保留 type 和完整二進位資料）
+- Q: Tab 關閉時的清理機制（應使用 beforeunload 事件或啟動時檢查時間戳？） → A: 下次啟動時檢查時間戳清理（穩健，檢查 SessionStorage 為空時清理超過 1 小時的資料）
+- Q: Repository 記憶體 Map 與 IndexedDB 的協作模式（Repository 應直接寫入 IndexedDB 還是由專門的 Service 協調？） → A: Repository 僅操作記憶體 Map，PersistenceService 協調持久化（符合關注點分離原則）
+- Q: 持久化觸發時機（何時調用 PersistenceService.saveState() 將記憶體資料寫入 IndexedDB？） → A: 關鍵用戶操作完成後儲存（視頻上傳、轉錄處理、高光選擇變更後），平衡效能與資料安全
+- Q: IndexedDB 序列化策略（Domain Entities 包含方法和 getters，如何正確序列化到 IndexedDB？） → A: 轉換為 Plain Objects 儲存，恢復時重建（saveState 轉 DTO，restoreState 呼叫建構子重建，保留完整行為）
