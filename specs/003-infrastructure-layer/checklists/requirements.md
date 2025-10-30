@@ -2,6 +2,7 @@
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2025-10-30
+**Updated**: 2025-10-30 (Added persistence requirements)
 **Feature**: [spec.md](../spec.md)
 
 ## Content Quality
@@ -29,7 +30,7 @@
 - [x] Feature meets measurable outcomes defined in Success Criteria
 - [x] No implementation details leak into specification
 
-## Validation Results
+## Validation Results (Updated)
 
 ### Content Quality Assessment
 
@@ -74,15 +75,32 @@
 
 ## Notes
 
-All validation items passed successfully. The specification is complete, unambiguous, and ready for the planning phase (`/speckit.plan`).
+All validation items passed successfully after adding persistence requirements. The specification is complete, unambiguous, and ready for the planning phase (`/speckit.plan`).
 
 **Notable Strengths**:
-1. Well-structured prioritization (P1 for core data sources, P2 for persistence, P3 for advanced features)
-2. Comprehensive edge case coverage (6 scenarios including resource management and UX considerations)
-3. Clear separation between in-scope (mock implementations, memory storage) and out-of-scope (real APIs, cloud storage)
+1. Well-structured prioritization (P1 for core data sources, P2 for persistence and repositories, P3 for advanced features)
+2. Comprehensive edge case coverage (11 scenarios including persistence failures, storage quotas, and cross-tab behavior)
+3. Clear separation between in-scope (IndexedDB + SessionStorage for refresh recovery) and out-of-scope (long-term storage, cross-tab sync)
 4. Bilingual approach makes it accessible to both technical and non-technical Chinese-speaking stakeholders
 5. Each user story includes "Independent Test" section, making it clear how to validate functionality in isolation
+6. Persistence strategy is pragmatic: 50MB threshold balances user experience with implementation complexity
+
+**Changes in Update (2025-10-30)**:
+- Added User Story 6: Basic Persistence for Accidental Refresh (Priority P2)
+- Added FR-021 to FR-027: Persistence Service requirements
+- Added SC-008 and SC-009: Measurable persistence outcomes
+- Updated Assumptions: Added 6 new assumptions about IndexedDB quotas, thresholds, and usage patterns
+- Updated Edge Cases: Added 5 new edge cases for persistence scenarios
+- Updated Key Entities: Added IPersistenceService and AppState
+- Updated Out of Scope: Clarified that long-term storage and cross-tab sync are excluded
+
+**Implementation Approach**:
+- Small videos (≤ 50MB): Full recovery via IndexedDB
+- Large videos (> 50MB): Metadata recovery via SessionStorage, prompt for re-upload
+- Graceful degradation: If IndexedDB fails, fall back to SessionStorage-only mode
+- Automatic cleanup: IndexedDB data cleared when tab closes
 
 **Minor Observations**:
-- FR-003, FR-008, FR-009 mention specific implementation approaches (setTimeout, URL.createObjectURL) which could be considered implementation details. However, in the context of an Infrastructure Layer spec, these are acceptable as they define the contract that this layer must fulfill.
+- FR-003, FR-008, FR-009, FR-021 mention specific technologies (setTimeout, URL.createObjectURL, IndexedDB, SessionStorage) which could be considered implementation details. However, in the context of an Infrastructure Layer spec, these are acceptable as they define the contract that this layer must fulfill.
 - Success criteria reference specific tools (Chrome DevTools Memory Profiler) which is good for validation clarity.
+- The 50MB threshold is documented as an assumption (can be adjusted based on testing)

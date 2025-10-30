@@ -87,14 +87,34 @@
 
 ---
 
+### User Story 6 - Basic Persistence for Accidental Refresh (Priority: P2)
+
+開發者需要實作基本持久化機制，防止用戶誤刷新導致工作遺失。小於 50MB 的視頻會儲存在 IndexedDB，大視頻則僅儲存元資料（視頻名稱、ID、轉錄、選擇狀態）在 SessionStorage。
+
+**Why this priority**: 提升用戶體驗，防止常見的誤操作導致工作損失。這是額外的保護機制，不影響核心功能，因此列為 P2。
+
+**Independent Test**: 可以透過整合測試獨立驗證：上傳視頻並編輯高光，模擬頁面刷新（重新載入應用），驗證是否能正確恢復狀態（小視頻完整恢復，大視頻提示重新上傳但保留編輯狀態）。
+
+**Acceptance Scenarios**:
+
+1. **Given** 用戶上傳了 30MB 視頻並編輯高光, **When** 按 F5 刷新頁面, **Then** 視頻檔案、轉錄資料和選擇狀態完整恢復，用戶可以繼續編輯
+2. **Given** 用戶上傳了 80MB 視頻並編輯高光, **When** 刷新頁面, **Then** 系統提示「檢測到未完成的編輯，請重新上傳視頻 "filename.mp4"」，轉錄和選擇狀態保留
+3. **Given** 用戶關閉瀏覽器 Tab, **When** 重新開啟應用, **Then** 所有資料清空（SessionStorage 和 IndexedDB 中的臨時資料被清除），用戶從全新狀態開始
+
+---
+
 ### Edge Cases
 
 - **Mock 資料檔案不存在時**: MockAIService 應提供內建的預設資料，確保系統在任何情況下都能返回有效的轉錄結構
 - **視頻 ID 不存在時的查詢**: 所有 Repository 的查詢方法應一致返回 null，而不是拋出例外
 - **重複儲存相同 ID 的 Entity**: Repository 應覆蓋舊資料（Map.set 行為），確保資料一致性
-- **記憶體資料遺失（頁面重新整理）**: 系統應能優雅處理，因為這是展示型專案，不需要實作 IndexedDB 或 LocalStorage
 - **blob URL 生命週期管理**: 確保在組件卸載或不再需要時調用 URL.revokeObjectURL()，避免記憶體洩漏
 - **Mock AI 延遲過長導致用戶等待**: 延遲時間設為 1.5 秒，足以模擬真實 API 體驗但不會讓用戶感到明顯卡頓
+- **IndexedDB 儲存配額不足**: 當瀏覽器儲存空間不足時，應降級為僅 SessionStorage 模式，並提示用戶清理瀏覽器資料
+- **用戶移動或刪除原始視頻檔案**: 不影響，因為視頻檔案已複製到 IndexedDB（小視頻）或僅儲存元資料（大視頻）
+- **刷新期間 IndexedDB 讀取失敗**: 應優雅降級，提示用戶重新上傳視頻，但盡可能保留 SessionStorage 中的編輯狀態
+- **視頻檔案剛好 50MB 邊界值**: 統一處理為「小視頻」，儲存到 IndexedDB
+- **用戶在多個 Tab 同時編輯**: 不支援跨 Tab 同步，每個 Tab 維護獨立的編輯狀態
 
 ## Requirements *(mandatory)*
 
@@ -135,14 +155,26 @@
 - **FR-019**: Repository MUST 使用 Map<string, Highlight> 作為記憶體儲存結構
 - **FR-020**: Repository MUST 提供 findByVideoId(videoId: string) 方法，返回所有關聯到該視頻的 Highlight Entity 陣列
 
+#### Persistence Service
+
+- **FR-021**: PersistenceService MUST 使用 IndexedDB 儲存小於或等於 50MB 的視頻檔案
+- **FR-022**: PersistenceService MUST 使用 SessionStorage 儲存應用狀態（視頻元資料、轉錄 ID、高光選擇）
+- **FR-023**: 刷新頁面時 MUST 自動檢測 SessionStorage 中的狀態並嘗試恢復
+- **FR-024**: 對於大於 50MB 的視頻，MUST 提示用戶重新上傳，但保留轉錄和高光選擇狀態
+- **FR-025**: 當 IndexedDB 儲存失敗（配額不足）時，MUST 優雅降級為僅 SessionStorage 模式
+- **FR-026**: PersistenceService MUST 在應用啟動時初始化 IndexedDB（建立 'videos'、'transcripts'、'highlights' 物件儲存庫）
+- **FR-027**: Tab 關閉時，MUST 自動清理 IndexedDB 中的臨時資料（可透過 beforeunload 事件或下次啟動時檢查時間戳）
+
 ### Key Entities
 
 - **TranscriptDTO**: 資料傳輸物件，包含完整轉錄文字（fullText）、段落陣列（sections）、段落標題（title）、句子陣列（sentences）、句子文字（text）、時間範圍（startTime, endTime）和高光建議標記（isHighlight）
 - **ITranscriptGenerator**: 輸出埠介面，定義 generate() 方法，由 MockAIService 實作
 - **IFileStorage**: 輸出埠介面，定義 save() 和 delete() 方法，由 FileStorageService 實作
+- **IPersistenceService**: 輸出埠介面，定義 saveState()、restoreState()、clearState() 方法，管理 IndexedDB 和 SessionStorage 的持久化操作
 - **IVideoRepository**: Domain Layer 定義的儲存庫介面，由 VideoRepositoryImpl 實作
 - **ITranscriptRepository**: Domain Layer 定義的儲存庫介面，由 TranscriptRepositoryImpl 實作
 - **IHighlightRepository**: Domain Layer 定義的儲存庫介面，由 HighlightRepositoryImpl 實作
+- **AppState**: 應用狀態資料結構，包含 videoId、videoMetadata（name, size）、transcriptId、selectedSentenceIds、timestamp，用於 SessionStorage 序列化
 
 ## Success Criteria *(mandatory)*
 
@@ -155,26 +187,36 @@
 - **SC-005**: Mock 資料的時間戳合理反映自然說話節奏（平均每個句子 3-5 秒），無時間重疊或異常跳躍
 - **SC-006**: 系統能正確處理邊界情況（如查詢不存在的 ID），返回 null 而不拋出未處理的例外
 - **SC-007**: blob URL 資源能在不需要時被正確釋放，避免記憶體洩漏（可透過 Chrome DevTools Memory Profiler 驗證）
+- **SC-008**: 小視頻（≤ 50MB）在刷新後能在 2 秒內完整恢復（包含視頻檔案、轉錄、選擇狀態），用戶可立即繼續編輯
+- **SC-009**: 大視頻（> 50MB）在刷新後能正確提示用戶重新上傳，並在重新上傳後自動恢復轉錄和選擇狀態
 
 ## Assumptions
 
 - Mock 資料將以 TypeScript 常數或 JSON 檔案形式存在於 `infrastructure/api/mock-data/` 目錄
-- 記憶體儲存足以滿足展示型專案需求，不需要實作 IndexedDB 或 LocalStorage
+- 記憶體 Map 用於運行時資料存取，IndexedDB 用於刷新恢復，兩者配合使用
 - Mock AI 延遲時間設為 1.5 秒，足以模擬真實 API 體驗但不會讓用戶感到明顯卡頓
 - 視頻檔案儲存使用瀏覽器原生 URL.createObjectURL()，無需實作上傳至伺服器的功能
 - 所有 Repository 使用 Map 作為儲存結構，提供 O(1) 的查詢性能
 - 專案採用 Clean Architecture，Infrastructure Layer 僅實作 Domain Layer 定義的介面，不包含業務邏輯
 - 依賴注入將在後續階段（Presentation Layer）配置，Infrastructure Layer 僅提供實作類別
 - Mock 資料的句子 ID 格式為 "sent_1", "sent_2"，段落 ID 格式為 "sec_1", "sec_2"，確保唯一性
+- IndexedDB 的瀏覽器配額至少有 100MB 可用（現代瀏覽器通常提供 GB 級配額）
+- 50MB 作為視頻大小閾值，能涵蓋大部分 demo 用途的視頻（2-5 分鐘 1080p 視頻約 30-40MB）
+- SessionStorage 容量限制（5-10MB）足以儲存元資料和選擇狀態（序列化後通常 < 100KB）
+- 用戶不會在同一瀏覽器的多個 Tab 中同時編輯（不實作跨 Tab 同步）
+- 持久化僅用於防止誤刷新，不作為長期儲存方案（Tab 關閉後清理資料）
+- 使用 `idb` 函式庫（Jake Archibald 的 IndexedDB Promise 包裝）簡化 IndexedDB 操作
 
 ## Out of Scope
 
 - 真實 AI API 整合（如 OpenAI Whisper、Google Speech-to-Text）
 - 視頻檔案上傳至雲端儲存（AWS S3、Azure Blob Storage）
-- 持久化儲存實作（IndexedDB、LocalStorage、SessionStorage）
+- 長期持久化（LocalStorage 用於跨會話儲存）
+- 跨 Tab 資料同步
 - 視頻檔案格式驗證和轉換
 - 錯誤日誌和監控系統
 - Repository 的分頁查詢功能
 - 資料庫遷移和版本控制
 - 多租戶支援和資料隔離
 - 視頻檔案壓縮和優化
+- 離線存取和 Service Worker 快取
