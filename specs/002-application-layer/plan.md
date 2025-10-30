@@ -7,7 +7,7 @@
 
 ## Summary
 
-實作 Application Layer 的核心功能，包含 5 個 Use Cases（UploadVideoUseCase, ProcessTranscriptUseCase, CreateHighlightUseCase, ToggleSentenceInHighlightUseCase, GenerateHighlightUseCase）以及 2 個 Port 介面（ITranscriptGenerator, IFileStorage）。Application Layer 負責協調 Domain Layer 的業務邏輯，透過 Port 介面與 Infrastructure Layer 解耦，並提供 DTO 進行跨層數據傳輸。
+實作 Application Layer 的核心功能，包含 5 個 Use Cases（UploadVideoUseCase, ProcessTranscriptUseCase, CreateHighlightUseCase, ToggleSentenceInHighlightUseCase, GenerateHighlightUseCase）以及 3 個 Port 介面（ITranscriptGenerator, IFileStorage, IVideoProcessor）。Application Layer 負責協調 Domain Layer 的業務邏輯，透過 Port 介面與 Infrastructure Layer 解耦，並提供 DTO 進行跨層數據傳輸。
 
 ## Technical Context
 
@@ -30,9 +30,9 @@
 
 **Scale/Scope**:
 - 5 個 Use Cases
-- 2 個 Port 介面
+- 3 個 Port 介面 (ITranscriptGenerator, IFileStorage, IVideoProcessor)
 - 2 個 DTO 類別
-- 平均每個 Use Case < 100 行代碼
+- 平均每個 Use Case ~110 行代碼（含完整文檔）
 
 ## Constitution Check
 
@@ -204,6 +204,7 @@ tests/
 **Ports**:
 - `ITranscriptGenerator`: 轉錄生成服務
 - `IFileStorage`: 文件儲存服務
+- `IVideoProcessor`: 視頻處理服務（元數據提取）
 
 **Use Cases**:
 - `UploadVideoUseCase`: 輸入、輸出、依賴、流程
@@ -262,7 +263,7 @@ export interface IUploadVideoUseCase {
 | 原則 | 狀態 | 驗證結果 |
 |------|------|----------|
 | Clean Architecture 分層 | ✅ PASS | - `data-model.md` 明確定義 DTOs、Ports、Use Cases 結構<br>- Application Layer 僅依賴 Domain Layer 介面<br>- Ports 由 Infrastructure Layer 實作 |
-| Infrastructure/Presentation 分離 | ✅ PASS | - Ports（ITranscriptGenerator, IFileStorage）明確定義<br>- Use Cases 不知道實作細節<br>- DI Container 管理依賴注入 |
+| Infrastructure/Presentation 分離 | ✅ PASS | - Ports（ITranscriptGenerator, IFileStorage, IVideoProcessor）明確定義<br>- Use Cases 不知道實作細節<br>- DI Container 管理依賴注入 |
 | DDD 模式 | ✅ PASS | - 每個 Use Case 代表完整用戶操作<br>- DTO 轉換邏輯清晰<br>- 聚合協調模式正確（GenerateHighlightUseCase） |
 | TypeScript 型別安全 | ✅ PASS | - 所有 contracts 定義完整型別<br>- 輸入/輸出型別明確<br>- 無 `any` 使用 |
 | 單一職責原則 | ✅ PASS | - 每個 Use Case 職責單一且清晰<br>- 平均程式碼行數預估 < 100 行<br>- 私有方法輔助邏輯提取 |
@@ -273,7 +274,7 @@ export interface IUploadVideoUseCase {
 | 文件 | 狀態 | 內容檢查 |
 |------|------|----------|
 | `research.md` | ✅ 完成 | - 4 個研究主題全部完成<br>- 決策理由清晰<br>- 無 NEEDS CLARIFICATION |
-| `data-model.md` | ✅ 完成 | - 2 個 DTOs 定義完整<br>- 2 個 Ports 定義完整<br>- 5 個 Use Cases 流程清晰<br>- 9 個錯誤類別定義 |
+| `data-model.md` | ✅ 完成 | - 2 個 DTOs 定義完整<br>- 3 個 Ports 定義完整<br>- 5 個 Use Cases 流程清晰<br>- 9 個錯誤類別定義 |
 | `contracts/ports.ts` | ✅ 完成 | - TypeScript 介面定義<br>- JSDoc 註釋完整 |
 | `contracts/use-cases.ts` | ✅ 完成 | - 所有 Use Cases 介面定義<br>- 輸入/輸出型別定義 |
 | `quickstart.md` | ✅ 完成 | - 建立 Use Case 步驟<br>- 測試範例<br>- DI 配置範例<br>- 檢查清單 |

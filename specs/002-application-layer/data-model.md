@@ -232,9 +232,9 @@ export class FileStorageService implements IFileStorage {
 
 ---
 
-### 2.3 IVideoProcessor（可選，未來可能需要）
+### 2.3 IVideoProcessor
 
-**用途**: 視頻處理操作（如元數據提取、縮圖生成）
+**用途**: 視頻處理操作（如元數據提取）
 
 ```typescript
 export interface IVideoProcessor {
@@ -245,18 +245,38 @@ export interface IVideoProcessor {
    * @throws VideoMetadataExtractionError
    */
   extractMetadata(file: File): Promise<VideoMetadata>;
-
-  /**
-   * 生成視頻縮圖
-   * @param file - 視頻文件
-   * @param timeInSeconds - 截取時間（秒）
-   * @returns Promise<string> - 縮圖 URL
-   */
-  generateThumbnail(file: File, timeInSeconds: number): Promise<string>;
 }
 ```
 
-**備註**: 目前 UploadVideoUseCase 內部直接使用 HTMLVideoElement 提取元數據，若未來需要更複雜的視頻處理（如伺服器端處理），可引入此 Port。
+**職責**:
+- `extractMetadata`: 從視頻文件中提取元數據（時長、尺寸、格式）
+
+**實作範例** (Infrastructure Layer):
+```typescript
+// infrastructure/video/VideoProcessorService.ts
+export class VideoProcessorService implements IVideoProcessor {
+  async extractMetadata(file: File): Promise<VideoMetadata> {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      video.onloadedmetadata = () => {
+        resolve(new VideoMetadata(
+          video.duration,
+          video.videoWidth,
+          video.videoHeight,
+          file.type
+        ));
+        URL.revokeObjectURL(video.src);
+      };
+      video.onerror = () => reject(new VideoMetadataExtractionError());
+      video.src = URL.createObjectURL(file);
+    });
+  }
+}
+```
+
+**使用場景**:
+- 在 `UploadVideoUseCase` 中使用，用於上傳視頻時提取元數據
 
 ---
 
@@ -655,6 +675,7 @@ export class FileStorageError extends ApplicationError {
 │  │ Port Implementations            │ │
 │  │ - MockAIService                 │ │
 │  │ - FileStorageService            │ │
+│  │ - VideoProcessorService         │ │
 │  └─────────────────────────────────┘ │
 └──────────────────────────────────────┘
 ```
@@ -666,7 +687,7 @@ export class FileStorageError extends ApplicationError {
 Application Layer 定義了：
 
 - **2 個 DTOs**: `VideoDTO`, `TranscriptDTO`（含巢狀結構）
-- **2 個 Ports**: `ITranscriptGenerator`, `IFileStorage`
+- **3 個 Ports**: `ITranscriptGenerator`, `IFileStorage`, `IVideoProcessor`
 - **5 個 Use Cases**: 涵蓋視頻上傳、轉錄處理、高光管理的完整流程
 - **9 個錯誤類別**: 提供清晰的錯誤語義
 

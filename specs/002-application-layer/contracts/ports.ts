@@ -68,14 +68,14 @@ export interface IFileStorage {
 }
 
 // ============================================================================
-// Video Processor Port (Optional, 未來可能需要)
+// Video Processor Port
 // ============================================================================
 
 /**
- * 視頻處理服務介面（可選）
+ * 視頻處理服務介面
  *
- * 目前 UploadVideoUseCase 內部直接使用 HTMLVideoElement 提取元數據。
- * 若未來需要更複雜的視頻處理（如伺服器端處理、縮圖生成），可引入此 Port。
+ * 由 Infrastructure Layer 實作（如 VideoProcessorService 使用 HTMLVideoElement）
+ * 用於 UploadVideoUseCase 提取視頻元數據
  */
 export interface IVideoProcessor {
   /**
@@ -84,16 +84,10 @@ export interface IVideoProcessor {
    * @param file - 視頻文件
    * @returns Promise<VideoMetadata> - 視頻元數據（時長、尺寸等）
    * @throws VideoMetadataExtractionError - 當提取失敗時
+   *
+   * @example
+   * const metadata = await videoProcessor.extractMetadata(videoFile);
+   * // metadata: { duration: 180, width: 1920, height: 1080, format: 'video/mp4' }
    */
   extractMetadata(file: File): Promise<VideoMetadata>;
-
-  /**
-   * 生成視頻縮圖
-   *
-   * @param file - 視頻文件
-   * @param timeInSeconds - 截取時間（秒）
-   * @returns Promise<string> - 縮圖 URL
-   * @throws VideoProcessingError - 當生成失敗時
-   */
-  generateThumbnail(file: File, timeInSeconds: number): Promise<string>;
 }
