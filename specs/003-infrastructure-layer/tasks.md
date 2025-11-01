@@ -25,10 +25,10 @@
 
 **Purpose**: 專案初始化和基礎結構建立
 
-- [ ] T001 安裝 idb 套件依賴 (執行 `npm install idb`)
-- [ ] T002 [P] 建立專案級 DI 目錄結構 (src/di/)
-- [ ] T003 [P] 建立 Infrastructure Layer 目錄結構 (src/infrastructure/{api,repositories,storage,utils})
-- [ ] T004 [P] 建立測試目錄結構 (tests/unit/infrastructure/, tests/unit/di/)
+- [X] T001 安裝 idb 套件依賴 (執行 `npm install idb`)
+- [X] T002 [P] 建立專案級 DI 目錄結構 (src/di/)
+- [X] T003 [P] 建立 Infrastructure Layer 目錄結構 (src/infrastructure/{api,repositories,storage,utils})
+- [X] T004 [P] 建立測試目錄結構 (tests/unit/infrastructure/, tests/unit/di/)
 
 ---
 
@@ -38,15 +38,15 @@
 
 **⚠️ CRITICAL**: 所有 User Story 工作都依賴此階段完成
 
-- [ ] T005 建立 DI Container 基礎結構 (src/di/container.ts) - 建立 Container 類別,提供 register() 和 resolve() 方法
-- [ ] T006 在 DI Container 中實作 Singleton 生命週期管理 - 確保 BrowserStorage 等共享實例僅建立一次
-- [ ] T007 建立 Persistence DTO 定義 (src/infrastructure/storage/dto/VideoPersistenceDTO.ts)
-- [ ] T008 [P] 建立 Persistence DTO 定義 (src/infrastructure/storage/dto/TranscriptPersistenceDTO.ts)
-- [ ] T009 [P] 建立 Persistence DTO 定義 (src/infrastructure/storage/dto/HighlightPersistenceDTO.ts)
-- [ ] T010 建立 DTO Mapper 工具類別 (src/infrastructure/utils/dto-mapper.ts) - 包含 Entity ↔ PersistenceDTO 雙向轉換
-- [ ] T011 [P] 建立 JSON Validator 工具類別 (src/infrastructure/utils/json-validator.ts) - 驗證 Mock AI JSON 格式
-- [ ] T012 實作 BrowserStorage 內部工具類別 (src/infrastructure/storage/BrowserStorage.ts) - 封裝 IndexedDB + SessionStorage 操作,包含 init(), save/restore 方法, cleanupStaleData()
-- [ ] T013 在 DI Container 中註冊 BrowserStorage 為 Singleton - 確保所有 Repository 共用同一個 BrowserStorage 實例
+- [X] T005 建立 DI Container 基礎結構 (src/di/container.ts) - 建立 Container 類別,提供 register() 和 resolve() 方法
+- [X] T006 在 DI Container 中實作 Singleton 生命週期管理 - 確保 BrowserStorage 等共享實例僅建立一次
+- [X] T007 建立 Persistence DTO 定義 (src/infrastructure/storage/dto/VideoPersistenceDTO.ts)
+- [X] T008 [P] 建立 Persistence DTO 定義 (src/infrastructure/storage/dto/TranscriptPersistenceDTO.ts)
+- [X] T009 [P] 建立 Persistence DTO 定義 (src/infrastructure/storage/dto/HighlightPersistenceDTO.ts)
+- [X] T010 建立 DTO Mapper 工具類別 (src/infrastructure/utils/dto-mapper.ts) - 包含 Entity ↔ PersistenceDTO 雙向轉換
+- [X] T011 [P] 建立 JSON Validator 工具類別 (src/infrastructure/utils/json-validator.ts) - 驗證 Mock AI JSON 格式
+- [X] T012 實作 BrowserStorage 內部工具類別 (src/infrastructure/storage/BrowserStorage.ts) - 封裝 IndexedDB + SessionStorage 操作,包含 init(), save/restore 方法, cleanupStaleData()
+- [X] T013 在 DI Container 中註冊 BrowserStorage 為 Singleton - 確保所有 Repository 共用同一個 BrowserStorage 實例
 
 **Checkpoint**: 基礎設施就緒 - User Story 實作可開始進行
 
