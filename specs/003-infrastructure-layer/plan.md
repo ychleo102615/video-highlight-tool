@@ -71,6 +71,9 @@ specs/003-infrastructure-layer/
 
 ```text
 src/
+├── di/                          # **專案級 DI Container**
+│   └── container.ts            # 依賴注入容器（Infrastructure + Presentation 共用）
+│
 ├── domain/                      # Domain Layer (已存在)
 │   ├── aggregates/
 │   │   ├── Video.ts
@@ -122,6 +125,8 @@ src/
 
 tests/
 └── unit/
+    ├── di/
+    │   └── container.test.ts
     └── infrastructure/
         ├── MockAIService.test.ts
         ├── FileStorageService.test.ts
@@ -132,7 +137,7 @@ tests/
 ```
 
 **Structure Decision**:
-採用 Clean Architecture 標準四層結構（Domain → Application → Infrastructure → Presentation），本次實作專注於 Infrastructure Layer。Infrastructure Layer 不創建新的業務邏輯，僅實作已在 Domain 和 Application Layer 定義的介面。BrowserStorage 為內部工具類別，封裝 IndexedDB 和 SessionStorage 操作，不對外暴露為 Port。
+採用 Clean Architecture 標準四層結構（Domain → Application → Infrastructure/Presentation），本次實作專注於 Infrastructure Layer。Infrastructure Layer 不創建新的業務邏輯，僅實作已在 Domain 和 Application Layer 定義的介面。BrowserStorage 為內部工具類別，封裝 IndexedDB 和 SessionStorage 操作，不對外暴露為 Port。**DI Container 建立在專案級位置 `src/di/container.ts`，作為 Infrastructure 和 Presentation Layer 的共享依賴注入機制**。
 
 ## Complexity Tracking
 

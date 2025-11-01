@@ -107,7 +107,6 @@
 
 ### Edge Cases
 
-- **JSON 尚未暫存時調用 generate()**: MockAIService 應拋出明確錯誤訊息「找不到 videoId 的 Mock 資料，請先上傳 JSON 檔案」，提示開發者需要先調用 setMockData()
 - **JSON 格式無效（非合法 JSON）**: MockAIService 應捕獲 JSON.parse() 錯誤，拋出友善錯誤訊息「JSON 格式無效，請檢查檔案內容」
 - **JSON 缺少必要欄位（sections 或 sentences）**: MockAIService 應拋出明確錯誤「JSON 格式錯誤：缺少必要欄位 'sections'」，列出缺少的欄位名稱
 - **JSON 句子缺少非必要欄位（isHighlight）**: MockAIService 應自動補完為預設值（isHighlight: false），並成功處理，不拋出錯誤
@@ -128,9 +127,9 @@
 
 #### Mock AI Service
 
-- **FR-001**: MockAIService MUST 實作 ITranscriptGenerator 介面，提供 generate(videoId: string) 方法，從記憶體快取讀取對應的 JSON 並解析
-- **FR-002**: MockAIService MUST 提供 setMockData(videoId: string, jsonContent: string) 公開方法，用於暫存 JSON 內容到記憶體 Map（此方法不在 ITranscriptGenerator 介面中，是 Mock 實作的額外功能）
-- **FR-003**: generate(videoId) MUST 從記憶體 Map 讀取對應的 JSON 內容；若不存在該 videoId 的資料，MUST 拋出明確錯誤（例如：「找不到 videoId 的 Mock 資料」）
+- **FR-001**: MockAIService MUST 實作 ITranscriptGenerator 介面，提供 generate(videoId: string): Promise<TranscriptDTO> 方法，從記憶體快取讀取對應的 JSON 並解析
+- **FR-002**: MockAIService MUST 提供 setMockData(videoId: string, jsonContent: string): void 公開方法，用於暫存 JSON 內容到記憶體 Map（此方法不在 ITranscriptGenerator 介面中，是 Mock 實作的額外功能）
+- **FR-003**: generate(videoId) MUST 從記憶體 Map 讀取對應的 JSON 內容；若不存在該 videoId 的資料，MUST 拋出明確錯誤訊息：「找不到 videoId 的 Mock 資料，請先調用 setMockData() 暫存 JSON」
 - **FR-004**: generate(videoId) MUST 解析 JSON 並驗證必要欄位（sections, sentences）；若缺少必要欄位，MUST 拋出明確錯誤訊息（例如：「JSON 格式錯誤：缺少必要欄位 'sections'」）
 - **FR-005**: generate(videoId) MUST 執行寬鬆驗證：若 JSON 缺少非必要欄位（如 isHighlight、fullText），MUST 自動補完預設值（isHighlight: false, fullText: 由所有句子 text 拼接生成）
 - **FR-006**: generate(videoId) MUST 模擬 1.5 秒的處理延遲（使用 setTimeout 或 Promise.delay），在延遲後返回符合 TranscriptDTO 格式的物件
@@ -172,6 +171,12 @@
 - **FR-027**: BrowserStorage MUST 在 init() 方法中初始化 IndexedDB（建立 'videos'、'transcripts'、'highlights' 物件儲存庫），並調用 cleanupStaleData()
 - **FR-028**: BrowserStorage.cleanupStaleData() MUST 刪除所有 sessionId 不等於當前會話 ID 的資料，以及 savedAt 距今超過 24 小時的資料
 
+#### Dependency Injection Container
+
+- **FR-029**: DI Container MUST 建立在 `src/di/container.ts`，提供統一的依賴註冊和解析機制，支援 Singleton 和 Transient 生命週期管理
+- **FR-030**: DI Container MUST 註冊所有 Repository 實作（VideoRepositoryImpl, TranscriptRepositoryImpl, HighlightRepositoryImpl）、Service 實作（MockAIService, FileStorageService）、以及 BrowserStorage 為 Singleton
+- **FR-031**: DI Container MUST 提供 resolve() 方法，供 Use Case 和其他消費者獲取依賴實例
+
 ### Key Entities
 
 - **TranscriptDTO**: 資料傳輸物件，包含完整轉錄文字（fullText）、段落陣列（sections）、段落標題（title）、句子陣列（sentences）、句子文字（text）、時間範圍（startTime, endTime）和高光建議標記（isHighlight）
@@ -180,8 +185,9 @@
 - **IVideoRepository**: Domain Layer 定義的儲存庫介面，由 VideoRepositoryImpl 實作
 - **ITranscriptRepository**: Domain Layer 定義的儲存庫介面，由 TranscriptRepositoryImpl 實作
 - **IHighlightRepository**: Domain Layer 定義的儲存庫介面，由 HighlightRepositoryImpl 實作
-- **BrowserStorage**: Infrastructure Layer 的內部工具類別（非介面），封裝 IndexedDB 和 SessionStorage 操作，由 Repository 透過依賴注入使用。職責包括：初始化資料庫、儲存和恢復資料、清理過期資料、管理會話 ID
+- **BrowserStorage**: Infrastructure Layer 的內部工具類別（**非介面，不定義在 Application Layer 的 Ports 中**），封裝 IndexedDB 和 SessionStorage 操作，由 Repository 透過建構函式直接注入具體實作。職責包括：初始化資料庫、儲存和恢復資料、清理過期資料、管理會話 ID。BrowserStorage 在專案級 DI Container (`src/di/container.ts`) 中註冊為 Singleton，僅供 Infrastructure Layer 的 Repository 使用
 - **PersistenceDTO**: 用於 IndexedDB 儲存的 Plain Objects，包含 VideoDTO、TranscriptDTO、HighlightDTO，對應 Domain Entities 的可序列化表示（無方法，僅資料屬性）
+- **DI Container**: 專案級依賴注入容器（位於 `src/di/container.ts`），集中管理所有跨層依賴關係。負責註冊和解析 Repository、Service、BrowserStorage 等實例。Infrastructure Layer 和 Presentation Layer 共用此容器
 
 ## Success Criteria *(mandatory)*
 
@@ -209,7 +215,8 @@
 - 視頻檔案儲存使用瀏覽器原生 URL.createObjectURL()，無需實作上傳至伺服器的功能
 - 所有 Repository 使用 Map 作為儲存結構，提供 O(1) 的查詢性能
 - 專案採用 Clean Architecture，Infrastructure Layer 僅實作 Domain/Application Layer 定義的介面，不定義新的介面
-- 依賴注入將在後續階段（Presentation Layer）配置，Infrastructure Layer 僅提供實作類別和內部工具
+- BrowserStorage 為 Infrastructure Layer 內部工具類別，不定義介面，Repository 透過建構函式直接接收 BrowserStorage 實例（在 `src/di/container.ts` 中註冊為 Singleton）
+- DI Container 位於 `src/di/container.ts`，為專案級共享基礎設施，Infrastructure Layer 和 Presentation Layer 均透過此容器解析依賴
 - Mock 資料的句子 ID 格式為 "sent_1", "sent_2"，段落 ID 格式為 "sec_1", "sec_2"，確保唯一性
 - IndexedDB 的瀏覽器配額至少有 100MB 可用（現代瀏覽器通常提供 GB 級配額）
 - 50MB 作為視頻大小閾值，能涵蓋大部分 demo 用途的視頻（2-5 分鐘 1080p 視頻約 30-40MB）
