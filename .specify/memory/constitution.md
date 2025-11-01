@@ -92,7 +92,7 @@ src/
 └── presentation/        # 🔵 UI 展示層
     ├── components/     # Vue 組件
     ├── composables/    # Composables
-    └── state/          # Pinia Stores
+    └── stores/         # Pinia Stores
 ```
 
 **依賴方向**:

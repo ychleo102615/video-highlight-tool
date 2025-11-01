@@ -234,6 +234,9 @@
 - [ ] T060 [P] 無障礙性改善：確保色彩對比度符合 WCAG AA 標準（4.5:1）
 - [ ] T061 [P] 新增 Loading 狀態指示器（使用 Naive UI 的 NSpin 組件）
 - [ ] T062 [P] 新增成功/錯誤通知（使用 Naive UI 的 NNotificationProvider）
+- [ ] T062a [P] 邊緣情況處理：為句子選擇添加 Debounce (50ms) 防止快速連續點擊導致狀態錯誤
+- [ ] T062b [P] 邊緣情況處理：測試並處理「預覽區播放時修改句子選擇」場景（暫停播放器並重新載入片段列表）
+- [ ] T062c 邊緣情況處理：決策是否實作「瀏覽器返回/重新整理」提示功能（beforeunload 事件），若不實作則在文件中標註為 Out of Scope
 - [ ] T063 程式碼清理和重構（移除未使用的程式碼、統一命名風格）
 - [ ] T064 執行 TypeScript 型別檢查（npm run type-check）確保無錯誤
 - [ ] T065 執行 ESLint 檢查（npm run lint）確保無 linting 錯誤
@@ -374,7 +377,7 @@ Task: "建立 useHighlight composable 在 src/presentation/composables/useHighli
 
 ## Summary
 
-- **Total Tasks**: 68
+- **Total Tasks**: 71
 - **Task Count by Phase**:
   - Setup: 5 tasks
   - Foundational: 10 tasks
@@ -385,9 +388,9 @@ Task: "建立 useHighlight composable 在 src/presentation/composables/useHighli
   - User Story 5: 4 tasks
   - User Story 6: 5 tasks
   - User Story 7: 6 tasks
-  - Polish: 12 tasks
+  - Polish: 15 tasks (包含 3 個邊緣情況處理任務)
 
-- **Parallel Opportunities**: 共 24 個任務標記為 [P]，可以平行執行
+- **Parallel Opportunities**: 共 27 個任務標記為 [P]，可以平行執行
 - **MVP Scope**: User Stories 1, 2, 3, 6（核心上傳、編輯、預覽、同步功能）
 - **Enhanced Features**: User Stories 4, 5, 7（文字疊加、時間軸、響應式）
 

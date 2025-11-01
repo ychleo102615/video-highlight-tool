@@ -8,7 +8,7 @@
 ## Summary
 
 開發 Presentation Layer，實作視頻高光編輯工具的完整 UI 層，包含：
-- **視頻上傳模組**: 使用 Vue 3 Composition API 建立上傳介面，整合 UploadVideoUseCase 和 ProcessTranscriptUseCase
+- **視頻上傳模組**: 使用 Vue 3 Composition API 建立上傳介面，整合 UploadVideoUseCase 和 ProcessTranscriptUseCase。視頻處理完成後，AI 建議的高光句子自動設為選中狀態（建立預設高光）
 - **編輯區模組**: 顯示轉錄內容（段落、句子、時間戳），支援句子選擇切換和雙向同步
 - **預覽區模組**: 使用 video.js 實作片段播放器、文字疊加層、時間軸視覺化
 - **響應式佈局**: 使用 Tailwind v4 實作桌面（左右分屏）與移動（上下堆疊）的自適應佈局
