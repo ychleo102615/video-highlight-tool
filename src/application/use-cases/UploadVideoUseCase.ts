@@ -49,18 +49,19 @@ export class UploadVideoUseCase {
    * 執行視頻上傳流程
    *
    * @param file - 視頻文件
+   * @param onProgress - 上傳進度回調（0-100），可選
    * @returns Promise<Video> - 建立的 Video Entity
    * @throws InvalidVideoFormatError - 當視頻格式不支援時
    * @throws VideoFileTooLargeError - 當視頻文件過大時
    * @throws VideoMetadataExtractionError - 當元數據提取失敗時
    * @throws FileStorageError - 當文件儲存失敗時
    */
-  async execute(file: File): Promise<Video> {
+  async execute(file: File, onProgress?: (progress: number) => void): Promise<Video> {
     // 1. 驗證輸入
     this.validateInput(file);
 
-    // 2. 儲存文件並獲取 URL
-    const url = await this.fileStorage.save(file);
+    // 2. 儲存文件並獲取 URL（傳遞進度回調）
+    const url = await this.fileStorage.save(file, onProgress);
 
     // 3. 提取視頻元數據
     const metadata = await this.videoProcessor.extractMetadata(file);

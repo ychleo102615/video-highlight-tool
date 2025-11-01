@@ -7,3 +7,4 @@
 export * from './ITranscriptGenerator';
 export * from './IFileStorage';
 export * from './IVideoProcessor';
+export * from './IMockDataProvider';

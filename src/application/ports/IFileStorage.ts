@@ -14,10 +14,11 @@ export interface IFileStorage {
    * 儲存文件並返回可訪問的 URL
    *
    * @param file - 要儲存的文件
+   * @param onProgress - 進度回調（0-100），可選
    * @returns Promise<string> - 文件 URL
    * @throws FileStorageError - 當儲存失敗時
    */
-  save(file: File): Promise<string>;
+  save(file: File, onProgress?: (progress: number) => void): Promise<string>;
 
   /**
    * 刪除文件

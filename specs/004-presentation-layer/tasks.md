@@ -23,11 +23,11 @@
 
 **Purpose**: 專案初始化與基礎設定
 
-- [ ] T001 安裝新依賴套件（tailwindcss@next, @tailwindcss/vite@next, video.js, @types/video.js, naive-ui, @heroicons/vue）
-- [ ] T002 [P] 設定 Tailwind CSS v4 在 vite.config.ts 中新增 tailwindcss() 插件
-- [ ] T003 [P] 建立 src/assets/main.css 並加入 @import "tailwindcss"
-- [ ] T004 [P] 更新 src/main.ts 引入 ./assets/main.css
-- [ ] T005 建立 Presentation Layer 資料夾結構（components/layout, components/upload, components/editing, components/preview, composables, stores, types）
+- [X] T001 安裝新依賴套件（tailwindcss, @tailwindcss/vite, video.js, @types/video.js, naive-ui, @heroicons/vue）
+- [X] T002 [P] 設定 Tailwind CSS 在 vite.config.ts 中新增 tailwindcss() 插件
+- [X] T003 [P] 建立 src/assets/main.css 並加入 @import "tailwindcss"
+- [X] T004 [P] 更新 src/main.ts 引入 ./assets/main.css
+- [X] T005 建立 Presentation Layer 資料夾結構（components/layout, components/upload, components/editing, components/preview, composables, stores, types）
 
 ---
 
@@ -39,25 +39,26 @@
 
 ### Application Layer 更新
 
-- [ ] T006 [P] 新增 IMockDataProvider Port 在 src/application/ports/IMockDataProvider.ts
-- [ ] T007 [P] 更新 IFileStorage Port 在 src/application/ports/IFileStorage.ts 新增 onProgress 回調參數
-- [ ] T008 更新 UploadVideoUseCase 在 src/application/use-cases/UploadVideoUseCase.ts 的 execute 方法新增 onProgress 參數
-- [ ] T009 [P] 新增 UploadVideoWithMockTranscriptUseCase 在 src/application/use-cases/UploadVideoWithMockTranscriptUseCase.ts
+- [X] T006 [P] 新增 IMockDataProvider Port 在 src/application/ports/IMockDataProvider.ts
+- [X] T007 [P] 更新 IFileStorage Port 在 src/application/ports/IFileStorage.ts 新增 onProgress 回調參數
+- [X] T008 更新 UploadVideoUseCase 在 src/application/use-cases/UploadVideoUseCase.ts 的 execute 方法新增 onProgress 參數
+- [X] T009 [P] 新增 UploadVideoWithMockTranscriptUseCase 在 src/application/use-cases/UploadVideoWithMockTranscriptUseCase.ts
 
 ### Infrastructure Layer 更新
 
-- [ ] T010 [P] 更新 MockAIService 在 src/infrastructure/api/MockAIService.ts 實作 IMockDataProvider 介面
-- [ ] T011 [P] 更新 FileStorageService 在 src/infrastructure/storage/FileStorageService.ts 支援 onProgress 回調
+- [X] T010 [P] 更新 MockAIService 在 src/infrastructure/api/MockAIService.ts 實作 IMockDataProvider 介面
+- [X] T011 [P] 更新 FileStorageService 在 src/infrastructure/storage/FileStorageService.ts 支援 onProgress 回調
+- [X] T011a [P] 建立 VideoProcessor 在 src/infrastructure/services/VideoProcessor.ts 實作 IVideoProcessor 介面
 
 ### DI Container 設定
 
-- [ ] T012 更新 DI Container 在 src/di/container.ts 註冊 MockDataProvider 和 UploadVideoWithMockTranscriptUseCase
+- [X] T012 更新 DI Container 在 src/di/container.ts 註冊 MockDataProvider, VideoProcessor, UploadVideoUseCase 和 UploadVideoWithMockTranscriptUseCase
 
 ### Type Definitions
 
-- [ ] T013 [P] 建立 Store Contracts 在 src/presentation/types/store-contracts.ts（複製自 specs/004-presentation-layer/contracts/）
-- [ ] T014 [P] 建立 Component Contracts 在 src/presentation/types/component-contracts.ts（複製自 specs/004-presentation-layer/contracts/）
-- [ ] T015 建立型別統一匯出檔 src/presentation/types/index.ts
+- [X] T013 [P] 建立 Store Contracts 在 src/presentation/types/store-contracts.ts（複製自 specs/004-presentation-layer/contracts/）
+- [X] T014 [P] 建立 Component Contracts 在 src/presentation/types/component-contracts.ts（複製自 specs/004-presentation-layer/contracts/）
+- [X] T015 建立型別統一匯出檔 src/presentation/types/index.ts
 
 **Checkpoint**: 基礎設施就緒 - 現在可以開始平行實作 User Story
 

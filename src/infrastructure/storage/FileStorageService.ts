@@ -27,6 +27,7 @@ export class FileStorageService implements IFileStorage {
    * 儲存檔案並返回 Blob URL
    *
    * @param file - File 物件
+   * @param onProgress - 進度回調（0-100），可選
    * @returns Promise<string> - Blob URL (格式: blob:http://...)
    * @throws FileStorageError - 當 Blob URL 生成失敗時
    *
@@ -34,25 +35,29 @@ export class FileStorageService implements IFileStorage {
    * - 使用 URL.createObjectURL() 生成 blob URL
    * - Blob URL 指向瀏覽器記憶體中的 File 物件
    * - 返回的 URL 可直接用於 <video> 標籤的 src 屬性
+   * - 本地環境：立即完成,進度直接設為 100%
    *
    * 錯誤處理:
    * - 驗證 file 參數有效性,無效時拋出 FileStorageError
    * - 捕獲 URL.createObjectURL() 失敗,拋出 FileStorageError
    */
-  async save(file: File): Promise<string> {
+  async save(file: File, onProgress?: (progress: number) => void): Promise<string> {
     try {
       // 驗證文件是否存在
       if (!file) {
         throw new FileStorageError('File is null or undefined');
       }
 
-      // 生成 Blob URL
+      // 生成 Blob URL（本地環境立即完成）
       const url = URL.createObjectURL(file);
 
       // 驗證 URL 是否成功生成
       if (!url) {
         throw new FileStorageError('Failed to create blob URL');
       }
+
+      // 本地環境：立即完成,進度設為 100%
+      onProgress?.(100);
 
       return url;
     } catch (error) {

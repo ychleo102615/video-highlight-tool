@@ -135,8 +135,11 @@ export async function registerInfrastructureDependencies(): Promise<void> {
   container.registerSingleton('BrowserStorage', () => browserStorage);
 
   // ==================== 2. Services ====================
-  // MockAIService: 實作 ITranscriptGenerator 介面
-  container.registerSingleton('ITranscriptGenerator', () => new MockAIService());
+  // MockAIService: 實作 ITranscriptGenerator 和 IMockDataProvider 介面
+  // 建立單一實例,同時註冊為兩個介面
+  const mockAIService = new MockAIService();
+  container.registerSingleton('ITranscriptGenerator', () => mockAIService);
+  container.registerSingleton('IMockDataProvider', () => mockAIService);
 
   // FileStorageService: 實作 IFileStorage 介面
   container.registerSingleton('IFileStorage', () => new FileStorageService());
@@ -158,5 +161,40 @@ export async function registerInfrastructureDependencies(): Promise<void> {
   container.registerSingleton(
     'IHighlightRepository',
     () => new HighlightRepositoryImpl(container.resolve('BrowserStorage'))
+  );
+
+  // ==================== 4. Use Cases ====================
+  // 註冊 Application Layer Use Cases（按需載入）
+  // 註冊為 Transient，每次使用都是新實例
+
+  // VideoProcessor: 用於提取視頻元數據（使用動態導入）
+  const { VideoProcessor } = await import('@/infrastructure/services/VideoProcessor');
+  container.registerSingleton('IVideoProcessor', () => new VideoProcessor());
+
+  // UploadVideoUseCase: 上傳視頻
+  const { UploadVideoUseCase } = await import(
+    '@/application/use-cases/UploadVideoUseCase'
+  );
+  container.register(
+    'UploadVideoUseCase',
+    () =>
+      new UploadVideoUseCase(
+        container.resolve('IVideoRepository'),
+        container.resolve('IFileStorage'),
+        container.resolve('IVideoProcessor')
+      )
+  );
+
+  // UploadVideoWithMockTranscriptUseCase: 上傳視頻並設定 Mock 轉錄資料
+  const { UploadVideoWithMockTranscriptUseCase } = await import(
+    '@/application/use-cases/UploadVideoWithMockTranscriptUseCase'
+  );
+  container.register(
+    'UploadVideoWithMockTranscriptUseCase',
+    () =>
+      new UploadVideoWithMockTranscriptUseCase(
+        container.resolve('UploadVideoUseCase'),
+        container.resolve('IMockDataProvider')
+      )
   );
 }
