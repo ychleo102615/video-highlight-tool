@@ -7,19 +7,21 @@
 
 ## User Scenarios & Testing *(mandatory)*
 
-### User Story 1 - Mock AI Transcript Generation (Priority: P1)
+### User Story 1 - Mock AI Transcript Generation from Cached JSON (Priority: P1)
 
-開發者需要模擬 AI 處理流程，當系統接收到視頻 ID 時，能夠返回完整的轉錄資料（包含段落、句子、時間戳和高光建議），無需真實的 AI API 調用。
+開發者需要實作 Mock AI Service，模擬真實 AI 處理流程。使用者上傳的 JSON 檔案內容會被預先暫存到記憶體中（關聯 videoId），當調用 generate(videoId) 時，系統從記憶體讀取對應的 JSON，解析並轉換為 TranscriptDTO 返回。
 
-**Why this priority**: 這是整個系統的核心資料來源，沒有轉錄資料就無法進行後續的高光編輯功能。作為最關鍵的基礎設施，必須最優先實作。
+**Why this priority**: 這是整個系統的核心資料來源，沒有轉錄資料就無法進行後續的高光編輯功能。作為最關鍵的基礎設施，必須最優先實作。使用 videoId 作為查詢參數符合真實 AI API 的呼叫模式。
 
-**Independent Test**: 可以透過單元測試獨立驗證：調用 Mock AI Service 並傳入視頻 ID，驗證返回的 JSON 數據結構是否符合 TranscriptDTO 格式，包含所有必要欄位和合理的時間戳。
+**Independent Test**: 可以透過單元測試獨立驗證：先調用 setMockData(videoId, jsonContent) 暫存 JSON，再調用 generate(videoId)，驗證返回的 TranscriptDTO 結構正確，且缺少的欄位（如 isHighlight）已補完為預設值（false）。
 
 **Acceptance Scenarios**:
 
-1. **Given** 系統已啟動且 Mock 資料檔案存在, **When** 調用 MockAIService.generate(videoId), **Then** 系統返回包含完整轉錄的 TranscriptDTO 物件，包含段落標題、句子文字、時間戳和高光建議
-2. **Given** Mock 資料包含 3 個段落共 15 個句子, **When** 開發者調用生成方法, **Then** 返回的資料結構完整保留所有段落和句子，並且時間戳按時間順序排列
-3. **Given** 系統模擬網路延遲, **When** 調用生成方法, **Then** 系統在 1.5 秒後返回結果（模擬真實 API 延遲）
+1. **Given** 使用者上傳了包含 3 個段落共 15 個句子的 JSON，系統已調用 setMockData(videoId, jsonContent) 暫存, **When** 調用 MockAIService.generate(videoId), **Then** 系統從記憶體讀取 JSON 並返回包含完整轉錄的 TranscriptDTO 物件
+2. **Given** JSON 檔案缺少某些句子的 isHighlight 欄位, **When** 調用 generate(videoId), **Then** 系統自動補完缺少的欄位為預設值（isHighlight: false），並成功返回完整的 TranscriptDTO
+3. **Given** JSON 已暫存到記憶體, **When** 調用 generate(videoId), **Then** 系統模擬 1.5 秒延遲後返回結果（模擬真實 AI 處理時間）
+4. **Given** JSON 缺少必要欄位（如 sections 或 sentences）, **When** 調用 generate(videoId), **Then** 系統拋出明確的錯誤訊息（例如：「JSON 格式錯誤：缺少必要欄位 'sections'」）
+5. **Given** 尚未調用 setMockData() 暫存 JSON, **When** 調用 generate(videoId), **Then** 系統拋出錯誤（例如：「找不到 videoId 的 Mock 資料，請先上傳 JSON 檔案」）
 
 ---
 
@@ -105,7 +107,11 @@
 
 ### Edge Cases
 
-- **Mock 資料檔案不存在時**: MockAIService 應提供內建的預設資料，確保系統在任何情況下都能返回有效的轉錄結構
+- **JSON 尚未暫存時調用 generate()**: MockAIService 應拋出明確錯誤訊息「找不到 videoId 的 Mock 資料，請先上傳 JSON 檔案」，提示開發者需要先調用 setMockData()
+- **JSON 格式無效（非合法 JSON）**: MockAIService 應捕獲 JSON.parse() 錯誤，拋出友善錯誤訊息「JSON 格式無效，請檢查檔案內容」
+- **JSON 缺少必要欄位（sections 或 sentences）**: MockAIService 應拋出明確錯誤「JSON 格式錯誤：缺少必要欄位 'sections'」，列出缺少的欄位名稱
+- **JSON 句子缺少非必要欄位（isHighlight）**: MockAIService 應自動補完為預設值（isHighlight: false），並成功處理，不拋出錯誤
+- **JSON 時間戳順序錯誤或重疊**: MockAIService 應發出警告（console.warn）但不阻斷處理，返回完整的 TranscriptDTO
 - **視頻 ID 不存在時的查詢**: 所有 Repository 的查詢方法應一致返回 null，而不是拋出例外
 - **重複儲存相同 ID 的 Entity**: Repository 應覆蓋舊資料（Map.set 行為），確保資料一致性
 - **blob URL 生命週期管理**: 確保在組件卸載或不再需要時調用 URL.revokeObjectURL()，避免記憶體洩漏
@@ -122,48 +128,49 @@
 
 #### Mock AI Service
 
-- **FR-001**: MockAIService MUST 實作 ITranscriptGenerator 介面，提供 generate(videoId: string) 方法
-- **FR-002**: generate() 方法 MUST 返回符合 TranscriptDTO 格式的 JSON 數據，包含 fullText、sections、sentences、startTime、endTime 和 isHighlight 欄位
-- **FR-003**: MockAIService MUST 模擬 1.5 秒的處理延遲（使用 setTimeout 或 Promise.delay）
-- **FR-004**: MockAIService MUST 提供至少 2-3 組不同主題的 Mock 資料（例如：技術分享、產品介紹、教學視頻）
-- **FR-005**: Mock 資料中的句子時間戳 MUST 按時間順序排列，且不重疊（endTime[n] <= startTime[n+1]）
-- **FR-006**: Mock 資料 MUST 包含建議高光句子的標記（isHighlight: true），佔總句子數的 20-30%
+- **FR-001**: MockAIService MUST 實作 ITranscriptGenerator 介面，提供 generate(videoId: string) 方法，從記憶體快取讀取對應的 JSON 並解析
+- **FR-002**: MockAIService MUST 提供 setMockData(videoId: string, jsonContent: string) 公開方法，用於暫存 JSON 內容到記憶體 Map（此方法不在 ITranscriptGenerator 介面中，是 Mock 實作的額外功能）
+- **FR-003**: generate(videoId) MUST 從記憶體 Map 讀取對應的 JSON 內容；若不存在該 videoId 的資料，MUST 拋出明確錯誤（例如：「找不到 videoId 的 Mock 資料」）
+- **FR-004**: generate(videoId) MUST 解析 JSON 並驗證必要欄位（sections, sentences）；若缺少必要欄位，MUST 拋出明確錯誤訊息（例如：「JSON 格式錯誤：缺少必要欄位 'sections'」）
+- **FR-005**: generate(videoId) MUST 執行寬鬆驗證：若 JSON 缺少非必要欄位（如 isHighlight、fullText），MUST 自動補完預設值（isHighlight: false, fullText: 由所有句子 text 拼接生成）
+- **FR-006**: generate(videoId) MUST 模擬 1.5 秒的處理延遲（使用 setTimeout 或 Promise.delay），在延遲後返回符合 TranscriptDTO 格式的物件
+- **FR-007**: generate(videoId) SHOULD 驗證句子時間戳的合理性：若時間戳不按順序或有重疊（endTime[n] > startTime[n+1]），SHOULD 發出警告（console.warn）但不阻斷處理
 
 #### File Storage Service
 
-- **FR-007**: FileStorageService MUST 實作 IFileStorage 介面，提供 save(file: File) 和 delete(url: string) 方法
-- **FR-008**: save() 方法 MUST 使用 URL.createObjectURL() 生成本地 blob URL
-- **FR-009**: delete() 方法 MUST 使用 URL.revokeObjectURL() 釋放資源
-- **FR-010**: save() 方法 MUST 返回有效的 URL 字串（格式：blob:http://...）
+- **FR-008**: FileStorageService MUST 實作 IFileStorage 介面，提供 save(file: File) 和 delete(url: string) 方法
+- **FR-009**: save() 方法 MUST 使用 URL.createObjectURL() 生成本地 blob URL
+- **FR-010**: delete() 方法 MUST 使用 URL.revokeObjectURL() 釋放資源
+- **FR-011**: save() 方法 MUST 返回有效的 URL 字串（格式：blob:http://...）
 
 #### Video Repository
 
-- **FR-011**: VideoRepositoryImpl MUST 實作 IVideoRepository 介面，提供 save() 和 findById() 方法
-- **FR-012**: Repository MUST 使用 Map<string, Video> 作為記憶體儲存結構，僅負責運行時的 CRUD 操作，不直接寫入 IndexedDB
-- **FR-013**: save() 方法 MUST 覆蓋已存在的相同 ID 的 Video Entity
-- **FR-014**: findById() 方法 MUST 在查詢不存在的 ID 時返回 null
+- **FR-012**: VideoRepositoryImpl MUST 實作 IVideoRepository 介面，提供 save() 和 findById() 方法
+- **FR-013**: Repository MUST 使用 Map<string, Video> 作為記憶體儲存結構，僅負責運行時的 CRUD 操作，不直接寫入 IndexedDB
+- **FR-014**: save() 方法 MUST 覆蓋已存在的相同 ID 的 Video Entity
+- **FR-015**: findById() 方法 MUST 在查詢不存在的 ID 時返回 null
 
 #### Transcript Repository
 
-- **FR-015**: TranscriptRepositoryImpl MUST 實作 ITranscriptRepository 介面
-- **FR-016**: Repository MUST 使用 Map<string, Transcript> 作為記憶體儲存結構，僅負責運行時的 CRUD 操作，不直接寫入 IndexedDB
-- **FR-017**: Repository MUST 提供 findByVideoId(videoId: string) 方法，支援按視頻 ID 查詢
+- **FR-016**: TranscriptRepositoryImpl MUST 實作 ITranscriptRepository 介面
+- **FR-017**: Repository MUST 使用 Map<string, Transcript> 作為記憶體儲存結構，僅負責運行時的 CRUD 操作，不直接寫入 IndexedDB
+- **FR-018**: Repository MUST 提供 findByVideoId(videoId: string) 方法，支援按視頻 ID 查詢
 
 #### Highlight Repository
 
-- **FR-018**: HighlightRepositoryImpl MUST 實作 IHighlightRepository 介面
-- **FR-019**: Repository MUST 使用 Map<string, Highlight> 作為記憶體儲存結構，僅負責運行時的 CRUD 操作，不直接寫入 IndexedDB
-- **FR-020**: Repository MUST 提供 findByVideoId(videoId: string) 方法，返回所有關聯到該視頻的 Highlight Entity 陣列
+- **FR-019**: HighlightRepositoryImpl MUST 實作 IHighlightRepository 介面
+- **FR-020**: Repository MUST 使用 Map<string, Highlight> 作為記憶體儲存結構，僅負責運行時的 CRUD 操作，不直接寫入 IndexedDB
+- **FR-021**: Repository MUST 提供 findByVideoId(videoId: string) 方法，返回所有關聯到該視頻的 Highlight Entity 陣列
 
 #### Browser Storage (Internal Helper)
 
-- **FR-021**: BrowserStorage MUST 使用 IndexedDB 儲存小於或等於 50MB 的視頻檔案，檔案以 File 物件直接儲存（IndexedDB 支援 Blob/File），同時記錄 savedAt 時間戳和 sessionId
-- **FR-022**: BrowserStorage MUST 在初始化時生成或讀取 SessionStorage 中的 sessionId（格式：session_timestamp_random），用於識別當前 Tab 會話
-- **FR-023**: Repository 的 findById() 方法 MUST 先查詢記憶體 Map，若未找到則調用 BrowserStorage.restore() 嘗試從 IndexedDB 恢復
-- **FR-024**: BrowserStorage.save() MUST 檢查視頻檔案大小，僅當 ≤ 50MB 時才儲存到 IndexedDB；大視頻僅記錄元資料（id, name, size）到 SessionStorage
-- **FR-025**: 當 IndexedDB 操作失敗（配額不足、權限錯誤）時，BrowserStorage MUST catch 錯誤並 console.warn，不阻斷 Repository 的主流程
-- **FR-026**: BrowserStorage MUST 在 init() 方法中初始化 IndexedDB（建立 'videos'、'transcripts'、'highlights' 物件儲存庫），並調用 cleanupStaleData()
-- **FR-027**: BrowserStorage.cleanupStaleData() MUST 刪除所有 sessionId 不等於當前會話 ID 的資料，以及 savedAt 距今超過 24 小時的資料
+- **FR-022**: BrowserStorage MUST 使用 IndexedDB 儲存小於或等於 50MB 的視頻檔案，檔案以 File 物件直接儲存（IndexedDB 支援 Blob/File），同時記錄 savedAt 時間戳和 sessionId
+- **FR-023**: BrowserStorage MUST 在初始化時生成或讀取 SessionStorage 中的 sessionId（格式：session_timestamp_random），用於識別當前 Tab 會話
+- **FR-024**: Repository 的 findById() 方法 MUST 先查詢記憶體 Map，若未找到則調用 BrowserStorage.restore() 嘗試從 IndexedDB 恢復
+- **FR-025**: BrowserStorage.save() MUST 檢查視頻檔案大小，僅當 ≤ 50MB 時才儲存到 IndexedDB；大視頻僅記錄元資料（id, name, size）到 SessionStorage
+- **FR-026**: 當 IndexedDB 操作失敗（配額不足、權限錯誤）時，BrowserStorage MUST catch 錯誤並 console.warn，不阻斷 Repository 的主流程
+- **FR-027**: BrowserStorage MUST 在 init() 方法中初始化 IndexedDB（建立 'videos'、'transcripts'、'highlights' 物件儲存庫），並調用 cleanupStaleData()
+- **FR-028**: BrowserStorage.cleanupStaleData() MUST 刪除所有 sessionId 不等於當前會話 ID 的資料，以及 savedAt 距今超過 24 小時的資料
 
 ### Key Entities
 
@@ -192,7 +199,9 @@
 
 ## Assumptions
 
-- Mock 資料將以 TypeScript 常數或 JSON 檔案形式存在於 `infrastructure/api/mock-data/` 目錄
+- Mock 轉錄資料來自使用者上傳的 JSON 檔案（與視頻檔案一同上傳），MockAIService 解析 JSON 並轉換為 TranscriptDTO；JSON 內容透過 setMockData(videoId, jsonContent) 暫存到記憶體 Map，generate(videoId) 時從 Map 讀取並解析
+- JSON 檔案僅在記憶體中處理，不需持久化（真正持久化的是解析後的 Transcript Entity，模擬真實場景中 AI 處理結果儲存到資料庫）
+- Presentation Layer 負責在上傳流程中調用 MockAIService.setMockData()，Application Layer 僅調用 generate(videoId)（符合分層職責）
 - 記憶體 Map 用於運行時資料存取（快速），BrowserStorage + IndexedDB 用於刷新恢復（可靠）
 - Repository 負責記憶體 Map 的 CRUD，同時在 save() 時調用 BrowserStorage 儲存，在 findById() 時優先查 Map，找不到才調用 BrowserStorage 恢復
 - BrowserStorage 是內部工具類別（非介面），封裝所有 IndexedDB 和 SessionStorage 操作，由 Repository 透過依賴注入使用
@@ -227,8 +236,13 @@
 
 ### Session 2025-10-30
 
-- Q: IndexedDB 中的視頻檔案儲存策略（應以何種格式儲存視頻 File 物件以確保刷新後可恢復播放？） → A: 直接儲存 File 物件（IndexedDB 原生支援 Blob/File），包含完整二進位資料和 MIME type
-- Q: Tab 關閉時的清理機制（應使用 beforeunload 事件或啟動時檢查時間戳？） → A: 下次啟動時檢查 sessionId 清理（穩健，BrowserStorage.init() 時刪除 sessionId 不匹配的資料及超過 24 小時的資料）
-- Q: Repository 記憶體 Map 與 IndexedDB 的協作模式（Repository 應直接寫入 IndexedDB 還是由專門的工具協調？） → A: Repository 僅操作記憶體 Map，BrowserStorage（內部工具類別）協調持久化（符合關注點分離原則，BrowserStorage 不是介面）
-- Q: 持久化觸發時機（何時將記憶體資料寫入 IndexedDB？） → A: Repository.save() 時同步調用 BrowserStorage.save()，Repository.findById() 時若記憶體未命中則調用 BrowserStorage.restore()
-- Q: BrowserStorage 是否應該定義為介面？ → A: 否，BrowserStorage 是 Infrastructure Layer 的內部工具類別，不對外暴露為 Output Port。Infrastructure Layer 僅實作 Domain/Application Layer 定義的介面，不定義新介面
+- Q: Mock JSON 資料來源（應使用內建預設資料還是使用者上傳？） → A: 使用者上傳 JSON 檔案（與視頻一同上傳），提供更大彈性讓使用者測試不同場景的轉錄資料
+- Q: MockAIService 的 generate() 方法簽名（應接受 jsonContent 還是 videoId？） → A: 接受 videoId 作為參數（符合真實 AI API 呼叫模式），JSON 內容透過 setMockData() 預先暫存到記憶體 Map
+- Q: setMockData() 方法應該放在介面中嗎？ → A: 否，setMockData() 是 MockAIService 的額外公開方法（不在 ITranscriptGenerator 介面中），因為真實 AI Service 不需要此方法。這是 Mock 實作特有的功能
+- Q: 誰負責調用 setMockData() 暫存 JSON？ → A: Presentation Layer 負責（在上傳流程中），因為它知道當前是 Mock 環境。Application Layer 僅調用 generate(videoId)，不知道 Mock 細節
+- Q: JSON 缺少欄位時的處理策略（嚴格驗證還是寬鬆補完？） → A: 寬鬆驗證（Q3: B），必要欄位缺少則拋錯，非必要欄位缺少則自動補完預設值（如 isHighlight: false）
+- Q: JSON 內容是否需要持久化？ → A: 否（Q2: B），JSON 僅在記憶體中處理，真正持久化的是解析後的 Transcript Entity（模擬真實場景中 AI 處理結果儲存到資料庫）
+- Q: IndexedDB 中的視頻檔案儲存策略 → A: 直接儲存 File 物件（IndexedDB 原生支援 Blob/File），包含完整二進位資料和 MIME type
+- Q: Tab 關閉時的清理機制 → A: 下次啟動時檢查 sessionId 清理（穩健，BrowserStorage.init() 時刪除 sessionId 不匹配的資料及超過 24 小時的資料）
+- Q: Repository 與 BrowserStorage 的協作模式 → A: Repository 僅操作記憶體 Map，BrowserStorage（內部工具類別）協調持久化（符合關注點分離原則）
+- Q: BrowserStorage 是否應該定義為介面？ → A: 否，是 Infrastructure Layer 的內部工具類別，不對外暴露為 Output Port
