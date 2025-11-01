@@ -1,0 +1,136 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://video-highlight-tool.local/schemas/mock-transcript-input.json",
+  "title": "Mock AI Transcript Input Schema",
+  "description": "使用者上傳的 JSON 檔案格式，用於 MockAIService 生成轉錄資料",
+  "type": "object",
+  "required": ["sections"],
+  "properties": {
+    "fullText": {
+      "type": "string",
+      "description": "完整轉錄文字（可選，若缺失則由所有句子 text 拼接生成）",
+      "minLength": 1
+    },
+    "sections": {
+      "type": "array",
+      "description": "段落陣列（必須至少包含一個段落）",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/Section"
+      }
+    }
+  },
+  "definitions": {
+    "Section": {
+      "type": "object",
+      "required": ["id", "title", "sentences"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "段落唯一識別碼",
+          "pattern": "^sec_[0-9]+$",
+          "examples": ["sec_1", "sec_2", "sec_3"]
+        },
+        "title": {
+          "type": "string",
+          "description": "段落標題",
+          "minLength": 1,
+          "maxLength": 100,
+          "examples": ["開場介紹", "產品功能展示", "總結"]
+        },
+        "sentences": {
+          "type": "array",
+          "description": "句子陣列（必須至少包含一個句子）",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/Sentence"
+          }
+        }
+      }
+    },
+    "Sentence": {
+      "type": "object",
+      "required": ["id", "text", "startTime", "endTime"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "句子唯一識別碼",
+          "pattern": "^sent_[0-9]+$",
+          "examples": ["sent_1", "sent_2", "sent_3"]
+        },
+        "text": {
+          "type": "string",
+          "description": "句子內容",
+          "minLength": 1,
+          "maxLength": 500,
+          "examples": ["大家好，歡迎來到今天的分享。", "今天我們要討論的主題是前端架構設計。"]
+        },
+        "startTime": {
+          "type": "number",
+          "description": "句子起始時間（秒，精確到小數點後一位）",
+          "minimum": 0,
+          "examples": [0.0, 4.5, 8.0]
+        },
+        "endTime": {
+          "type": "number",
+          "description": "句子結束時間（秒，必須 >= startTime）",
+          "minimum": 0,
+          "examples": [4.5, 8.0, 13.5]
+        },
+        "isHighlight": {
+          "type": "boolean",
+          "description": "是否為 AI 建議的高光句子（可選，預設為 false）",
+          "default": false
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "fullText": "大家好，歡迎來到今天的分享。今天我們要討論的主題是前端架構設計。Clean Architecture 是由 Robert Martin 提出的軟體架構模式。核心理念是讓業務邏輯獨立於框架和外部依賴。",
+      "sections": [
+        {
+          "id": "sec_1",
+          "title": "開場介紹",
+          "sentences": [
+            {
+              "id": "sent_1",
+              "text": "大家好，歡迎來到今天的分享。",
+              "startTime": 0.0,
+              "endTime": 3.5,
+              "isHighlight": true
+            },
+            {
+              "id": "sent_2",
+              "text": "今天我們要討論的主題是前端架構設計。",
+              "startTime": 3.5,
+              "endTime": 7.0,
+              "isHighlight": true
+            }
+          ]
+        },
+        {
+          "id": "sec_2",
+          "title": "Clean Architecture 介紹",
+          "sentences": [
+            {
+              "id": "sent_3",
+              "text": "Clean Architecture 是由 Robert Martin 提出的軟體架構模式。",
+              "startTime": 7.0,
+              "endTime": 12.5,
+              "isHighlight": false
+            },
+            {
+              "id": "sent_4",
+              "text": "核心理念是讓業務邏輯獨立於框架和外部依賴。",
+              "startTime": 12.5,
+              "endTime": 17.0,
+              "isHighlight": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "additionalProperties": false
+}
