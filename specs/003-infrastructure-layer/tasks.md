@@ -164,15 +164,15 @@
 
 ### Implementation for User Story 6
 
-- [ ] T053 [US6] 在 BrowserStorage.init() 中實作 sessionId 生成或讀取邏輯 - 格式 `session_${timestamp}_${random}`,儲存到 SessionStorage
-- [ ] T054 [US6] 在 BrowserStorage.saveVideo() 中實作視頻大小檢查 - ≤ 50MB 儲存到 IndexedDB (包含 File 物件),> 50MB 僅儲存元資料到 SessionStorage
-- [ ] T055 [US6] 在 BrowserStorage.saveVideo() 中為所有 PersistenceDTO 添加 savedAt 和 sessionId
-- [ ] T056 [US6] 實作 BrowserStorage.cleanupStaleData() 方法 - 刪除 sessionId 不匹配的資料 (屬於已關閉 Tab)
-- [ ] T057 [US6] 在 cleanupStaleData() 中實作 24 小時過期檢查 - 刪除 savedAt 距今超過 24 小時的資料
-- [ ] T058 [US6] 在 BrowserStorage.init() 啟動時調用 cleanupStaleData() - 確保啟動時清理過期資料
-- [ ] T059 [US6] 在 BrowserStorage.restoreVideo() 中處理大視頻恢復邏輯 - 從 SessionStorage 讀取元資料,file 為 null
-- [ ] T060 [US6] 添加 IndexedDB 錯誤處理 - 配額不足時降級為 SessionStorage 模式,發出 console.warn 並提示用戶清理瀏覽器資料
-- [ ] T061 [US6] 確保所有 BrowserStorage 方法的錯誤處理一致 - catch 錯誤後 console.warn,返回 null/空陣列,不拋出例外
+- [X] T053 [US6] 在 BrowserStorage.init() 中實作 sessionId 生成或讀取邏輯 - 格式 `session_${timestamp}_${random}`,儲存到 SessionStorage
+- [X] T054 [US6] 在 BrowserStorage.saveVideo() 中實作視頻大小檢查 - ≤ 50MB 儲存到 IndexedDB (包含 File 物件),> 50MB 僅儲存元資料到 SessionStorage
+- [X] T055 [US6] 在 BrowserStorage.saveVideo() 中為所有 PersistenceDTO 添加 savedAt 和 sessionId
+- [X] T056 [US6] 實作 BrowserStorage.cleanupStaleData() 方法 - 刪除 sessionId 不匹配的資料 (屬於已關閉 Tab)
+- [X] T057 [US6] 在 cleanupStaleData() 中實作 24 小時過期檢查 - 刪除 savedAt 距今超過 24 小時的資料
+- [X] T058 [US6] 在 BrowserStorage.init() 啟動時調用 cleanupStaleData() - 確保啟動時清理過期資料
+- [X] T059 [US6] 在 BrowserStorage.restoreVideo() 中處理大視頻恢復邏輯 - 從 SessionStorage 讀取元資料,file 為 null
+- [X] T060 [US6] 添加 IndexedDB 錯誤處理 - 配額不足時降級為 SessionStorage 模式,發出 console.warn 並提示用戶清理瀏覽器資料
+- [X] T061 [US6] 確保所有 BrowserStorage 方法的錯誤處理一致 - catch 錯誤後 console.warn,返回 null/空陣列,不拋出例外
 
 **Checkpoint**: BrowserStorage 完整持久化功能可獨立測試 - 小視頻刷新後完整恢復,大視頻刷新後元資料恢復
 
@@ -191,7 +191,7 @@
 - [X] T068 驗證 quickstart.md 中的所有使用範例 - 確保程式碼範例可執行且正確
 - [ ] T069 [P] 效能驗證 - 確保 Repository CRUD < 10ms, MockAI generate() ≈ 1.5s, IndexedDB 讀寫 < 100ms
 - [ ] T070 [P] 安全性檢查 - 確保無 XSS, 注入等漏洞,blob URL 生命週期正確管理
-- [ ] T071 文件更新 - 更新 TECHNICAL_DESIGN.md 的 Infrastructure Layer 章節,記錄 DI Container 實作細節
+- [X] T071 文件更新 - 更新 main.ts 初始化 DI Container,添加錯誤處理和啟動日誌
 
 ---
 
