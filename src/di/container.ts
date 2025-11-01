@@ -197,4 +197,41 @@ export async function registerInfrastructureDependencies(): Promise<void> {
         container.resolve('IMockDataProvider')
       )
   );
+
+  // ProcessTranscriptUseCase: 處理視頻轉錄
+  const { ProcessTranscriptUseCase } = await import(
+    '@/application/use-cases/ProcessTranscriptUseCase'
+  );
+  container.register(
+    'ProcessTranscriptUseCase',
+    () =>
+      new ProcessTranscriptUseCase(
+        container.resolve('ITranscriptRepository'),
+        container.resolve('IVideoRepository'),
+        container.resolve('ITranscriptGenerator')
+      )
+  );
+
+  // CreateHighlightUseCase: 建立高光
+  const { CreateHighlightUseCase } = await import(
+    '@/application/use-cases/CreateHighlightUseCase'
+  );
+  container.register(
+    'CreateHighlightUseCase',
+    () =>
+      new CreateHighlightUseCase(
+        container.resolve('IHighlightRepository'),
+        container.resolve('IVideoRepository')
+      )
+  );
+
+  // ToggleSentenceInHighlightUseCase: 切換句子選中狀態
+  const { ToggleSentenceInHighlightUseCase } = await import(
+    '@/application/use-cases/ToggleSentenceInHighlightUseCase'
+  );
+  container.register(
+    'ToggleSentenceInHighlightUseCase',
+    () =>
+      new ToggleSentenceInHighlightUseCase(container.resolve('IHighlightRepository'))
+  );
 }

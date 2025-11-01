@@ -76,14 +76,14 @@
 
 ### Implementation for User Story 1
 
-- [ ] T016 [P] [US1] 建立 videoStore 在 src/presentation/stores/videoStore.ts（State: video, isUploading, uploadProgress, error）
-- [ ] T017 [P] [US1] 建立 transcriptStore 在 src/presentation/stores/transcriptStore.ts（State: transcript, isProcessing, playingSentenceId, error）
-- [ ] T018 [P] [US1] 建立 highlightStore 在 src/presentation/stores/highlightStore.ts（State: currentHighlight, isLoading, error）
-- [ ] T019 [P] [US1] 建立 useVideoUpload composable 在 src/presentation/composables/useVideoUpload.ts
-- [ ] T020 [P] [US1] 建立 useTranscript composable 在 src/presentation/composables/useTranscript.ts
-- [ ] T021 [US1] 建立 VideoUpload 組件在 src/presentation/components/upload/VideoUpload.vue（支援視頻和可選轉錄 JSON 檔案上傳）
-- [ ] T022 [US1] 整合 VideoUpload 到 App.vue 並測試上傳流程（包含錯誤處理和進度顯示）
-- [ ] T023 [US1] 測試上傳完成後自動觸發轉錄處理和預設高光建立
+- [X] T016 [P] [US1] 建立 videoStore 在 src/presentation/stores/videoStore.ts（State: video, isUploading, uploadProgress, error）
+- [X] T017 [P] [US1] 建立 transcriptStore 在 src/presentation/stores/transcriptStore.ts（State: transcript, isProcessing, playingSentenceId, error）
+- [X] T018 [P] [US1] 建立 highlightStore 在 src/presentation/stores/highlightStore.ts（State: currentHighlight, isLoading, error）
+- [X] T019 [P] [US1] 建立 useVideoUpload composable 在 src/presentation/composables/useVideoUpload.ts
+- [X] T020 [P] [US1] 建立 useTranscript composable 在 src/presentation/composables/useTranscript.ts
+- [X] T021 [US1] 建立 VideoUpload 組件在 src/presentation/components/upload/VideoUpload.vue（支援視頻和可選轉錄 JSON 檔案上傳）
+- [X] T022 [US1] 整合 VideoUpload 到 App.vue 並測試上傳流程（包含錯誤處理和進度顯示）
+- [X] T023 [US1] 測試上傳完成後自動觸發轉錄處理和預設高光建立
 
 **Checkpoint**: 此時 User Story 1 應完全可用且可獨立測試（視頻上傳 → AI 處理 → 預設高光建立）
 
