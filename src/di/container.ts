@@ -4,15 +4,14 @@
  * 提供依賴管理和生命週期控制,支援 Singleton 模式
  */
 
-type Constructor<T = any> = new (...args: any[]) => T;
-type Factory<T = any> = () => T;
+type Factory<T = unknown> = () => T;
 
 enum Lifecycle {
   Transient = 'transient', // 每次 resolve 都建立新實例
-  Singleton = 'singleton'   // 僅建立一次,後續返回同一個實例
+  Singleton = 'singleton', // 僅建立一次,後續返回同一個實例
 }
 
-interface Registration<T = any> {
+interface Registration<T = unknown> {
   factory: Factory<T>;
   lifecycle: Lifecycle;
   instance?: T; // Singleton 實例快取
@@ -106,15 +105,58 @@ export const container = new Container();
  * 註冊 Infrastructure Layer 依賴
  *
  * 應在應用啟動時調用此函式,確保所有依賴都已正確註冊
+ *
+ * 註冊順序:
+ * 1. BrowserStorage (基礎設施,被 Repository 依賴)
+ * 2. Services (MockAIService, FileStorageService)
+ * 3. Repositories (VideoRepositoryImpl, TranscriptRepositoryImpl, HighlightRepositoryImpl)
  */
 export async function registerInfrastructureDependencies(): Promise<void> {
   // 動態導入以避免循環依賴
   const { BrowserStorage } = await import('@/infrastructure/storage/BrowserStorage');
+  const { MockAIService } = await import('@/infrastructure/api/MockAIService');
+  const { FileStorageService } = await import('@/infrastructure/storage/FileStorageService');
+  const { VideoRepositoryImpl } = await import(
+    '@/infrastructure/repositories/VideoRepositoryImpl'
+  );
+  const { TranscriptRepositoryImpl } = await import(
+    '@/infrastructure/repositories/TranscriptRepositoryImpl'
+  );
+  const { HighlightRepositoryImpl } = await import(
+    '@/infrastructure/repositories/HighlightRepositoryImpl'
+  );
 
+  // ==================== 1. BrowserStorage ====================
   // 建立並初始化 BrowserStorage 實例
   const browserStorage = new BrowserStorage();
   await browserStorage.init();
 
   // 註冊為 Singleton (所有 Repository 共用同一個實例)
   container.registerSingleton('BrowserStorage', () => browserStorage);
+
+  // ==================== 2. Services ====================
+  // MockAIService: 實作 ITranscriptGenerator 介面
+  container.registerSingleton('ITranscriptGenerator', () => new MockAIService());
+
+  // FileStorageService: 實作 IFileStorage 介面
+  container.registerSingleton('IFileStorage', () => new FileStorageService());
+
+  // ==================== 3. Repositories ====================
+  // VideoRepositoryImpl: 實作 IVideoRepository 介面
+  container.registerSingleton(
+    'IVideoRepository',
+    () => new VideoRepositoryImpl(container.resolve('BrowserStorage'))
+  );
+
+  // TranscriptRepositoryImpl: 實作 ITranscriptRepository 介面
+  container.registerSingleton(
+    'ITranscriptRepository',
+    () => new TranscriptRepositoryImpl(container.resolve('BrowserStorage'))
+  );
+
+  // HighlightRepositoryImpl: 實作 IHighlightRepository 介面
+  container.registerSingleton(
+    'IHighlightRepository',
+    () => new HighlightRepositoryImpl(container.resolve('BrowserStorage'))
+  );
 }

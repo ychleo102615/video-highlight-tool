@@ -17,11 +17,7 @@ import { TimeStamp } from '@/domain/value-objects/TimeStamp';
 import { TimeRange } from '@/domain/value-objects/TimeRange';
 
 import type { VideoPersistenceDTO } from '../storage/dto/VideoPersistenceDTO';
-import type {
-  TranscriptPersistenceDTO,
-  SectionDTO,
-  SentenceDTO,
-} from '../storage/dto/TranscriptPersistenceDTO';
+import type { TranscriptPersistenceDTO } from '../storage/dto/TranscriptPersistenceDTO';
 import type { HighlightPersistenceDTO } from '../storage/dto/HighlightPersistenceDTO';
 
 export class DTOMapper {

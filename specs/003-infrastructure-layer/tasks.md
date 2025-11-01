@@ -60,14 +60,14 @@
 
 ### Implementation for User Story 1
 
-- [ ] T014 [US1] 實作 MockAIService 類別基本結構 (src/infrastructure/api/MockAIService.ts) - 實作 ITranscriptGenerator 介面,建立 mockDataMap: Map<string, string>
-- [ ] T015 [US1] 實作 setMockData(videoId, jsonContent) 公開方法 - 暫存 JSON 字串到記憶體 Map
-- [ ] T016 [US1] 實作 generate(videoId) 方法 - 從 Map 讀取 JSON,若不存在則拋出錯誤「找不到 videoId 的 Mock 資料,請先上傳 JSON 檔案」
-- [ ] T017 [US1] 在 generate() 中整合 JSONValidator - 驗證必要欄位 (sections, sentences),缺失則拋出明確錯誤訊息
-- [ ] T018 [US1] 在 generate() 中實作寬鬆補完邏輯 - isHighlight 預設 false, fullText 由句子 text 拼接生成
-- [ ] T019 [US1] 在 generate() 中實作時間戳合理性檢查 - 時間重疊或順序錯誤發出 console.warn 但不阻斷
-- [ ] T020 [US1] 在 generate() 中添加 1.5 秒模擬延遲 (使用 setTimeout/Promise.delay)
-- [ ] T021 [US1] 在 generate() 中使用 DTOMapper 將解析結果轉換為 TranscriptDTO (Application Layer DTO)
+- [X] T014 [US1] 實作 MockAIService 類別基本結構 (src/infrastructure/api/MockAIService.ts) - 實作 ITranscriptGenerator 介面,建立 mockDataMap: Map<string, string>
+- [X] T015 [US1] 實作 setMockData(videoId, jsonContent) 公開方法 - 暫存 JSON 字串到記憶體 Map
+- [X] T016 [US1] 實作 generate(videoId) 方法 - 從 Map 讀取 JSON,若不存在則拋出錯誤「找不到 videoId 的 Mock 資料,請先上傳 JSON 檔案」
+- [X] T017 [US1] 在 generate() 中整合 JSONValidator - 驗證必要欄位 (sections, sentences),缺失則拋出明確錯誤訊息
+- [X] T018 [US1] 在 generate() 中實作寬鬆補完邏輯 - isHighlight 預設 false, fullText 由句子 text 拼接生成
+- [X] T019 [US1] 在 generate() 中實作時間戳合理性檢查 - 時間重疊或順序錯誤發出 console.warn 但不阻斷
+- [X] T020 [US1] 在 generate() 中添加 1.5 秒模擬延遲 (使用 setTimeout/Promise.delay)
+- [X] T021 [US1] 在 generate() 中使用 DTOMapper 將解析結果轉換為 TranscriptDTO (Application Layer DTO)
 
 **Checkpoint**: MockAIService 完整功能可獨立測試 - setMockData() → generate() → 返回正確 TranscriptDTO
 
@@ -81,10 +81,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T022 [US2] 實作 FileStorageService 類別 (src/infrastructure/storage/FileStorageService.ts) - 實作 IFileStorage 介面
-- [ ] T023 [US2] 實作 save(file: File) 方法 - 使用 URL.createObjectURL() 生成 blob URL,返回 URL 字串
-- [ ] T024 [US2] 實作 delete(url: string) 方法 - 使用 URL.revokeObjectURL() 釋放資源
-- [ ] T025 [US2] 添加錯誤處理 - 捕獲 URL 操作失敗,發出 console.warn 但不拋出例外
+- [X] T022 [US2] 實作 FileStorageService 類別 (src/infrastructure/storage/FileStorageService.ts) - 實作 IFileStorage 介面
+- [X] T023 [US2] 實作 save(file: File) 方法 - 使用 URL.createObjectURL() 生成 blob URL,返回 URL 字串
+- [X] T024 [US2] 實作 delete(url: string) 方法 - 使用 URL.revokeObjectURL() 釋放資源
+- [X] T025 [US2] 添加錯誤處理 - 捕獲 URL 操作失敗,發出 console.warn 但不拋出例外
 
 **Checkpoint**: FileStorageService 完整功能可獨立測試 - save() 生成有效 URL, delete() 釋放資源
 
@@ -98,14 +98,14 @@
 
 ### Implementation for User Story 3
 
-- [ ] T026 [US3] 實作 VideoRepositoryImpl 類別 (src/infrastructure/repositories/VideoRepositoryImpl.ts) - 實作 IVideoRepository 介面,建立 videos: Map<string, Video>
-- [ ] T027 [US3] 在建構函式注入 BrowserStorage 依賴 - private browserStorage: BrowserStorage
-- [ ] T028 [US3] 實作 save(video: Video) 方法 - 儲存到記憶體 Map,並調用 browserStorage.saveVideo(persistenceDto)
-- [ ] T029 [US3] 在 save() 中使用 DTOMapper 轉換 Entity → VideoPersistenceDTO (包含 savedAt, sessionId)
-- [ ] T030 [US3] 實作 findById(id: string) 方法 - 先查記憶體 Map,找不到則調用 browserStorage.restoreVideo()
-- [ ] T031 [US3] 在 findById() 中使用 DTOMapper 轉換 VideoPersistenceDTO → Entity (若從 IndexedDB 恢復)
-- [ ] T032 [US3] 確保 findById() 查詢不存在 ID 時返回 null (不拋出例外)
-- [ ] T033 [US3] 添加錯誤處理 - 捕獲 BrowserStorage 錯誤,記錄 console.warn 但不阻斷主流程
+- [X] T026 [US3] 實作 VideoRepositoryImpl 類別 (src/infrastructure/repositories/VideoRepositoryImpl.ts) - 實作 IVideoRepository 介面,建立 videos: Map<string, Video>
+- [X] T027 [US3] 在建構函式注入 BrowserStorage 依賴 - private browserStorage: BrowserStorage
+- [X] T028 [US3] 實作 save(video: Video) 方法 - 儲存到記憶體 Map,並調用 browserStorage.saveVideo(persistenceDto)
+- [X] T029 [US3] 在 save() 中使用 DTOMapper 轉換 Entity → VideoPersistenceDTO (包含 savedAt, sessionId)
+- [X] T030 [US3] 實作 findById(id: string) 方法 - 先查記憶體 Map,找不到則調用 browserStorage.restoreVideo()
+- [X] T031 [US3] 在 findById() 中使用 DTOMapper 轉換 VideoPersistenceDTO → Entity (若從 IndexedDB 恢復)
+- [X] T032 [US3] 確保 findById() 查詢不存在 ID 時返回 null (不拋出例外)
+- [X] T033 [US3] 添加錯誤處理 - 捕獲 BrowserStorage 錯誤,記錄 console.warn 但不阻斷主流程
 
 **Checkpoint**: VideoRepositoryImpl 完整功能可獨立測試 - save() → findById() → 返回正確 Entity,刷新後可從 IndexedDB 恢復
 
@@ -119,15 +119,15 @@
 
 ### Implementation for User Story 4
 
-- [ ] T034 [US4] 實作 TranscriptRepositoryImpl 類別 (src/infrastructure/repositories/TranscriptRepositoryImpl.ts) - 實作 ITranscriptRepository 介面,建立 transcripts: Map<string, Transcript>
-- [ ] T035 [US4] 在建構函式注入 BrowserStorage 依賴 - private browserStorage: BrowserStorage
-- [ ] T036 [US4] 實作 save(transcript: Transcript) 方法 - 儲存到記憶體 Map,並調用 browserStorage.saveTranscript(persistenceDto)
-- [ ] T037 [US4] 在 save() 中使用 DTOMapper 轉換 Entity → TranscriptPersistenceDTO (包含 savedAt, sessionId)
-- [ ] T038 [US4] 實作 findById(id: string) 方法 - 先查記憶體 Map,找不到則調用 browserStorage.restoreTranscript()
-- [ ] T039 [US4] 實作 findByVideoId(videoId: string) 方法 - 先查記憶體 Map (遍歷比對 videoId),找不到則調用 browserStorage.restoreTranscriptByVideoId()
-- [ ] T040 [US4] 在 findById() 和 findByVideoId() 中使用 DTOMapper 轉換 TranscriptPersistenceDTO → Entity
-- [ ] T041 [US4] 確保查詢方法返回 null (而非拋出例外) 當資料不存在時
-- [ ] T042 [US4] 添加錯誤處理 - 捕獲 BrowserStorage 錯誤,記錄 console.warn 但不阻斷主流程
+- [X] T034 [US4] 實作 TranscriptRepositoryImpl 類別 (src/infrastructure/repositories/TranscriptRepositoryImpl.ts) - 實作 ITranscriptRepository 介面,建立 transcripts: Map<string, Transcript>
+- [X] T035 [US4] 在建構函式注入 BrowserStorage 依賴 - private browserStorage: BrowserStorage
+- [X] T036 [US4] 實作 save(transcript: Transcript) 方法 - 儲存到記憶體 Map,並調用 browserStorage.saveTranscript(persistenceDto)
+- [X] T037 [US4] 在 save() 中使用 DTOMapper 轉換 Entity → TranscriptPersistenceDTO (包含 savedAt, sessionId)
+- [X] T038 [US4] 實作 findById(id: string) 方法 - 先查記憶體 Map,找不到則調用 browserStorage.restoreTranscript()
+- [X] T039 [US4] 實作 findByVideoId(videoId: string) 方法 - 先查記憶體 Map (遍歷比對 videoId),找不到則調用 browserStorage.restoreTranscriptByVideoId()
+- [X] T040 [US4] 在 findById() 和 findByVideoId() 中使用 DTOMapper 轉換 TranscriptPersistenceDTO → Entity
+- [X] T041 [US4] 確保查詢方法返回 null (而非拋出例外) 當資料不存在時
+- [X] T042 [US4] 添加錯誤處理 - 捕獲 BrowserStorage 錯誤,記錄 console.warn 但不阻斷主流程
 
 **Checkpoint**: TranscriptRepositoryImpl 完整功能可獨立測試 - save() → findByVideoId() → 返回正確 Transcript
 
@@ -141,16 +141,16 @@
 
 ### Implementation for User Story 5
 
-- [ ] T043 [US5] 實作 HighlightRepositoryImpl 類別 (src/infrastructure/repositories/HighlightRepositoryImpl.ts) - 實作 IHighlightRepository 介面,建立 highlights: Map<string, Highlight>
-- [ ] T044 [US5] 在建構函式注入 BrowserStorage 依賴 - private browserStorage: BrowserStorage
-- [ ] T045 [US5] 實作 save(highlight: Highlight) 方法 - 儲存到記憶體 Map,並調用 browserStorage.saveHighlight(persistenceDto)
-- [ ] T046 [US5] 在 save() 中使用 DTOMapper 轉換 Entity → HighlightPersistenceDTO (selectedSentenceIds Set → Array)
-- [ ] T047 [US5] 實作 findById(id: string) 方法 - 先查記憶體 Map,找不到則調用 browserStorage.restoreHighlight()
-- [ ] T048 [US5] 實作 findByVideoId(videoId: string) 方法 - 先查記憶體 Map (遍歷比對 videoId),找不到則調用 browserStorage.restoreHighlightsByVideoId()
-- [ ] T049 [US5] 在 findById() 和 findByVideoId() 中使用 DTOMapper 轉換 HighlightPersistenceDTO → Entity
-- [ ] T050 [US5] 在 DTOMapper 中處理 Highlight 恢復邏輯 - 逐一調用 addSentence() 重建內部狀態
-- [ ] T051 [US5] 確保 findByVideoId() 返回空陣列 (而非 null) 當沒有資料時
-- [ ] T052 [US5] 添加錯誤處理 - 捕獲 BrowserStorage 錯誤,記錄 console.warn 但不阻斷主流程
+- [X] T043 [US5] 實作 HighlightRepositoryImpl 類別 (src/infrastructure/repositories/HighlightRepositoryImpl.ts) - 實作 IHighlightRepository 介面,建立 highlights: Map<string, Highlight>
+- [X] T044 [US5] 在建構函式注入 BrowserStorage 依賴 - private browserStorage: BrowserStorage
+- [X] T045 [US5] 實作 save(highlight: Highlight) 方法 - 儲存到記憶體 Map,並調用 browserStorage.saveHighlight(persistenceDto)
+- [X] T046 [US5] 在 save() 中使用 DTOMapper 轉換 Entity → HighlightPersistenceDTO (selectedSentenceIds Set → Array)
+- [X] T047 [US5] 實作 findById(id: string) 方法 - 先查記憶體 Map,找不到則調用 browserStorage.restoreHighlight()
+- [X] T048 [US5] 實作 findByVideoId(videoId: string) 方法 - 先查記憶體 Map (遍歷比對 videoId),找不到則調用 browserStorage.restoreHighlightsByVideoId()
+- [X] T049 [US5] 在 findById() 和 findByVideoId() 中使用 DTOMapper 轉換 HighlightPersistenceDTO → Entity
+- [X] T050 [US5] 在 DTOMapper 中處理 Highlight 恢復邏輯 - 逐一調用 addSentence() 重建內部狀態
+- [X] T051 [US5] 確保 findByVideoId() 返回空陣列 (而非 null) 當沒有資料時
+- [X] T052 [US5] 添加錯誤處理 - 捕獲 BrowserStorage 錯誤,記錄 console.warn 但不阻斷主流程
 
 **Checkpoint**: HighlightRepositoryImpl 完整功能可獨立測試 - save() → findByVideoId() → 返回所有相關 Highlight Entity
 
@@ -182,13 +182,13 @@
 
 **Purpose**: 跨多個 User Story 的改進和最終整合
 
-- [ ] T062 [P] 程式碼審查與重構 - 確保符合 Clean Architecture 分層原則,無違反依賴規則
-- [ ] T063 [P] 添加 TypeScript 型別完整性檢查 - 確保型別覆蓋率 > 90%
-- [ ] T064 在 DI Container 中註冊 MockAIService - 註冊為 Singleton,提供給 Use Case 使用
-- [ ] T065 [P] 在 DI Container 中註冊 FileStorageService - 註冊為 Singleton
-- [ ] T066 在 DI Container 中註冊所有 Repository 實作 - VideoRepositoryImpl, TranscriptRepositoryImpl, HighlightRepositoryImpl (依賴 BrowserStorage)
-- [ ] T067 驗證 DI Container 可正確解析所有依賴 - 透過單元測試驗證 resolve() 方法返回正確實例
-- [ ] T068 驗證 quickstart.md 中的所有使用範例 - 確保程式碼範例可執行且正確
+- [X] T062 [P] 程式碼審查與重構 - 確保符合 Clean Architecture 分層原則,無違反依賴規則
+- [X] T063 [P] 添加 TypeScript 型別完整性檢查 - 確保型別覆蓋率 > 90%
+- [X] T064 在 DI Container 中註冊 MockAIService - 註冊為 Singleton,提供給 Use Case 使用
+- [X] T065 [P] 在 DI Container 中註冊 FileStorageService - 註冊為 Singleton
+- [X] T066 在 DI Container 中註冊所有 Repository 實作 - VideoRepositoryImpl, TranscriptRepositoryImpl, HighlightRepositoryImpl (依賴 BrowserStorage)
+- [X] T067 驗證 DI Container 可正確解析所有依賴 - 透過單元測試驗證 resolve() 方法返回正確實例
+- [X] T068 驗證 quickstart.md 中的所有使用範例 - 確保程式碼範例可執行且正確
 - [ ] T069 [P] 效能驗證 - 確保 Repository CRUD < 10ms, MockAI generate() ≈ 1.5s, IndexedDB 讀寫 < 100ms
 - [ ] T070 [P] 安全性檢查 - 確保無 XSS, 注入等漏洞,blob URL 生命週期正確管理
 - [ ] T071 文件更新 - 更新 TECHNICAL_DESIGN.md 的 Infrastructure Layer 章節,記錄 DI Container 實作細節

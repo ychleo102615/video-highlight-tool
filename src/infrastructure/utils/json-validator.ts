@@ -40,10 +40,14 @@ export class JSONValidator {
    */
   static validate(jsonContent: string): TranscriptData {
     // 1. 解析 JSON
-    let data: any;
+    let data: Record<string, unknown>;
     try {
-      data = JSON.parse(jsonContent);
-    } catch (error) {
+      const parsed = JSON.parse(jsonContent);
+      if (typeof parsed !== 'object' || parsed === null) {
+        throw new Error('JSON 格式錯誤:根節點必須是物件');
+      }
+      data = parsed as Record<string, unknown>;
+    } catch {
       throw new Error('JSON 格式錯誤:無法解析 JSON 字串');
     }
 
@@ -129,7 +133,7 @@ export class JSONValidator {
       }
     }
 
-    return data as TranscriptData;
+    return data as unknown as TranscriptData;
   }
 
   /**
