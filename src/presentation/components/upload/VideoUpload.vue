@@ -20,7 +20,7 @@ const selectedTranscriptFile = ref<File | null>(null)
 // ========================================
 // Constants
 // ========================================
-const SUPPORTED_VIDEO_FORMATS = ['video/mp4', 'video/mov', 'video/webm']
+const SUPPORTED_VIDEO_FORMATS = ['video/mp4', 'video/quicktime', 'video/webm']
 const MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB
 
 // ========================================
@@ -130,7 +130,7 @@ function clearTranscriptFile() {
       <input
         ref="videoFileInput"
         type="file"
-        accept="video/mp4,video/mov,video/webm"
+        :accept="SUPPORTED_VIDEO_FORMATS.join(',')"
         class="hidden"
         @change="handleVideoFileChange"
       />

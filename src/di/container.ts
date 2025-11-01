@@ -206,9 +206,9 @@ export async function registerInfrastructureDependencies(): Promise<void> {
     'ProcessTranscriptUseCase',
     () =>
       new ProcessTranscriptUseCase(
+        container.resolve('ITranscriptGenerator'),
         container.resolve('ITranscriptRepository'),
-        container.resolve('IVideoRepository'),
-        container.resolve('ITranscriptGenerator')
+        container.resolve('IVideoRepository')
       )
   );
 
