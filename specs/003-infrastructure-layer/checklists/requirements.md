@@ -85,22 +85,35 @@ All validation items passed successfully after adding persistence requirements. 
 5. Each user story includes "Independent Test" section, making it clear how to validate functionality in isolation
 6. Persistence strategy is pragmatic: 50MB threshold balances user experience with implementation complexity
 
-**Changes in Update (2025-10-30)**:
+**Changes in Update (2025-10-30 - Revision 2)**:
 - Added User Story 6: Basic Persistence for Accidental Refresh (Priority P2)
-- Added FR-021 to FR-027: Persistence Service requirements
+- Added FR-021 to FR-027: BrowserStorage (internal helper) requirements
+- **CRITICAL ARCHITECTURE CORRECTION**: Replaced `IPersistenceService` interface with `BrowserStorage` internal tool class
+  - Reason: Infrastructure Layer should NOT define new interfaces (violates Clean Architecture principles)
+  - BrowserStorage is an internal helper, not an Output Port interface
+  - Only Repository uses BrowserStorage (through constructor injection)
+  - This preserves 002-application-layer spec integrity (no need to modify it)
 - Added SC-008 and SC-009: Measurable persistence outcomes
-- Updated Assumptions: Added 6 new assumptions about IndexedDB quotas, thresholds, and usage patterns
+- Updated Assumptions: Clarified that BrowserStorage is internal, not an interface; Infrastructure Layer only implements existing interfaces
 - Updated Edge Cases: Added 5 new edge cases for persistence scenarios
-- Updated Key Entities: Added IPersistenceService and AppState
+- Updated Key Entities: Added BrowserStorage (tool class) instead of IPersistenceService (interface)
 - Updated Out of Scope: Clarified that long-term storage and cross-tab sync are excluded
 
 **Implementation Approach**:
-- Small videos (≤ 50MB): Full recovery via IndexedDB
-- Large videos (> 50MB): Metadata recovery via SessionStorage, prompt for re-upload
-- Graceful degradation: If IndexedDB fails, fall back to SessionStorage-only mode
-- Automatic cleanup: IndexedDB data cleared when tab closes
+- Repository handles in-memory Map + delegates to BrowserStorage for persistence
+- BrowserStorage is injected into Repository via constructor (concrete class, not interface)
+- Small videos (≤ 50MB): Full file recovery via IndexedDB
+- Large videos (> 50MB): No file storage, Repository returns null on restore
+- Graceful degradation: If IndexedDB fails, BrowserStorage warns and continues (non-blocking)
+- Automatic cleanup: BrowserStorage checks sessionId on init(), cleans stale data from closed tabs
+
+**Architecture Compliance**:
+- ✅ Infrastructure Layer does NOT define new interfaces
+- ✅ Only implements interfaces from Domain Layer (IVideoRepository) and Application Layer (ITranscriptGenerator, IFileStorage)
+- ✅ BrowserStorage is an internal implementation detail, not exposed as port
+- ✅ No changes needed to 002-application-layer spec
 
 **Minor Observations**:
-- FR-003, FR-008, FR-009, FR-021 mention specific technologies (setTimeout, URL.createObjectURL, IndexedDB, SessionStorage) which could be considered implementation details. However, in the context of an Infrastructure Layer spec, these are acceptable as they define the contract that this layer must fulfill.
-- Success criteria reference specific tools (Chrome DevTools Memory Profiler) which is good for validation clarity.
-- The 50MB threshold is documented as an assumption (can be adjusted based on testing)
+- FR-003, FR-008, FR-009, FR-021 mention specific technologies (setTimeout, URL.createObjectURL, IndexedDB) which are acceptable for Infrastructure Layer specs as they define technical implementation requirements.
+- Success criteria reference specific tools (Chrome DevTools Memory Profiler) for validation clarity.
+- The 50MB threshold is documented as an assumption (adjustable based on testing)
