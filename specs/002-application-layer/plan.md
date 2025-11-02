@@ -199,7 +199,7 @@ tests/
 - `VideoDTO`: 視頻元數據（duration, width, height, format）
 - `TranscriptDTO`: 轉錄數據（fullText, sections[]）
   - `SectionDTO`: 段落數據（id, title, sentences[]）
-  - `SentenceDTO`: 句子數據（id, text, startTime, endTime, isHighlight）
+  - `SentenceDTO`: 句子數據（id, text, startTime, endTime, isHighlightSuggestion）
 
 **Ports**:
 - `ITranscriptGenerator`: 轉錄生成服務

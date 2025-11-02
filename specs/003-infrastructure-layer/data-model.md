@@ -108,7 +108,7 @@ export interface SentenceDTO {
   text: string;
   startTime: number;             // 起始時間（秒）
   endTime: number;               // 結束時間（秒）
-  isHighlightSuggestion: boolean; // AI 建議的高光標記
+  isHighlightSuggestionSuggestion: boolean; // AI 建議的高光標記
 }
 ```
 
@@ -182,7 +182,7 @@ export interface TranscriptDTO {
       text: string;
       startTime: number;
       endTime: number;
-      isHighlight: boolean;      // 注意：Application DTO 使用 isHighlight
+      isHighlightSuggestion: boolean;      // 注意：Application DTO 使用 isHighlightSuggestion
     }[];
   }[];
 }
@@ -190,7 +190,7 @@ export interface TranscriptDTO {
 
 **與 TranscriptPersistenceDTO 的差異**:
 - Application DTO 不包含 `savedAt` 和 `sessionId`（由 Infrastructure Layer 添加）
-- Application DTO 的 `isHighlight` 對應 Persistence DTO 的 `isHighlightSuggestion`
+- Application DTO 的 `isHighlightSuggestion` 對應 Persistence DTO 的 `isHighlightSuggestionSuggestion`
 - Application DTO 不包含 `id` 和 `videoId`（由 Use Case 生成/提供）
 
 **資料流向**:
@@ -268,7 +268,7 @@ function applicationTranscriptDtoToEntity(dto: TranscriptDTO, videoId: string): 
         sentenceDto.id,
         sentenceDto.text,
         timeRange,
-        sentenceDto.isHighlight // Application DTO 使用 isHighlight
+        sentenceDto.isHighlightSuggestion // Application DTO 使用 isHighlightSuggestion
       );
     });
     return new Section(sectionDto.id, sectionDto.title, sentences);
@@ -300,7 +300,7 @@ function transcriptEntityToPersistenceDto(transcript: Transcript, sessionId: str
         text: sentence.text,
         startTime: sentence.timeRange.start.seconds,
         endTime: sentence.timeRange.end.seconds,
-        isHighlightSuggestion: sentence.isHighlightSuggestion,
+        isHighlightSuggestionSuggestion: sentence.isHighlightSuggestionSuggestion,
       })),
     })),
     savedAt: Date.now(),
@@ -324,7 +324,7 @@ function transcriptPersistenceDtoToEntity(dto: TranscriptPersistenceDTO): Transc
         sentenceDto.id,
         sentenceDto.text,
         timeRange,
-        sentenceDto.isHighlightSuggestion
+        sentenceDto.isHighlightSuggestionSuggestion
       );
     });
     return new Section(sectionDto.id, sectionDto.title, sentences);

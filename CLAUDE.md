@@ -380,7 +380,7 @@ watch(() => transcriptStore.currentSentenceId, (id) => {
   "text": "大家好，歡迎來到今天的分享。",
   "startTime": 0.0,
   "endTime": 3.2,
-  "isHighlight": true
+  "isHighlightSuggestion": true
 }
 ```
 
@@ -428,14 +428,14 @@ src/
           "text": "大家好，今天要和大家分享前端架構設計的經驗。",
           "startTime": 0.0,
           "endTime": 4.5,
-          "isHighlight": true
+          "isHighlightSuggestion": true
         },
         {
           "id": "sent_2",
           "text": "我們會討論 Clean Architecture 在前端的應用。",
           "startTime": 4.5,
           "endTime": 8.0,
-          "isHighlight": true
+          "isHighlightSuggestion": true
         }
       ]
     },
@@ -448,14 +448,14 @@ src/
           "text": "Clean Architecture 是由 Robert Martin 提出的軟體架構模式。",
           "startTime": 8.0,
           "endTime": 13.5,
-          "isHighlight": false
+          "isHighlightSuggestion": false
         },
         {
           "id": "sent_4",
           "text": "核心理念是讓業務邏輯獨立於框架和外部依賴。",
           "startTime": 13.5,
           "endTime": 18.0,
-          "isHighlight": true
+          "isHighlightSuggestion": true
         }
       ]
     }
@@ -480,7 +480,7 @@ src/
           "text": "歡迎觀看我們最新產品的功能展示。",
           "startTime": 0.0,
           "endTime": 3.5,
-          "isHighlight": true
+          "isHighlightSuggestion": true
         }
       ]
     }

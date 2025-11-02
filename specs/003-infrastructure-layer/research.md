@@ -57,7 +57,7 @@
 
 **Rationale**:
 1. **必要欄位驗證**: 檢查 `sections`, `sentences`, `text`, `startTime`, `endTime` 等核心欄位是否存在，若缺失則拋出明確錯誤
-2. **非必要欄位補完**: 若 `isHighlight` 缺失，自動補完為 `false`；若 `fullText` 缺失，由所有句子 `text` 拼接生成
+2. **非必要欄位補完**: 若 `isHighlightSuggestion` 缺失，自動補完為 `false`；若 `fullText` 缺失，由所有句子 `text` 拼接生成
 3. **時間戳合理性**: 驗證時間戳是否按順序排列，若異常則發出 `console.warn` 但不阻斷處理（允許使用者測試邊界情況）
 4. **錯誤訊息友善**: 拋出的錯誤訊息清楚指出缺失的欄位名稱，方便使用者修正 JSON
 
@@ -69,7 +69,7 @@ if (!sections || !Array.isArray(sections)) {
 }
 
 // 非必要欄位補完
-const isHighlight = sentence.isHighlight ?? false;
+const isHighlightSuggestion = sentence.isHighlightSuggestion ?? false;
 const fullText = data.fullText ?? sections.flatMap(s => s.sentences.map(sen => sen.text)).join(' ');
 
 // 時間戳合理性警告

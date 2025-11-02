@@ -8,7 +8,7 @@
  *
  * 設計原則：
  * - 只接受 JSON 字串，確保所有資料都經過 JSONValidator 驗證
- * - Infrastructure Layer (MockAIService) 負責驗證、補完非必要欄位
+ * - Infrastructure Layer (MockAIService) 負責驗證、補完非必要欄位（isHighlightSuggestion, fullText）
  * - Mock 資料在 generate() 使用後自動清除（一次性使用）
  */
 export interface IMockDataProvider {
@@ -21,7 +21,7 @@ export interface IMockDataProvider {
    *
    * 流程：
    * 1. 驗證 JSON 格式（使用 JSONValidator）
-   * 2. 補完非必要欄位（isHighlight, fullText）
+   * 2. 補完非必要欄位（isHighlightSuggestion, fullText）
    * 3. 檢查時間戳合理性
    * 4. 存儲到記憶體 Map
    * 5. 資料在 ITranscriptGenerator.generate() 使用後自動清除

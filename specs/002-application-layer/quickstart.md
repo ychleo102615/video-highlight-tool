@@ -428,7 +428,7 @@ private convertSectionToEntity(dto: SectionDTO): Section {
         new TimeStamp(sentenceDTO.startTime),
         new TimeStamp(sentenceDTO.endTime)
       ),
-      sentenceDTO.isHighlight
+      sentenceDTO.isHighlightSuggestion
     )
   );
 

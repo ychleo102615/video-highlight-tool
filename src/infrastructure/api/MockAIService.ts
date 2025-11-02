@@ -41,7 +41,7 @@ export class MockAIService implements ITranscriptGenerator, IMockDataProvider {
    *
    * 流程:
    * 1. 驗證 JSON 格式 (使用 JSONValidator)
-   * 2. 補完非必要欄位 (isHighlight, fullText)
+   * 2. 補完非必要欄位 (isHighlightSuggestion, fullText)
    * 3. 存儲補完後的 JSON 到記憶體 Map
    */
   setMockData(videoId: string, jsonContent: string): void {
@@ -65,7 +65,7 @@ export class MockAIService implements ITranscriptGenerator, IMockDataProvider {
    * 流程:
    * 1. 從記憶體 Map 讀取 JSON 字串
    * 2. 驗證 JSON 格式 (使用 JSONValidator)
-   * 3. 補完非必要欄位 (isHighlight, fullText)
+   * 3. 補完非必要欄位 (isHighlightSuggestion, fullText)
    * 4. 檢查時間戳合理性 (發出警告但不阻斷)
    * 5. 模擬 1.5 秒延遲
    * 6. 轉換為 TranscriptDTO (Application Layer DTO)

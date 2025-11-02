@@ -48,14 +48,14 @@
          │ contains
          │
          ▼
-┌─────────────────────┐
-│     Sentence        │ (Entity, 屬於 Transcript 聚合)
-├─────────────────────┤
-│ - id: string        │
-│ - text: string      │
-│ - timeRange: TR     │
-│ - isHighlight: bool │
-└─────────────────────┘
+┌─────────────────────────────┐
+│     Sentence                │ (Entity, 屬於 Transcript 聚合)
+├─────────────────────────────┤
+│ - id: string                │
+│ - text: string              │
+│ - timeRange: TR             │
+│ - isHighlightSuggestion: bool │
+└─────────────────────────────┘
          △
          │
          │ 通過 ID 引用

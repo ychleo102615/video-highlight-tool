@@ -597,7 +597,7 @@ TranscriptDTO {
           text: string
           startTime: number
           endTime: number
-          isHighlight: boolean
+          isHighlightSuggestion: boolean
         }
       ]
     }

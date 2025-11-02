@@ -39,7 +39,7 @@
             "text": "句子內容",
             "startTime": 0.0,
             "endTime": 3.5,
-            "isHighlight": true
+            "isHighlightSuggestion": true
           }
         ]
       }

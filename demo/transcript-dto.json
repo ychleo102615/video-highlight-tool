@@ -1,0 +1,66 @@
+{
+  "fullText": "Well, let's talk a little bit about what leads up to it. You're writing like this, they're reading like this. What's the first thing that happens to them? This has never happened to you, aren't you? Right, so they misunderstand. That's the second thing that happens. The second thing that happens is you interfere, they do not understand.",
+  "sections": [
+    {
+      "id": "section_1",
+      "title": "Introduction",
+      "sentences": [
+        {
+          "id": "sentence_0",
+          "text": "Well, let's talk a little bit about what leads up to it.",
+          "startTime": 0.0,
+          "endTime": 5.68,
+          "isHighlightSuggestion": true
+        },
+        {
+          "id": "sentence_1",
+          "text": "You're writing like this, they're reading like this.",
+          "startTime": 5.68,
+          "endTime": 9.12,
+          "isHighlightSuggestion": false
+        },
+        {
+          "id": "sentence_2",
+          "text": "What's the first thing that happens to them?",
+          "startTime": 9.12,
+          "endTime": 17.68,
+          "isHighlightSuggestion": true
+        }
+      ]
+    },
+    {
+      "id": "section_2",
+      "title": "Common Issues",
+      "sentences": [
+        {
+          "id": "sentence_3",
+          "text": "This has never happened to you, aren't you?",
+          "startTime": 17.68,
+          "endTime": 22.2,
+          "isHighlightSuggestion": false
+        },
+        {
+          "id": "sentence_4",
+          "text": "Right, so they misunderstand.",
+          "startTime": 22.2,
+          "endTime": 26.6,
+          "isHighlightSuggestion": true
+        },
+        {
+          "id": "sentence_5",
+          "text": "That's the second thing that happens.",
+          "startTime": 26.6,
+          "endTime": 29.32,
+          "isHighlightSuggestion": false
+        },
+        {
+          "id": "sentence_6",
+          "text": "The second thing that happens is you interfere, they do not understand.",
+          "startTime": 29.32,
+          "endTime": 32.32,
+          "isHighlightSuggestion": true
+        }
+      ]
+    }
+  ]
+}

@@ -26,13 +26,13 @@
 ### 可選欄位
 
 - `fullText` (string) - 完整轉錄文字（若缺失，由所有句子 text 拼接生成）
-- `sentences[].isHighlight` (boolean) - 是否為 AI 建議的高光句子（預設 false）
+- `sentences[].isHighlightSuggestion` (boolean) - 是否為 AI 建議的高光句子（預設 false）
 
 ### 驗證規則
 
 1. **必要欄位驗證**: 若缺少 `sections` 或 `sentences`，MockAIService 應拋出明確錯誤
 2. **時間戳合理性**: 若 `endTime < startTime` 或時間戳重疊，發出 `console.warn` 但不阻斷處理
-3. **寬鬆補完**: 若缺少 `isHighlight`，自動補完為 `false`；若缺少 `fullText`，由所有句子 text 拼接生成
+3. **寬鬆補完**: 若缺少 `isHighlightSuggestion`，自動補完為 `false`；若缺少 `fullText`，由所有句子 text 拼接生成
 
 ### 範例
 
@@ -51,14 +51,14 @@
           "text": "大家好，歡迎來到今天的分享。",
           "startTime": 0.0,
           "endTime": 3.5,
-          "isHighlight": true
+          "isHighlightSuggestion": true
         },
         {
           "id": "sent_2",
           "text": "今天我們要討論的主題是前端架構設計。",
           "startTime": 3.5,
           "endTime": 7.0,
-          "isHighlight": true
+          "isHighlightSuggestion": true
         }
       ]
     }
@@ -89,7 +89,7 @@
 
 **補完結果**:
 - `fullText` 自動生成為 `"大家好，歡迎來到今天的分享。"`
-- `isHighlight` 自動補完為 `false`
+- `isHighlightSuggestion` 自動補完為 `false`
 
 #### 範例 3: 缺少必要欄位（會拋出錯誤）
 

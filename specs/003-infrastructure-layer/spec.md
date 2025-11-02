@@ -13,12 +13,12 @@
 
 **Why this priority**: 這是整個系統的核心資料來源，沒有轉錄資料就無法進行後續的高光編輯功能。作為最關鍵的基礎設施，必須最優先實作。使用 videoId 作為查詢參數符合真實 AI API 的呼叫模式。
 
-**Independent Test**: 可以透過單元測試獨立驗證：先調用 setMockData(videoId, jsonContent) 暫存 JSON，再調用 generate(videoId)，驗證返回的 TranscriptDTO 結構正確，且缺少的欄位（如 isHighlight）已補完為預設值（false）。
+**Independent Test**: 可以透過單元測試獨立驗證：先調用 setMockData(videoId, jsonContent) 暫存 JSON，再調用 generate(videoId)，驗證返回的 TranscriptDTO 結構正確，且缺少的欄位（如 isHighlightSuggestion）已補完為預設值（false）。
 
 **Acceptance Scenarios**:
 
 1. **Given** 使用者上傳了包含 3 個段落共 15 個句子的 JSON，系統已調用 setMockData(videoId, jsonContent) 暫存, **When** 調用 MockAIService.generate(videoId), **Then** 系統從記憶體讀取 JSON 並返回包含完整轉錄的 TranscriptDTO 物件
-2. **Given** JSON 檔案缺少某些句子的 isHighlight 欄位, **When** 調用 generate(videoId), **Then** 系統自動補完缺少的欄位為預設值（isHighlight: false），並成功返回完整的 TranscriptDTO
+2. **Given** JSON 檔案缺少某些句子的 isHighlightSuggestion 欄位, **When** 調用 generate(videoId), **Then** 系統自動補完缺少的欄位為預設值（isHighlightSuggestion: false），並成功返回完整的 TranscriptDTO
 3. **Given** JSON 已暫存到記憶體, **When** 調用 generate(videoId), **Then** 系統模擬 1.5 秒延遲後返回結果（模擬真實 AI 處理時間）
 4. **Given** JSON 缺少必要欄位（如 sections 或 sentences）, **When** 調用 generate(videoId), **Then** 系統拋出明確的錯誤訊息（例如：「JSON 格式錯誤：缺少必要欄位 'sections'」）
 5. **Given** 尚未調用 setMockData() 暫存 JSON, **When** 調用 generate(videoId), **Then** 系統拋出錯誤（例如：「找不到 videoId 的 Mock 資料，請先上傳 JSON 檔案」）
@@ -109,7 +109,7 @@
 
 - **JSON 格式無效（非合法 JSON）**: MockAIService 應捕獲 JSON.parse() 錯誤，拋出友善錯誤訊息「JSON 格式無效，請檢查檔案內容」
 - **JSON 缺少必要欄位（sections 或 sentences）**: MockAIService 應拋出明確錯誤「JSON 格式錯誤：缺少必要欄位 'sections'」，列出缺少的欄位名稱
-- **JSON 句子缺少非必要欄位（isHighlight）**: MockAIService 應自動補完為預設值（isHighlight: false），並成功處理，不拋出錯誤
+- **JSON 句子缺少非必要欄位（isHighlightSuggestion）**: MockAIService 應自動補完為預設值（isHighlightSuggestion: false），並成功處理，不拋出錯誤
 - **JSON 時間戳順序錯誤或重疊**: MockAIService 應發出警告（console.warn）但不阻斷處理，返回完整的 TranscriptDTO
 - **視頻 ID 不存在時的查詢**: 所有 Repository 的查詢方法應一致返回 null，而不是拋出例外
 - **重複儲存相同 ID 的 Entity**: Repository 應覆蓋舊資料（Map.set 行為），確保資料一致性
@@ -131,7 +131,7 @@
 - **FR-002**: MockAIService MUST 提供 setMockData(videoId: string, jsonContent: string): void 公開方法，用於暫存 JSON 內容到記憶體 Map（此方法不在 ITranscriptGenerator 介面中，是 Mock 實作的額外功能）
 - **FR-003**: generate(videoId) MUST 從記憶體 Map 讀取對應的 JSON 內容；若不存在該 videoId 的資料，MUST 拋出明確錯誤訊息：「找不到 videoId 的 Mock 資料，請先調用 setMockData() 暫存 JSON」
 - **FR-004**: generate(videoId) MUST 解析 JSON 並驗證必要欄位（sections, sentences）；若缺少必要欄位，MUST 拋出明確錯誤訊息（例如：「JSON 格式錯誤：缺少必要欄位 'sections'」）
-- **FR-005**: generate(videoId) MUST 執行寬鬆驗證：若 JSON 缺少非必要欄位（如 isHighlight、fullText），MUST 自動補完預設值（isHighlight: false, fullText: 由所有句子 text 拼接生成）
+- **FR-005**: generate(videoId) MUST 執行寬鬆驗證：若 JSON 缺少非必要欄位（如 isHighlightSuggestion、fullText），MUST 自動補完預設值（isHighlightSuggestion: false, fullText: 由所有句子 text 拼接生成）
 - **FR-006**: generate(videoId) MUST 模擬 1.5 秒的處理延遲（使用 setTimeout 或 Promise.delay），在延遲後返回符合 TranscriptDTO 格式的物件
 - **FR-007**: generate(videoId) SHOULD 驗證句子時間戳的合理性：若時間戳不按順序或有重疊（endTime[n] > startTime[n+1]），SHOULD 發出警告（console.warn）但不阻斷處理
 
@@ -179,7 +179,7 @@
 
 ### Key Entities
 
-- **TranscriptDTO**: 資料傳輸物件，包含完整轉錄文字（fullText）、段落陣列（sections）、段落標題（title）、句子陣列（sentences）、句子文字（text）、時間範圍（startTime, endTime）和高光建議標記（isHighlight）
+- **TranscriptDTO**: 資料傳輸物件，包含完整轉錄文字（fullText）、段落陣列（sections）、段落標題（title）、句子陣列（sentences）、句子文字（text）、時間範圍（startTime, endTime）和高光建議標記（isHighlightSuggestion）
 - **ITranscriptGenerator**: 輸出埠介面（定義在 Application Layer），定義 generate() 方法，由 MockAIService 實作
 - **IFileStorage**: 輸出埠介面（定義在 Application Layer），定義 save() 和 delete() 方法，由 FileStorageService 實作
 - **IVideoRepository**: Domain Layer 定義的儲存庫介面，由 VideoRepositoryImpl 實作
@@ -247,7 +247,7 @@
 - Q: MockAIService 的 generate() 方法簽名（應接受 jsonContent 還是 videoId？） → A: 接受 videoId 作為參數（符合真實 AI API 呼叫模式），JSON 內容透過 setMockData() 預先暫存到記憶體 Map
 - Q: setMockData() 方法應該放在介面中嗎？ → A: 否，setMockData() 是 MockAIService 的額外公開方法（不在 ITranscriptGenerator 介面中），因為真實 AI Service 不需要此方法。這是 Mock 實作特有的功能
 - Q: 誰負責調用 setMockData() 暫存 JSON？ → A: Presentation Layer 負責（在上傳流程中），因為它知道當前是 Mock 環境。Application Layer 僅調用 generate(videoId)，不知道 Mock 細節
-- Q: JSON 缺少欄位時的處理策略（嚴格驗證還是寬鬆補完？） → A: 寬鬆驗證（Q3: B），必要欄位缺少則拋錯，非必要欄位缺少則自動補完預設值（如 isHighlight: false）
+- Q: JSON 缺少欄位時的處理策略（嚴格驗證還是寬鬆補完？） → A: 寬鬆驗證（Q3: B），必要欄位缺少則拋錯，非必要欄位缺少則自動補完預設值（如 isHighlightSuggestion: false）
 - Q: JSON 內容是否需要持久化？ → A: 否（Q2: B），JSON 僅在記憶體中處理，真正持久化的是解析後的 Transcript Entity（模擬真實場景中 AI 處理結果儲存到資料庫）
 - Q: IndexedDB 中的視頻檔案儲存策略 → A: 直接儲存 File 物件（IndexedDB 原生支援 Blob/File），包含完整二進位資料和 MIME type
 - Q: Tab 關閉時的清理機制 → A: 下次啟動時檢查 sessionId 清理（穩健，BrowserStorage.init() 時刪除 sessionId 不匹配的資料及超過 24 小時的資料）

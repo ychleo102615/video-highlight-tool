@@ -91,7 +91,7 @@ export interface SentenceDTO {
   endTime: number;
 
   /** 是否為 AI 建議的高光句子 */
-  isHighlight: boolean;
+  isHighlightSuggestion: boolean;
 }
 ```
 
@@ -110,14 +110,14 @@ export interface SentenceDTO {
           text: '大家好，今天要和大家分享前端架構設計的經驗。',
           startTime: 0.0,
           endTime: 4.5,
-          isHighlight: true
+          isHighlightSuggestion: true
         },
         {
           id: 'sent_2',
           text: '我們會討論 Clean Architecture 在前端的應用。',
           startTime: 4.5,
           endTime: 8.0,
-          isHighlight: true
+          isHighlightSuggestion: true
         }
       ]
     },
@@ -130,7 +130,7 @@ export interface SentenceDTO {
           text: 'Clean Architecture 是由 Robert Martin 提出的軟體架構模式。',
           startTime: 8.0,
           endTime: 13.5,
-          isHighlight: false
+          isHighlightSuggestion: false
         }
       ]
     }
@@ -362,7 +362,7 @@ private convertToEntity(dto: TranscriptDTO): Transcript {
           new TimeStamp(sentenceDTO.startTime),
           new TimeStamp(sentenceDTO.endTime)
         ),
-        sentenceDTO.isHighlight
+        sentenceDTO.isHighlightSuggestion
       )
     );
 

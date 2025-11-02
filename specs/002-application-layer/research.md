@@ -128,7 +128,7 @@ export interface SentenceDTO {
   text: string;
   startTime: number;
   endTime: number;
-  isHighlight: boolean;
+  isHighlightSuggestion: boolean;
 }
 
 // application/use-cases/ProcessTranscriptUseCase.ts
@@ -191,7 +191,7 @@ export class ProcessTranscriptUseCase {
         new TimeStamp(dto.startTime),
         new TimeStamp(dto.endTime)
       ),
-      dto.isHighlight
+      dto.isHighlightSuggestion
     );
   }
 }

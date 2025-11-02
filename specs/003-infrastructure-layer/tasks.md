@@ -64,7 +64,7 @@
 - [X] T015 [US1] 實作 setMockData(videoId, jsonContent) 公開方法 - 暫存 JSON 字串到記憶體 Map
 - [X] T016 [US1] 實作 generate(videoId) 方法 - 從 Map 讀取 JSON,若不存在則拋出錯誤「找不到 videoId 的 Mock 資料,請先上傳 JSON 檔案」
 - [X] T017 [US1] 在 generate() 中整合 JSONValidator - 驗證必要欄位 (sections, sentences),缺失則拋出明確錯誤訊息
-- [X] T018 [US1] 在 generate() 中實作寬鬆補完邏輯 - isHighlight 預設 false, fullText 由句子 text 拼接生成
+- [X] T018 [US1] 在 generate() 中實作寬鬆補完邏輯 - isHighlightSuggestion 預設 false, fullText 由句子 text 拼接生成
 - [X] T019 [US1] 在 generate() 中實作時間戳合理性檢查 - 時間重疊或順序錯誤發出 console.warn 但不阻斷
 - [X] T020 [US1] 在 generate() 中添加 1.5 秒模擬延遲 (使用 setTimeout/Promise.delay)
 - [X] T021 [US1] 在 generate() 中使用 DTOMapper 將解析結果轉換為 TranscriptDTO (Application Layer DTO)

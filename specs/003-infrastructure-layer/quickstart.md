@@ -59,7 +59,7 @@ const jsonContent = `{
           "text": "大家好，歡迎來到今天的分享。",
           "startTime": 0.0,
           "endTime": 3.5,
-          "isHighlight": true
+          "isHighlightSuggestion": true
         }
       ]
     }
@@ -97,7 +97,7 @@ try {
 #### 寬鬆補完示例
 
 ```typescript
-// JSON 缺少 isHighlight 和 fullText
+// JSON 缺少 isHighlightSuggestion 和 fullText
 const partialJson = `{
   "sections": [
     {
@@ -120,7 +120,7 @@ const dto = await mockAI.generate('video-789');
 
 // 自動補完
 console.log(dto.fullText); // "這是一個句子。"
-console.log(dto.sections[0].sentences[0].isHighlight); // false
+console.log(dto.sections[0].sentences[0].isHighlightSuggestion); // false
 ```
 
 ---
@@ -429,7 +429,7 @@ describe('MockAIService', () => {
 
     expect(dto.sections).toHaveLength(1);
     expect(dto.sections[0].title).toBe('Test');
-    expect(dto.sections[0].sentences[0].isHighlight).toBe(false); // 自動補完
+    expect(dto.sections[0].sentences[0].isHighlightSuggestion).toBe(false); // 自動補完
   });
 
   it('should throw error if JSON not cached', async () => {
