@@ -42,7 +42,7 @@ const containerClasses = computed(() => {
 
   // 選中狀態
   if (props.isSelected) {
-    return `${baseClasses} border-l-4 border-blue-500 bg-blue-50 hover:bg-blue-100`
+    return `${baseClasses} border border-l-4 border-blue-500 bg-blue-50 hover:bg-blue-100`
   }
 
   // 未選中狀態
