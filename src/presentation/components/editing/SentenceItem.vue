@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { ClockIcon } from '@heroicons/vue/24/outline'
+import { useHighlightStore } from '@/presentation/stores/highlightStore'
 import type { SentenceItemProps, SentenceItemEmits } from '@/presentation/types/component-contracts'
 
 /**
@@ -23,6 +24,11 @@ import type { SentenceItemProps, SentenceItemEmits } from '@/presentation/types/
 // ========================================
 const props = defineProps<SentenceItemProps>()
 const emit = defineEmits<SentenceItemEmits>()
+
+// ========================================
+// Stores
+// ========================================
+const highlightStore = useHighlightStore()
 
 // ========================================
 // Computed Styles
@@ -76,12 +82,23 @@ function handleClick() {
 
 /**
  * 處理時間戳點擊
- * 跳轉到對應時間
+ * 如果句子未選中，先選中句子（await 完成），然後跳轉到對應時間
  * @param event 點擊事件（阻止冒泡，避免觸發句子點擊）
  */
-function handleTimeClick(event: Event) {
+async function handleTimeClick(event: Event) {
   event.stopPropagation() // 阻止冒泡，避免觸發容器的 click 事件
-  emit('seek', props.startTime)
+
+  try {
+    // 如果句子未選中，先選中它，等待操作完成後再 seek
+    if (!props.isSelected) {
+      await highlightStore.toggleSentence(props.sentenceId)
+    }
+
+    // toggle 完成後（或句子已選中），跳轉到對應時間
+    emit('seek', props.startTime)
+  } catch (error) {
+    console.error('處理時間戳點擊失敗:', error)
+  }
 }
 </script>
 
