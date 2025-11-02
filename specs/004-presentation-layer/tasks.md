@@ -101,13 +101,13 @@
 
 ### Implementation for User Story 2
 
-- [ ] T024 [P] [US2] 建立 useHighlight composable 在 src/presentation/composables/useHighlight.ts
-- [ ] T025 [P] [US2] 建立 SentenceItem 組件在 src/presentation/components/editing/SentenceItem.vue（顯示句子、時間戳、選中狀態視覺化）
-- [ ] T026 [P] [US2] 建立 SectionItem 組件在 src/presentation/components/editing/SectionItem.vue（顯示段落標題和句子列表）
-- [ ] T027 [US2] 建立 SectionList 組件在 src/presentation/components/editing/SectionList.vue（渲染所有段落）
-- [ ] T028 [US2] 建立 EditingArea 組件在 src/presentation/components/editing/EditingArea.vue（容器組件，處理滾動）
-- [ ] T029 [US2] 整合 EditingArea 到 App.vue 並測試句子選擇功能
-- [ ] T030 [US2] 驗證選中狀態的視覺反饋（未選中、選中、播放中三種狀態）
+- [X] T024 [P] [US2] 建立 useHighlight composable 在 src/presentation/composables/useHighlight.ts
+- [X] T025 [P] [US2] 建立 SentenceItem 組件在 src/presentation/components/editing/SentenceItem.vue（顯示句子、時間戳、選中狀態視覺化）
+- [X] T026 [P] [US2] 建立 SectionItem 組件在 src/presentation/components/editing/SectionItem.vue（顯示段落標題和句子列表）
+- [X] T027 [US2] 建立 SectionList 組件在 src/presentation/components/editing/SectionList.vue（渲染所有段落）
+- [X] T028 [US2] 建立 EditingArea 組件在 src/presentation/components/editing/EditingArea.vue（容器組件，處理滾動）
+- [X] T029 [US2] 整合 EditingArea 到 App.vue 並測試句子選擇功能
+- [X] T030 [US2] 驗證選中狀態的視覺反饋（未選中、選中、播放中三種狀態）
 
 **Checkpoint**: 此時 User Stories 1 和 2 都應該獨立運作（上傳視頻 → 顯示轉錄 → 選擇句子）
 

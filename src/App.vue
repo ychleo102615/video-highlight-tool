@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import VideoUpload from '@/presentation/components/upload/VideoUpload.vue'
+import EditingArea from '@/presentation/components/editing/EditingArea.vue'
 import { useVideoStore } from '@/presentation/stores/videoStore'
 import { useTranscriptStore } from '@/presentation/stores/transcriptStore'
 import { useHighlightStore } from '@/presentation/stores/highlightStore'
@@ -17,7 +18,7 @@ const highlightStore = useHighlightStore()
 // ========================================
 const showUpload = computed(() => !videoStore.hasVideo)
 const showProcessing = computed(() => transcriptStore.isProcessing)
-const showHighlight = computed(() => highlightStore.hasHighlight)
+const showEditingArea = computed(() => transcriptStore.hasTranscript && highlightStore.hasHighlight)
 </script>
 
 <template>
@@ -30,31 +31,29 @@ const showHighlight = computed(() => highlightStore.hasHighlight)
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="h-[calc(100vh-5rem)]">
       <!-- 上傳區（未上傳視頻時顯示） -->
-      <div v-if="showUpload">
+      <div v-if="showUpload" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <VideoUpload />
       </div>
 
       <!-- 處理中狀態 -->
-      <div v-else-if="showProcessing" class="text-center py-12">
-        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-        <p class="mt-4 text-gray-600">正在處理轉錄內容...</p>
+      <div v-else-if="showProcessing" class="flex items-center justify-center h-full">
+        <div class="text-center">
+          <div
+            class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"
+          ></div>
+          <p class="mt-4 text-gray-600">正在處理轉錄內容...</p>
+        </div>
       </div>
 
-      <!-- 高光編輯區（轉錄處理完成後顯示） -->
-      <div v-else-if="showHighlight" class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-xl font-semibold mb-4 text-gray-800">高光編輯</h2>
-        <p class="text-gray-600">
-          視頻已上傳成功！轉錄內容已處理完成，預設高光已建立。
-        </p>
-        <p class="text-sm text-gray-500 mt-2">
-          選中的句子數量：{{ highlightStore.selectedSentenceIds.size }} / {{ transcriptStore.allSentences.length }}
-        </p>
+      <!-- 編輯區（轉錄處理完成後顯示） -->
+      <div v-else-if="showEditingArea" class="h-full">
+        <EditingArea />
       </div>
 
       <!-- 其他狀態 -->
-      <div v-else class="text-center py-12">
+      <div v-else class="flex items-center justify-center h-full">
         <p class="text-gray-500">載入中...</p>
       </div>
     </main>

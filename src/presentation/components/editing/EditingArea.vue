@@ -1,0 +1,155 @@
+<script setup lang="ts">
+import { computed, watch, nextTick, ref } from 'vue'
+import SectionList from './SectionList.vue'
+import { useTranscriptStore } from '@/presentation/stores/transcriptStore'
+import { useHighlightStore } from '@/presentation/stores/highlightStore'
+import type { EditingAreaProps } from '@/presentation/types/component-contracts'
+
+/**
+ * EditingArea 組件
+ *
+ * 職責：
+ * - 作為編輯區的容器組件
+ * - 整合 SectionList 組件
+ * - 處理句子選擇事件（呼叫 highlightStore.toggleSentence）
+ * - 處理時間跳轉事件（後續 User Story 6 會與 PreviewArea 同步）
+ * - 監聽當前播放句子變化，自動滾動到該句子
+ */
+
+// ========================================
+// Props
+// ========================================
+defineProps<EditingAreaProps>()
+
+// ========================================
+// Stores
+// ========================================
+const transcriptStore = useTranscriptStore()
+const highlightStore = useHighlightStore()
+
+// ========================================
+// Refs
+// ========================================
+const editingAreaRef = ref<HTMLDivElement | null>(null)
+
+// ========================================
+// Computed Properties
+// ========================================
+
+/**
+ * 段落列表（來自 transcriptStore）
+ */
+const sections = computed(() => transcriptStore.sections)
+
+/**
+ * 當前播放的句子 ID（來自 transcriptStore）
+ */
+const playingSentenceId = computed(() => transcriptStore.playingSentenceId)
+
+/**
+ * 選中的句子 ID 集合（來自 highlightStore）
+ */
+const selectedSentenceIds = computed(() => highlightStore.selectedSentenceIds)
+
+/**
+ * 是否有轉錄內容
+ */
+const hasTranscript = computed(() => transcriptStore.hasTranscript)
+
+/**
+ * 是否正在處理轉錄
+ */
+const isProcessing = computed(() => transcriptStore.isProcessing)
+
+// ========================================
+// Event Handlers
+// ========================================
+
+/**
+ * 處理句子切換事件
+ * 呼叫 highlightStore.toggleSentence 切換選中狀態
+ * @param sentenceId 句子 ID
+ */
+async function handleToggleSentence(sentenceId: string) {
+  try {
+    await highlightStore.toggleSentence(sentenceId)
+  } catch (error) {
+    console.error('切換句子選中狀態失敗:', error)
+  }
+}
+
+/**
+ * 處理時間跳轉事件
+ * 此處暫時只是 console.log，User Story 6 會實作與 VideoPlayer 的同步
+ * @param time 時間（秒數）
+ */
+function handleSeekToTime(time: number) {
+  console.log('跳轉到時間:', time)
+  // TODO: User Story 6 - 與 PreviewArea 的 VideoPlayer 同步
+}
+
+// ========================================
+// Auto Scroll Logic
+// ========================================
+
+/**
+ * 監聽當前播放句子變化，自動滾動到該句子
+ * User Story 6 的需求：當前句子不在可見範圍時，編輯區自動滾動使其可見
+ */
+watch(playingSentenceId, async (newSentenceId) => {
+  if (!newSentenceId || !editingAreaRef.value) return
+
+  await nextTick()
+
+  // 尋找對應的句子元素（使用 data-sentence-id 屬性）
+  const sentenceElement = editingAreaRef.value.querySelector(
+    `[data-sentence-id="${newSentenceId}"]`
+  )
+
+  if (sentenceElement) {
+    // 自動滾動到該元素，使其出現在可見區域中央
+    sentenceElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    })
+  }
+})
+</script>
+
+<template>
+  <div ref="editingAreaRef" class="h-full overflow-auto bg-gray-50 p-4 lg:p-6">
+    <!-- 標題 -->
+    <div class="mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 mb-2">轉錄內容</h2>
+      <p class="text-sm text-gray-600">點擊句子以選擇/取消選擇，點擊時間戳跳轉到對應位置</p>
+    </div>
+
+    <!-- 載入中狀態 -->
+    <div
+      v-if="isProcessing"
+      class="flex flex-col items-center justify-center py-12 text-center"
+    >
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+      <p class="text-lg text-gray-700">正在處理轉錄內容...</p>
+    </div>
+
+    <!-- 無轉錄內容提示 -->
+    <div
+      v-else-if="!hasTranscript"
+      class="flex flex-col items-center justify-center py-12 text-center text-gray-500"
+    >
+      <p class="text-lg">尚未上傳視頻</p>
+      <p class="text-sm mt-2">請先上傳視頻以生成轉錄內容</p>
+    </div>
+
+    <!-- 段落列表 -->
+    <SectionList
+      v-else
+      :sections="sections"
+      :playing-sentence-id="playingSentenceId"
+      :selected-sentence-ids="selectedSentenceIds"
+      @toggle-sentence="handleToggleSentence"
+      @seek-to-time="handleSeekToTime"
+    />
+  </div>
+</template>
