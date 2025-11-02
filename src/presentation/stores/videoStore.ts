@@ -3,7 +3,6 @@ import { ref, computed } from 'vue'
 import type { Video } from '@/domain/aggregates/Video'
 import type { UploadVideoUseCase } from '@/application/use-cases/UploadVideoUseCase'
 import type { UploadVideoWithMockTranscriptUseCase } from '@/application/use-cases/UploadVideoWithMockTranscriptUseCase'
-import type { TranscriptDTO } from '@/application/dto/TranscriptDTO'
 import { container } from '@/di/container'
 import type {
   VideoStoreState,
@@ -52,32 +51,31 @@ export const useVideoStore = defineStore('video', () => {
       uploadProgress.value = 0
       error.value = null
 
-      // 如果有轉錄檔案,解析並使用 UploadVideoWithMockTranscriptUseCase
+      // 根據是否有轉錄檔案選擇不同的 Use Case
+      let uploadedVideo: Video
+
       if (transcriptFile) {
-        const transcriptData = await parseTranscriptFile(transcriptFile)
-        const uploadedVideo = await uploadWithMockUseCase.execute(
+        // 使用 UploadVideoWithMockTranscriptUseCase
+        // Use Case 內部會讀取 JSON 並調用 setMockData 進行驗證
+        uploadedVideo = await uploadWithMockUseCase.execute(
           videoFile,
-          transcriptData,
+          transcriptFile,
           (progress: number) => {
             uploadProgress.value = progress
           }
         )
-        video.value = uploadedVideo
-
-        // 視頻上傳完成後,觸發轉錄處理
-        const transcriptStore = useTranscriptStore()
-        await transcriptStore.processTranscript(uploadedVideo.id)
       } else {
-        // 否則使用標準 UploadVideoUseCase
-        const uploadedVideo = await uploadVideoUseCase.execute(videoFile, (progress: number) => {
+        // 使用標準 UploadVideoUseCase
+        uploadedVideo = await uploadVideoUseCase.execute(videoFile, (progress: number) => {
           uploadProgress.value = progress
         })
-        video.value = uploadedVideo
-
-        // 視頻上傳完成後,觸發轉錄處理
-        const transcriptStore = useTranscriptStore()
-        await transcriptStore.processTranscript(uploadedVideo.id)
       }
+
+      video.value = uploadedVideo
+
+      // 視頻上傳完成後,觸發轉錄處理
+      const transcriptStore = useTranscriptStore()
+      await transcriptStore.processTranscript(uploadedVideo.id)
 
       uploadProgress.value = 100
     } catch (err) {
@@ -95,19 +93,6 @@ export const useVideoStore = defineStore('video', () => {
     video.value = null
     uploadProgress.value = 0
     error.value = null
-  }
-
-  /**
-   * 解析轉錄 JSON 檔案
-   * @param file 轉錄 JSON 檔案
-   */
-  async function parseTranscriptFile(file: File): Promise<TranscriptDTO> {
-    const text = await file.text()
-    try {
-      return JSON.parse(text) as TranscriptDTO
-    } catch (err) {
-      throw new Error('轉錄 JSON 檔案格式錯誤')
-    }
   }
 
   // ========================================

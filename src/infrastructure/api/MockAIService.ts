@@ -38,13 +38,26 @@ export class MockAIService implements ITranscriptGenerator, IMockDataProvider {
    *
    * @param videoId - 視頻 ID
    * @param jsonContent - JSON 字串內容
+   * @throws Error 如果 JSON 格式無效
    *
    * 使用場景:
    * - 使用者上傳視頻後,同時上傳對應的 JSON 檔案
    * - Presentation Layer 調用此方法暫存 JSON 到記憶體
+   *
+   * 流程:
+   * 1. 驗證 JSON 格式 (使用 JSONValidator)
+   * 2. 補完非必要欄位 (isHighlight, fullText)
+   * 3. 存儲補完後的 JSON 到記憶體 Map
    */
   setMockData(videoId: string, jsonContent: string): void {
-    this.mockDataMap.set(videoId, jsonContent);
+    // 1. 驗證 JSON 格式 (會拋出錯誤如果格式無效)
+    const validatedData = JSONValidator.validate(jsonContent);
+
+    // 2. 補完非必要欄位
+    const completedData = JSONValidator.fillDefaults(validatedData);
+
+    // 3. 存儲補完後的 JSON 字串
+    this.mockDataMap.set(videoId, JSON.stringify(completedData));
   }
 
   /**

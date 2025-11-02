@@ -10,7 +10,15 @@ import type { TranscriptDTO } from '../dto/TranscriptDTO'
  */
 export interface IMockDataProvider {
   /**
-   * 設定指定視頻的 Mock 轉錄資料
+   * 設定指定視頻的 Mock 資料（JSON 字串格式）
+   * @param videoId 視頻 ID
+   * @param jsonContent JSON 字串內容
+   * @throws Error 如果 JSON 格式無效
+   */
+  setMockData(videoId: string, jsonContent: string): void
+
+  /**
+   * 設定指定視頻的 Mock 轉錄資料（TranscriptDTO 格式）
    * @param videoId 視頻 ID
    * @param data 轉錄資料（TranscriptDTO 格式）
    */
