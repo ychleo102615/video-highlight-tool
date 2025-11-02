@@ -126,9 +126,9 @@ function formatTime(seconds: number): string {
       <span>{{ formatTime(currentTime) }} / {{ formatTime(totalDuration) }}</span>
     </div>
 
-    <!-- 時間軸主體 -->
+    <!-- 時間軸主體（移動端增加高度以便於點擊） -->
     <div
-      class="timeline-track relative h-12 bg-gray-200 rounded-lg cursor-pointer overflow-hidden"
+      class="timeline-track relative h-16 lg:h-12 bg-gray-200 rounded-lg cursor-pointer overflow-hidden"
       @click="handleTimelineClick"
     >
       <!-- 高光片段區塊 -->

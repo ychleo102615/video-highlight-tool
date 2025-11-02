@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import VideoUpload from '@/presentation/components/upload/VideoUpload.vue'
 import EditingArea from '@/presentation/components/editing/EditingArea.vue'
 import PreviewArea from '@/presentation/components/preview/PreviewArea.vue'
+import SplitLayout from '@/presentation/components/layout/SplitLayout.vue'
 import { useVideoStore } from '@/presentation/stores/videoStore'
 import { useTranscriptStore } from '@/presentation/stores/transcriptStore'
 import { useHighlightStore } from '@/presentation/stores/highlightStore'
@@ -72,18 +73,18 @@ function handleSeekToTime(time: number) {
         </div>
       </div>
 
-      <!-- 主內容區：編輯區 + 預覽區（左右分屏） -->
-      <div v-else-if="showMainContent" class="flex flex-col lg:flex-row h-full">
-        <!-- 編輯區：移動端 50vh，桌面端 50% 寬度 -->
-        <div class="h-1/2 lg:h-full lg:w-1/2 overflow-hidden border-b lg:border-b-0 lg:border-r border-gray-200">
+      <!-- 主內容區：編輯區 + 預覽區（使用 SplitLayout） -->
+      <SplitLayout v-if="showMainContent">
+        <!-- 左側/上方：編輯區 -->
+        <template #left>
           <EditingArea @seek-to-time="handleSeekToTime" />
-        </div>
+        </template>
 
-        <!-- 預覽區：移動端 50vh，桌面端 50% 寬度 -->
-        <div class="h-1/2 lg:h-full lg:w-1/2 overflow-hidden">
+        <!-- 右側/下方：預覽區 -->
+        <template #right>
           <PreviewArea :seek-time="seekTime" />
-        </div>
-      </div>
+        </template>
+      </SplitLayout>
 
       <!-- 其他狀態 -->
       <div v-else class="flex items-center justify-center h-full">

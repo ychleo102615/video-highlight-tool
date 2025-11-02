@@ -39,7 +39,8 @@ const highlightStore = useHighlightStore()
  * 根據選中狀態和播放狀態動態設定樣式
  */
 const containerClasses = computed(() => {
-  const baseClasses = 'p-3 rounded-lg cursor-pointer transition-all duration-200'
+  // 移動端使用較大的 padding (p-4) 確保觸控目標足夠大
+  const baseClasses = 'p-4 lg:p-3 rounded-lg cursor-pointer transition-all duration-200 min-h-[44px]'
 
   // 播放中狀態（最高優先級）
   if (props.isPlaying) {
@@ -109,10 +110,10 @@ async function handleTimeClick(event: Event) {
       {{ text }}
     </p>
 
-    <!-- 時間戳按鈕 -->
+    <!-- 時間戳按鈕（移動端增大觸控目標） -->
     <button
       type="button"
-      class="inline-flex items-center gap-1.5 px-2 py-1 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors min-h-[32px]"
+      class="inline-flex items-center gap-1.5 px-3 py-2 lg:px-2 lg:py-1 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors min-h-[44px] lg:min-h-[32px] min-w-[44px] lg:min-w-0"
       @click="handleTimeClick"
     >
       <ClockIcon class="w-4 h-4" />

@@ -189,4 +189,25 @@ defineExpose({
   width: 100%;
   height: 100%;
 }
+
+/**
+ * 移動端觸控目標優化
+ * 增大 video.js 控制按鈕的點擊區域，確保 ≥ 44x44px
+ */
+@media (max-width: 1024px) {
+  .video-player-container .video-js .vjs-control {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .video-player-container .video-js .vjs-play-control,
+  .video-player-container .video-js .vjs-fullscreen-control {
+    width: 48px;
+    height: 48px;
+  }
+
+  .video-player-container .video-js .vjs-progress-control {
+    min-height: 44px;
+  }
+}
 </style>

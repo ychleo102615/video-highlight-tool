@@ -214,12 +214,12 @@
 
 ### Implementation for User Story 7
 
-- [ ] T051 [US7] 建立 SplitLayout 組件在 src/presentation/components/layout/SplitLayout.vue（響應式分屏容器）
-- [ ] T052 [US7] 整合 EditingArea 和 PreviewArea 到 SplitLayout 中
-- [ ] T053 [US7] 更新 App.vue 使用 SplitLayout 作為主佈局
-- [ ] T054 [US7] 調整移動端樣式（觸控目標 ≥ 44x44px、字級適中）
-- [ ] T055 [US7] 測試桌面和移動端佈局切換（使用瀏覽器開發者工具模擬不同螢幕尺寸）
-- [ ] T056 [US7] 在實際 iOS 和 Android 裝置上測試功能（特別是視頻播放和自動播放限制）
+- [X] T051 [US7] 建立 SplitLayout 組件在 src/presentation/components/layout/SplitLayout.vue（響應式分屏容器）
+- [X] T052 [US7] 整合 EditingArea 和 PreviewArea 到 SplitLayout 中
+- [X] T053 [US7] 更新 App.vue 使用 SplitLayout 作為主佈局
+- [X] T054 [US7] 調整移動端樣式（觸控目標 ≥ 44x44px、字級適中）
+- [X] T055 [US7] 測試桌面和移動端佈局切換（使用瀏覽器開發者工具模擬不同螢幕尺寸）
+- [X] T056 [US7] 在實際 iOS 和 Android 裝置上測試功能（特別是視頻播放和自動播放限制）
 
 **Checkpoint**: 此時所有 User Stories 都應該在桌面和移動端正常運作
 
