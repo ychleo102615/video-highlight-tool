@@ -170,7 +170,7 @@ function formatTime(seconds: number): string {
 
       <!-- 播放進度指示器 -->
       <div
-        class="progress-indicator absolute top-0 h-full w-1 bg-rose-400 transition-all duration-100 pointer-events-none z-10"
+        class="progress-indicator absolute top-0 h-full w-1 bg-rose-400 pointer-events-none z-10"
         :style="{ left: `${progressPercent}%` }"
       ></div>
     </div>
@@ -222,5 +222,7 @@ function formatTime(seconds: number): string {
 
 .progress-indicator {
   box-shadow: 0 0 6px rgba(251, 113, 133, 0.6);
+  /* 使用線性過渡讓移動更順暢，匹配視頻播放速度 */
+  transition: left 0.25s linear;
 }
 </style>
