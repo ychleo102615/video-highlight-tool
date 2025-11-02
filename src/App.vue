@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import VideoUpload from '@/presentation/components/upload/VideoUpload.vue'
 import EditingArea from '@/presentation/components/editing/EditingArea.vue'
 import PreviewArea from '@/presentation/components/preview/PreviewArea.vue'
@@ -15,11 +15,35 @@ const transcriptStore = useTranscriptStore()
 const highlightStore = useHighlightStore()
 
 // ========================================
+// Refs
+// ========================================
+/** 用於編輯區 → 預覽區同步的 seek 時間 */
+const seekTime = ref<number | null>(null)
+
+// ========================================
 // Computed
 // ========================================
 const showUpload = computed(() => !videoStore.hasVideo)
 const showProcessing = computed(() => transcriptStore.isProcessing)
 const showMainContent = computed(() => transcriptStore.hasTranscript && highlightStore.hasHighlight)
+
+// ========================================
+// Event Handlers
+// ========================================
+
+/**
+ * 處理編輯區的時間跳轉請求
+ * User Story 6: 編輯區 → 預覽區同步
+ * @param time 時間（秒數）
+ */
+function handleSeekToTime(time: number) {
+  // 更新 seekTime，觸發 PreviewArea 的 watch
+  seekTime.value = time
+  // 重置為 null，以便下次相同時間也能觸發（例如連續點擊同一個時間戳）
+  setTimeout(() => {
+    seekTime.value = null
+  }, 100)
+}
 </script>
 
 <template>
@@ -52,12 +76,12 @@ const showMainContent = computed(() => transcriptStore.hasTranscript && highligh
       <div v-else-if="showMainContent" class="flex flex-col lg:flex-row h-full">
         <!-- 編輯區：移動端 50vh，桌面端 50% 寬度 -->
         <div class="h-1/2 lg:h-full lg:w-1/2 overflow-hidden border-b lg:border-b-0 lg:border-r border-gray-200">
-          <EditingArea />
+          <EditingArea @seek-to-time="handleSeekToTime" />
         </div>
 
         <!-- 預覽區：移動端 50vh，桌面端 50% 寬度 -->
         <div class="h-1/2 lg:h-full lg:w-1/2 overflow-hidden">
-          <PreviewArea />
+          <PreviewArea :seek-time="seekTime" />
         </div>
       </div>
 

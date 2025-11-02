@@ -68,6 +68,10 @@ import EmptyState from '@/presentation/components/common/EmptyState.vue'
 import { useVideoStore } from '@/presentation/stores/videoStore'
 import { useHighlightStore } from '@/presentation/stores/highlightStore'
 import { useTranscriptStore } from '@/presentation/stores/transcriptStore'
+import type { PreviewAreaProps } from '@/presentation/types/component-contracts'
+
+// Props
+const props = defineProps<PreviewAreaProps>()
 
 // Stores
 const videoStore = useVideoStore()
@@ -137,6 +141,19 @@ watch(
       // Edge case: 清除播放狀態，避免編輯區仍顯示「播放中」的提示
       transcriptStore.setPlayingSentenceId(null)
       currentPlayTime.value = 0
+    }
+  }
+)
+
+/**
+ * 監聽外部的 seekTime prop 變化（來自 EditingArea 的時間戳點擊）
+ * User Story 6: 編輯區 → 預覽區同步
+ */
+watch(
+  () => props.seekTime,
+  (time) => {
+    if (time !== null && time !== undefined && videoPlayerRef.value) {
+      handleSeek(time)
     }
   }
 )

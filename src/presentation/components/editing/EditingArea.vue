@@ -3,7 +3,7 @@ import { computed, watch, nextTick, ref } from 'vue'
 import SectionList from './SectionList.vue'
 import { useTranscriptStore } from '@/presentation/stores/transcriptStore'
 import { useHighlightStore } from '@/presentation/stores/highlightStore'
-import type { EditingAreaProps } from '@/presentation/types/component-contracts'
+import type { EditingAreaProps, EditingAreaEmits } from '@/presentation/types/component-contracts'
 
 /**
  * EditingArea 組件
@@ -12,14 +12,15 @@ import type { EditingAreaProps } from '@/presentation/types/component-contracts'
  * - 作為編輯區的容器組件
  * - 整合 SectionList 組件
  * - 處理句子選擇事件（呼叫 highlightStore.toggleSentence）
- * - 處理時間跳轉事件（後續 User Story 6 會與 PreviewArea 同步）
+ * - 處理時間跳轉事件（emit 到 App.vue 以同步 PreviewArea）
  * - 監聽當前播放句子變化，自動滾動到該句子
  */
 
 // ========================================
-// Props
+// Props & Emits
 // ========================================
 defineProps<EditingAreaProps>()
+const emit = defineEmits<EditingAreaEmits>()
 
 // ========================================
 // Stores
@@ -80,12 +81,11 @@ async function handleToggleSentence(sentenceId: string) {
 
 /**
  * 處理時間跳轉事件
- * 此處暫時只是 console.log，User Story 6 會實作與 VideoPlayer 的同步
+ * emit seek-to-time 事件到 App.vue，由 App.vue 通知 PreviewArea 跳轉
  * @param time 時間（秒數）
  */
 function handleSeekToTime(time: number) {
-  console.log('跳轉到時間:', time)
-  // TODO: User Story 6 - 與 PreviewArea 的 VideoPlayer 同步
+  emit('seek-to-time', time)
 }
 
 // ========================================

@@ -192,11 +192,11 @@
 
 ### Implementation for User Story 6
 
-- [ ] T046 [US6] 實作時間戳點擊跳轉在 SentenceItem.vue（emit seek 事件）
-- [ ] T047 [US6] 實作預覽區 → 編輯區同步在 EditingArea.vue（監聽 playingSentenceId 變化並高亮 + 滾動）
-- [ ] T048 [US6] 實作編輯區 → 預覽區同步在 PreviewArea.vue（監聽 seek 事件並更新 VideoPlayer）
-- [ ] T049 [US6] 測試雙向同步的正確性和效能（延遲 < 100-200ms）
-- [ ] T050 [US6] 測試自動滾動機制（scrollIntoView 實作）
+- [X] T046 [US6] 實作時間戳點擊跳轉在 SentenceItem.vue（emit seek 事件）
+- [X] T047 [US6] 實作預覽區 → 編輯區同步在 EditingArea.vue（監聽 playingSentenceId 變化並高亮 + 滾動）
+- [X] T048 [US6] 實作編輯區 → 預覽區同步在 PreviewArea.vue（監聽 seek 事件並更新 VideoPlayer）
+- [X] T049 [US6] 測試雙向同步的正確性和效能（延遲 < 100-200ms）
+- [X] T050 [US6] 測試自動滾動機制（scrollIntoView 實作）
 
 **Checkpoint**: 此時 User Stories 1-6 都應該獨立運作（完整的雙向同步體驗）
 

@@ -57,6 +57,17 @@ export interface EditingAreaProps {
 }
 
 /**
+ * EditingArea 組件 Emits
+ */
+export interface EditingAreaEmits {
+  /**
+   * 使用者點擊時間戳跳轉時觸發
+   * @param time 時間（秒數）
+   */
+  (e: 'seek-to-time', time: number): void
+}
+
+/**
  * SectionList 組件 Props
  */
 export interface SectionListProps {
@@ -147,7 +158,8 @@ export interface SentenceItemEmits {
  * PreviewArea 組件 Props
  */
 export interface PreviewAreaProps {
-  // 從 Store 獲取資料，無需 props
+  /** 外部的 seek 請求（用於編輯區 → 預覽區同步） */
+  seekTime?: number | null
 }
 
 /**
