@@ -150,10 +150,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T038 [US4] 建立 TranscriptOverlay 組件在 src/presentation/components/preview/TranscriptOverlay.vue（文字疊加層，支援淡入淡出）
-- [ ] T039 [US4] 整合 TranscriptOverlay 到 PreviewArea.vue 並實作時間同步邏輯
-- [ ] T040 [US4] 測試文字同步精確度（使用 useVideoPlayer 的 currentTime 更新 transcriptStore.playingSentenceId）
-- [ ] T041 [US4] 驗證文字疊加樣式（位置、背景、過渡效果）
+- [X] T038 [US4] 建立 TranscriptOverlay 組件在 src/presentation/components/preview/TranscriptOverlay.vue（文字疊加層，支援淡入淡出）
+- [X] T039 [US4] 整合 TranscriptOverlay 到 VideoPlayer.vue 並實作時間同步邏輯
+- [X] T040 [US4] 測試文字同步精確度（使用 useVideoPlayer 的 currentTime 更新 transcriptStore.playingSentenceId）
+- [X] T041 [US4] 驗證文字疊加樣式（位置、背景、過渡效果）
 
 **Checkpoint**: 此時 User Stories 1-4 都應該獨立運作（上傳 → 選擇 → 預覽 + 文字疊加）
 

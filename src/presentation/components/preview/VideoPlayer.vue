@@ -6,6 +6,12 @@
       class="video-js vjs-big-play-centered"
     ></video>
 
+    <!-- 文字疊加層 -->
+    <TranscriptOverlay
+      :current-text="currentTranscriptText"
+      :visible="showTranscript"
+    />
+
     <!-- 載入狀態 -->
     <div
       v-if="isLoading"
@@ -17,9 +23,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
 import { NSpin } from 'naive-ui'
 import { useVideoPlayer } from '@/presentation/composables/useVideoPlayer'
+import { useTranscriptStore } from '@/presentation/stores/transcriptStore'
+import TranscriptOverlay from './TranscriptOverlay.vue'
 import type { VideoPlayerProps, VideoPlayerEmits } from '@/presentation/types/component-contracts'
 
 // Props
@@ -27,6 +35,9 @@ const props = defineProps<VideoPlayerProps>()
 
 // Emits
 const emit = defineEmits<VideoPlayerEmits>()
+
+// Stores
+const transcriptStore = useTranscriptStore()
 
 // 使用 useVideoPlayer composable
 const {
@@ -45,6 +56,16 @@ const {
 
 // 載入狀態
 const isLoading = ref(true)
+
+// 計算當前播放句子的文字（用於文字疊加）
+const currentTranscriptText = computed(() => {
+  return transcriptStore.playingSentence?.text ?? ''
+})
+
+// 控制文字疊加是否顯示（暫停時也顯示）
+const showTranscript = computed(() => {
+  return currentTranscriptText.value !== ''
+})
 
 /**
  * 事件處理函數：視頻載入完成
