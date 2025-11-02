@@ -92,8 +92,13 @@ async function handleUpload() {
     return
   }
 
+  if (!selectedTranscriptFile.value) {
+    alert('請選擇轉錄檔案。')
+    return
+  }
+
   try {
-    await uploadVideo(selectedVideoFile.value, selectedTranscriptFile.value || undefined)
+    await uploadVideo(selectedVideoFile.value, selectedTranscriptFile.value)
 
     // 上傳成功，清除選擇
     selectedVideoFile.value = null
@@ -148,12 +153,9 @@ function clearTranscriptFile() {
       <p class="mt-1 text-xs text-gray-500">支援格式：MP4, MOV, WEBM（最大 100MB）</p>
     </div>
 
-    <!-- 轉錄文件選擇（可選） -->
+    <!-- 轉錄文件選擇 -->
     <div class="mb-6">
-      <label class="block text-sm font-medium text-gray-700 mb-2">
-        轉錄檔案（選填）
-        <span class="text-xs text-gray-500 font-normal">- 若不提供則使用 Mock AI 生成</span>
-      </label>
+      <label class="block text-sm font-medium text-gray-700 mb-2">轉錄檔案 *</label>
       <input
         ref="transcriptFileInput"
         type="file"
@@ -184,7 +186,7 @@ function clearTranscriptFile() {
         type="primary"
         size="large"
         :loading="isUploading"
-        :disabled="!selectedVideoFile || isUploading"
+        :disabled="!selectedVideoFile || !selectedTranscriptFile || isUploading"
         @click="handleUpload"
         class="w-full lg:w-auto"
       >
