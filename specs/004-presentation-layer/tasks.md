@@ -126,12 +126,12 @@
 
 ### Implementation for User Story 3
 
-- [ ] T031 [P] [US3] 建立 useVideoPlayer composable 在 src/presentation/composables/useVideoPlayer.ts（封裝 video.js 和片段播放邏輯）
-- [ ] T032 [US3] 建立 VideoPlayer 組件在 src/presentation/components/preview/VideoPlayer.vue（使用 video.js 播放器）
-- [ ] T033 [US3] 實作片段播放機制在 useVideoPlayer.ts（基於 timeupdate 事件 + seekTo 方法）
-- [ ] T034 [P] [US3] 建立 EmptyState 組件在 src/presentation/components/common/EmptyState.vue（顯示空狀態提示）
-- [ ] T035 [US3] 建立 PreviewArea 組件在 src/presentation/components/preview/PreviewArea.vue（容器組件，整合 VideoPlayer）
-- [ ] T036 [US3] 整合 PreviewArea 到 App.vue 並測試片段播放功能
+- [X] T031 [P] [US3] 建立 useVideoPlayer composable 在 src/presentation/composables/useVideoPlayer.ts（封裝 video.js 和片段播放邏輯）
+- [X] T032 [US3] 建立 VideoPlayer 組件在 src/presentation/components/preview/VideoPlayer.vue（使用 video.js 播放器）
+- [X] T033 [US3] 實作片段播放機制在 useVideoPlayer.ts（基於 timeupdate 事件 + seekTo 方法）
+- [X] T034 [P] [US3] 建立 EmptyState 組件在 src/presentation/components/common/EmptyState.vue（顯示空狀態提示）
+- [X] T035 [US3] 建立 PreviewArea 組件在 src/presentation/components/preview/PreviewArea.vue（容器組件，整合 VideoPlayer）
+- [X] T036 [US3] 整合 PreviewArea 到 App.vue 並測試片段播放功能
 - [ ] T037 [US3] 測試邊緣情況（無選中句子、拖動到非選中區域、片段切換流暢度）
 
 **Checkpoint**: 此時 User Stories 1, 2, 3 都應該獨立運作（上傳 → 選擇 → 預覽片段）

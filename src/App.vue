@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import VideoUpload from '@/presentation/components/upload/VideoUpload.vue'
 import EditingArea from '@/presentation/components/editing/EditingArea.vue'
+import PreviewArea from '@/presentation/components/preview/PreviewArea.vue'
 import { useVideoStore } from '@/presentation/stores/videoStore'
 import { useTranscriptStore } from '@/presentation/stores/transcriptStore'
 import { useHighlightStore } from '@/presentation/stores/highlightStore'
@@ -18,7 +19,7 @@ const highlightStore = useHighlightStore()
 // ========================================
 const showUpload = computed(() => !videoStore.hasVideo)
 const showProcessing = computed(() => transcriptStore.isProcessing)
-const showEditingArea = computed(() => transcriptStore.hasTranscript && highlightStore.hasHighlight)
+const showMainContent = computed(() => transcriptStore.hasTranscript && highlightStore.hasHighlight)
 </script>
 
 <template>
@@ -47,9 +48,17 @@ const showEditingArea = computed(() => transcriptStore.hasTranscript && highligh
         </div>
       </div>
 
-      <!-- 編輯區（轉錄處理完成後顯示） -->
-      <div v-else-if="showEditingArea" class="h-full">
-        <EditingArea />
+      <!-- 主內容區：編輯區 + 預覽區（左右分屏） -->
+      <div v-else-if="showMainContent" class="flex flex-col lg:flex-row h-full">
+        <!-- 編輯區：移動端 50vh，桌面端 50% 寬度 -->
+        <div class="h-1/2 lg:h-full lg:w-1/2 overflow-hidden border-b lg:border-b-0 lg:border-r border-gray-200">
+          <EditingArea />
+        </div>
+
+        <!-- 預覽區：移動端 50vh，桌面端 50% 寬度 -->
+        <div class="h-1/2 lg:h-full lg:w-1/2 overflow-hidden">
+          <PreviewArea />
+        </div>
       </div>
 
       <!-- 其他狀態 -->
