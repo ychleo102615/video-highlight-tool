@@ -16,7 +16,7 @@ interface SentenceData {
   text: string;
   startTime: number;
   endTime: number;
-  isHighlight?: boolean; // 非必要
+  isHighlightSuggestion?: boolean; // 非必要
 }
 
 interface SectionData {
@@ -150,11 +150,11 @@ export class JSONValidator {
         .join(' ');
     }
 
-    // 補完 isHighlight (若缺失)
+    // 補完 isHighlightSuggestion (若缺失)
     for (const section of data.sections) {
       for (const sentence of section.sentences) {
-        if (sentence.isHighlight === undefined) {
-          sentence.isHighlight = false;
+        if (sentence.isHighlightSuggestion === undefined) {
+          sentence.isHighlightSuggestion = false;
         }
       }
     }

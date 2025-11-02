@@ -124,7 +124,7 @@ export class ProcessTranscriptUseCase {
       TimeStamp.fromSeconds(dto.endTime)
     );
 
-    return new Sentence(dto.id, dto.text, timeRange, dto.isHighlight);
+    return new Sentence(dto.id, dto.text, timeRange, dto.isHighlightSuggestion);
   }
 
   /**

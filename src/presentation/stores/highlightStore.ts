@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, triggerRef } from 'vue'
 import type { Highlight } from '@/domain/aggregates/Highlight'
 import type { Sentence } from '@/domain/aggregates/Transcript/Sentence'
 import type { TimeRange } from '@/domain/value-objects/TimeRange'
@@ -131,6 +131,9 @@ export const useHighlightStore = defineStore('highlight', () => {
       const highlightRepository = container.resolve<IHighlightRepository>('IHighlightRepository')
       const updatedHighlight = await highlightRepository.findById(currentHighlight.value.id)
       currentHighlight.value = updatedHighlight
+
+      // 強制觸發響應式更新，確保 computed 重新計算
+      triggerRef(currentHighlight)
     } catch (err) {
       error.value = (err as Error).message
       throw err

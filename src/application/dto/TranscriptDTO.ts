@@ -21,7 +21,7 @@ export interface SentenceDTO {
   endTime: number;
 
   /** 是否為 AI 建議的高光句子 */
-  isHighlight: boolean;
+  isHighlightSuggestion: boolean;
 }
 
 /**
