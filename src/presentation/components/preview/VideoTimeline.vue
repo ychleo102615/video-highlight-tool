@@ -68,7 +68,7 @@ const segmentBlocks = computed(() => {
 
 /**
  * 處理時間軸點擊事件
- * 點擊時跳轉到該位置的時間
+ * 點擊時直接跳轉到該位置對應的時間
  */
 function handleTimelineClick(event: MouseEvent) {
   const target = event.currentTarget as HTMLElement
@@ -76,57 +76,36 @@ function handleTimelineClick(event: MouseEvent) {
   const clickX = event.clientX - rect.left
   const clickPercent = clickX / rect.width
 
+  // 計算點擊位置對應的時間
   const seekTime = clickPercent * props.totalDuration
 
-  // 查找最近的片段起點
-  const nearestSegment = findNearestSegment(seekTime)
-  if (nearestSegment) {
-    emit('seek', nearestSegment.startTime)
-  } else {
-    // 如果沒有片段，跳轉到點擊位置
-    emit('seek', seekTime)
-  }
+  // 直接跳轉到點擊位置的時間
+  emit('seek', seekTime)
 }
 
 /**
  * 處理片段區塊點擊事件
- * 點擊片段時跳轉到該片段起點
+ * 根據點擊位置在片段內的相對位置，計算精確的跳轉時間
  */
-function handleSegmentClick(event: MouseEvent, startTime: number) {
+function handleSegmentClick(event: MouseEvent, startTime: number, endTime: number) {
   event.stopPropagation()
-  emit('seek', startTime)
-}
 
-/**
- * 查找最近的片段
- * 優先返回點擊位置所在的片段，否則返回最近的片段
- */
-function findNearestSegment(time: number): TimeSegment | undefined {
-  // 如果沒有片段，返回 undefined
-  if (props.segments.length === 0) return undefined
+  // 獲取片段元素的位置資訊
+  const segmentElement = event.currentTarget as HTMLElement
+  const rect = segmentElement.getBoundingClientRect()
 
-  // 檢查是否點擊在某個片段內
-  const clickedSegment = props.segments.find(
-    (seg) => time >= seg.startTime && time <= seg.endTime
-  )
-  if (clickedSegment) return clickedSegment
+  // 計算點擊位置在片段內的相對位置（0-1）
+  const clickX = event.clientX - rect.left
+  const segmentWidth = rect.width
+  const relativePosition = clickX / segmentWidth
 
-  // 如果不在片段內，找最近的片段
-  const firstSegment = props.segments[0]
-  if (!firstSegment) return undefined
+  // 計算片段時長
+  const segmentDuration = endTime - startTime
 
-  let nearest = firstSegment
-  let minDistance = Math.abs(time - firstSegment.startTime)
+  // 計算應該跳轉到的時間：片段起點 + 相對位置 × 片段時長
+  const seekTime = startTime + relativePosition * segmentDuration
 
-  for (const segment of props.segments) {
-    const distance = Math.abs(time - segment.startTime)
-    if (distance < minDistance) {
-      minDistance = distance
-      nearest = segment
-    }
-  }
-
-  return nearest
+  emit('seek', seekTime)
 }
 
 /**
@@ -160,7 +139,7 @@ function formatTime(seconds: number): string {
             class="segment-block absolute top-0 h-full bg-blue-500 hover:bg-blue-600 transition-colors duration-200 cursor-pointer rounded-sm"
             :style="{ left: block.left, width: block.width }"
             :title="`${formatTime(block.startTime)} - ${formatTime(block.endTime)}`"
-            @click="handleSegmentClick($event, block.startTime)"
+            @click="handleSegmentClick($event, block.startTime, block.endTime)"
           >
             <!-- 片段內部視覺效果 -->
             <div class="w-full h-full opacity-50 bg-blue-400 rounded-sm"></div>
