@@ -567,6 +567,8 @@ watch([currentTime, currentSentenceTime], ([video, sentence]) => {
 - IndexedDB (小視頻檔案 + 所有 Entity DTO) + SessionStorage (sessionId + 大視頻元資料) (003-infrastructure-layer)
 - TypeScript ^5.9.0 + Vue 3 ^3.5.22 + Pinia ^3.0.3, video.js ^8.0.0（待安裝）, Naive UI ^2.40.0（待安裝）, @heroicons/vue（待安裝）, Tailwind CSS v4（待設定） (004-presentation-layer)
 - N/A（Presentation Layer 不直接操作儲存，通過 Use Case 和 Repository） (004-presentation-layer)
+- TypeScript 5.9.0 + Vue 3.5.22, Pinia 3.0.3, idb 8.0.3, video.js 8.23.4, Naive UI 2.43.1 (005-session-restore)
+- IndexedDB (小視頻檔案 + 所有 Entity) + SessionStorage (sessionId + 大視頻元資料) (005-session-restore)
 
 ## Recent Changes
 - 001-domain-layer: Added TypeScript ^5.0.0 + 無（Domain Layer 不依賴任何外部框架，僅使用 TypeScript 標準庫）
