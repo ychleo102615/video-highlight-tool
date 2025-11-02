@@ -14,24 +14,24 @@ import type { TranscriptDTO } from '@/application/dto/TranscriptDTO'
 /**
  * Mock 資料提供者介面（Application Layer Port）
  *
- * 用途：允許 Presentation Layer 上傳自訂的 Mock 轉錄 JSON 資料
+ * 用途：允許 Use Case 設定自訂的 Mock 轉錄 JSON 資料
  * 實作者：MockAIService (Infrastructure Layer)
  *
  * 注意：此介面僅在開發/展示環境使用，生產環境不需要
+ *
+ * 設計原則：
+ * - 只接受 JSON 字串，確保所有資料都經過 JSONValidator 驗證
+ * - Infrastructure Layer (MockAIService) 負責驗證、補完非必要欄位
+ * - Mock 資料在 generate() 使用後自動清除（一次性使用）
  */
 export interface IMockDataProvider {
   /**
-   * 設定指定視頻的 Mock 轉錄資料
+   * 設定指定視頻的 Mock 資料（JSON 字串格式）
    * @param videoId 視頻 ID
-   * @param data 轉錄資料（TranscriptDTO 格式）
+   * @param jsonContent JSON 字串內容
+   * @throws Error 如果 JSON 格式無效
    */
-  setMockTranscript(videoId: string, data: TranscriptDTO): void
-
-  /**
-   * 清除指定視頻的 Mock 資料
-   * @param videoId 視頻 ID
-   */
-  clearMockTranscript(videoId: string): void
+  setMockData(videoId: string, jsonContent: string): void
 }
 
 // ============================================================================
@@ -44,7 +44,8 @@ export interface IMockDataProvider {
  * 用途：處理使用者同時上傳視頻和轉錄 JSON 檔案的情況
  * 職責：
  *   1. 重用 UploadVideoUseCase 上傳視頻
- *   2. 透過 IMockDataProvider 設定 Mock 轉錄資料
+ *   2. 讀取轉錄 JSON 檔案內容
+ *   3. 透過 IMockDataProvider.setMockData 設定 Mock 資料（會進行驗證）
  *
  * 依賴：
  *   - UploadVideoUseCase (重用現有邏輯)
@@ -54,13 +55,13 @@ export interface IUploadVideoWithMockTranscriptUseCase {
   /**
    * 執行上傳視頻並設定 Mock 轉錄資料
    * @param videoFile 視頻檔案
-   * @param transcriptData 轉錄資料（已解析的 TranscriptDTO）
+   * @param transcriptFile 轉錄 JSON 檔案
    * @param onProgress 上傳進度回調（0-100）
    * @returns 上傳的 Video Entity
    */
   execute(
     videoFile: File,
-    transcriptData: TranscriptDTO,
+    transcriptFile: File,
     onProgress?: (progress: number) => void
   ): Promise<Video>
 }
@@ -115,35 +116,34 @@ export interface IUploadVideoUseCase {
 
 /**
  * MockAIService 實作範例（Infrastructure Layer）
+ *
+ * 注意：實際的 MockAIService 已實作完整功能，包含 JSONValidator 驗證
  */
 export class MockAIServiceExample implements ITranscriptGenerator, IMockDataProvider {
-  private mockDataMap = new Map<string, TranscriptDTO>()
+  private mockDataMap = new Map<string, string>() // 存儲 JSON 字串
 
   // IMockDataProvider 實作
-  setMockTranscript(videoId: string, data: TranscriptDTO): void {
-    this.mockDataMap.set(videoId, data)
-  }
-
-  clearMockTranscript(videoId: string): void {
-    this.mockDataMap.delete(videoId)
+  setMockData(videoId: string, jsonContent: string): void {
+    // 1. 驗證 JSON 格式（使用 JSONValidator）
+    // 2. 補完非必要欄位
+    // 3. 存儲到 mockDataMap
+    this.mockDataMap.set(videoId, jsonContent)
   }
 
   // ITranscriptGenerator 實作
   async generate(videoId: string): Promise<TranscriptDTO> {
-    // 優先使用使用者上傳的 Mock 資料
-    if (this.mockDataMap.has(videoId)) {
-      const data = this.mockDataMap.get(videoId)!
-      // 使用後清除（避免下次誤用）
-      this.mockDataMap.delete(videoId)
-      return data
+    const jsonContent = this.mockDataMap.get(videoId)
+    if (!jsonContent) {
+      throw new Error(`找不到 videoId "${videoId}" 的 Mock 資料`)
     }
 
-    // 否則返回預設 Mock 資料
-    return this.getDefaultMockData()
-  }
+    // 解析並返回（已驗證過）
+    const data = JSON.parse(jsonContent) as TranscriptDTO
 
-  private getDefaultMockData(): TranscriptDTO {
-    // ... 預設 Mock 資料
+    // 使用後自動清除（一次性使用）
+    this.mockDataMap.delete(videoId)
+
+    return data
   }
 }
 
@@ -160,14 +160,17 @@ export class UploadVideoWithMockTranscriptUseCaseExample
 
   async execute(
     videoFile: File,
-    transcriptData: TranscriptDTO,
+    transcriptFile: File,
     onProgress?: (progress: number) => void
   ): Promise<Video> {
     // 1. 上傳視頻（重用現有 Use Case）
     const video = await this.uploadVideoUseCase.execute(videoFile, onProgress)
 
-    // 2. 設定 Mock 轉錄資料
-    this.mockDataProvider.setMockTranscript(video.id, transcriptData)
+    // 2. 讀取轉錄 JSON 檔案內容
+    const jsonContent = await transcriptFile.text()
+
+    // 3. 設定 Mock 資料（setMockData 會進行驗證、補完非必要欄位、檢查時間戳）
+    this.mockDataProvider.setMockData(video.id, jsonContent)
 
     return video
   }

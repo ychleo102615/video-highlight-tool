@@ -29,11 +29,6 @@ export class MockAIService implements ITranscriptGenerator, IMockDataProvider {
   private mockDataMap: Map<string, string> = new Map();
 
   /**
-   * 記憶體快取 - 儲存 videoId → TranscriptDTO 的映射（用於 IMockDataProvider）
-   */
-  private mockTranscriptMap: Map<string, TranscriptDTO> = new Map();
-
-  /**
    * 設定 Mock 資料
    *
    * @param videoId - 視頻 ID
@@ -68,32 +63,19 @@ export class MockAIService implements ITranscriptGenerator, IMockDataProvider {
    * @throws Error 如果找不到 Mock 資料或 JSON 格式無效
    *
    * 流程:
-   * 1. 優先使用 TranscriptDTO 資料（來自 setMockTranscript）
-   * 2. 否則從記憶體 Map 讀取 JSON 字串
-   * 3. 驗證 JSON 格式 (使用 JSONValidator)
-   * 4. 補完非必要欄位 (isHighlight, fullText)
-   * 5. 檢查時間戳合理性 (發出警告但不阻斷)
-   * 6. 模擬 1.5 秒延遲
-   * 7. 轉換為 TranscriptDTO (Application Layer DTO)
+   * 1. 從記憶體 Map 讀取 JSON 字串
+   * 2. 驗證 JSON 格式 (使用 JSONValidator)
+   * 3. 補完非必要欄位 (isHighlight, fullText)
+   * 4. 檢查時間戳合理性 (發出警告但不阻斷)
+   * 5. 模擬 1.5 秒延遲
+   * 6. 轉換為 TranscriptDTO (Application Layer DTO)
    */
   async generate(videoId: string): Promise<TranscriptDTO> {
-    // 優先使用 TranscriptDTO 資料（來自 IMockDataProvider.setMockTranscript）
-    if (this.mockTranscriptMap.has(videoId)) {
-      const data = this.mockTranscriptMap.get(videoId)!;
-      // 使用後清除（避免下次誤用）
-      this.mockTranscriptMap.delete(videoId);
-
-      // 模擬 AI 處理延遲 (1.5 秒)
-      await this.delay(1500);
-
-      return data;
-    }
-
     // 1. 從記憶體 Map 讀取 JSON
     const jsonContent = this.mockDataMap.get(videoId);
     if (!jsonContent) {
       throw new Error(
-        `找不到 videoId "${videoId}" 的 Mock 資料,請先使用 setMockData() 或 setMockTranscript() 上傳資料`
+        `找不到 videoId "${videoId}" 的 Mock 資料,請先使用 setMockData() 上傳資料`
       );
     }
 
@@ -129,6 +111,9 @@ export class MockAIService implements ITranscriptGenerator, IMockDataProvider {
       ),
     };
 
+    // 7. 使用後自動清除（避免內存洩漏，確保一次性使用）
+    this.mockDataMap.delete(videoId);
+
     return transcriptDTO;
   }
 
@@ -143,48 +128,12 @@ export class MockAIService implements ITranscriptGenerator, IMockDataProvider {
   }
 
   /**
-   * 設定 Mock 轉錄資料（實作 IMockDataProvider 介面）
-   *
-   * @param videoId - 視頻 ID
-   * @param data - 轉錄資料（TranscriptDTO 格式）
-   */
-  setMockTranscript(videoId: string, data: TranscriptDTO): void {
-    this.mockTranscriptMap.set(videoId, data);
-  }
-
-  /**
-   * 清除 Mock 轉錄資料（實作 IMockDataProvider 介面）
-   *
-   * @param videoId - 視頻 ID
-   */
-  clearMockTranscript(videoId: string): void {
-    this.mockTranscriptMap.delete(videoId);
-  }
-
-  /**
-   * 清除特定視頻的 Mock 資料
-   *
-   * @param videoId - 視頻 ID
-   */
-  clearMockData(videoId: string): void {
-    this.mockDataMap.delete(videoId);
-  }
-
-  /**
-   * 清除所有 Mock 資料
-   */
-  clearAllMockData(): void {
-    this.mockDataMap.clear();
-    this.mockTranscriptMap.clear();
-  }
-
-  /**
    * 檢查是否存在特定視頻的 Mock 資料
    *
    * @param videoId - 視頻 ID
    * @returns boolean - 是否存在
    */
   hasMockData(videoId: string): boolean {
-    return this.mockDataMap.has(videoId) || this.mockTranscriptMap.has(videoId);
+    return this.mockDataMap.has(videoId);
   }
 }

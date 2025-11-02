@@ -190,15 +190,23 @@ EOF
 **檔案**: `src/application/ports/IMockDataProvider.ts`
 
 ```typescript
-import type { TranscriptDTO } from '@/application/dto/TranscriptDTO'
-
 /**
  * Mock 資料提供者介面
  * 注意：此介面僅在開發/展示環境使用
+ *
+ * 設計原則：
+ * - 只接受 JSON 字串，確保所有資料都經過 JSONValidator 驗證
+ * - Infrastructure Layer (MockAIService) 負責驗證、補完非必要欄位
+ * - Mock 資料在 generate() 使用後自動清除（一次性使用）
  */
 export interface IMockDataProvider {
-  setMockTranscript(videoId: string, data: TranscriptDTO): void
-  clearMockTranscript(videoId: string): void
+  /**
+   * 設定指定視頻的 Mock 資料（JSON 字串格式）
+   * @param videoId 視頻 ID
+   * @param jsonContent JSON 字串內容
+   * @throws Error 如果 JSON 格式無效
+   */
+  setMockData(videoId: string, jsonContent: string): void
 }
 ```
 
@@ -253,7 +261,6 @@ async execute(
 
 ```typescript
 import type { Video } from '@/domain/aggregates/Video'
-import type { TranscriptDTO } from '@/application/dto/TranscriptDTO'
 import type { UploadVideoUseCase } from './UploadVideoUseCase'
 import type { IMockDataProvider } from '@/application/ports/IMockDataProvider'
 
@@ -265,14 +272,17 @@ export class UploadVideoWithMockTranscriptUseCase {
 
   async execute(
     videoFile: File,
-    transcriptData: TranscriptDTO,
+    transcriptFile: File,
     onProgress?: (progress: number) => void
   ): Promise<Video> {
     // 1. 上傳視頻（重用現有 Use Case）
     const video = await this.uploadVideoUseCase.execute(videoFile, onProgress)
 
-    // 2. 設定 Mock 轉錄資料
-    this.mockDataProvider.setMockTranscript(video.id, transcriptData)
+    // 2. 讀取轉錄 JSON 檔案內容
+    const jsonContent = await transcriptFile.text()
+
+    // 3. 設定 Mock 資料（setMockData 會進行驗證、補完非必要欄位、檢查時間戳）
+    this.mockDataProvider.setMockData(video.id, jsonContent)
 
     return video
   }
@@ -297,44 +307,36 @@ export * from './UploadVideoWithMockTranscriptUseCase'  // 新增
 
 **檔案**: `src/infrastructure/api/MockAIService.ts`
 
-讓 MockAIService 同時實作 `ITranscriptGenerator` 和 `IMockDataProvider`：
+MockAIService 已實作 `ITranscriptGenerator` 和 `IMockDataProvider` 介面，並包含：
 
+- `setMockData(videoId, jsonContent)`: 驗證 JSON 格式、補完欄位並存儲
+- `generate(videoId)`: 生成轉錄資料（使用 setMockData 設定的資料，使用後自動清除）
+
+**關鍵實作**：
 ```typescript
-import type { ITranscriptGenerator } from '@/application/ports/ITranscriptGenerator'
-import type { IMockDataProvider } from '@/application/ports/IMockDataProvider'
-import type { TranscriptDTO } from '@/application/dto/TranscriptDTO'
+// setMockData 會進行驗證
+setMockData(videoId: string, jsonContent: string): void {
+  // 1. 驗證 JSON 格式（使用 JSONValidator）
+  const validatedData = JSONValidator.validate(jsonContent)
 
-export class MockAIService implements ITranscriptGenerator, IMockDataProvider {
-  private mockDataMap = new Map<string, TranscriptDTO>()
+  // 2. 補完非必要欄位
+  const completedData = JSONValidator.fillDefaults(validatedData)
 
-  // IMockDataProvider 實作
-  setMockTranscript(videoId: string, data: TranscriptDTO): void {
-    this.mockDataMap.set(videoId, data)
+  // 3. 存儲補完後的 JSON 字串
+  this.mockDataMap.set(videoId, JSON.stringify(completedData))
+}
+
+// generate 會讀取並使用驗證後的資料
+async generate(videoId: string): Promise<TranscriptDTO> {
+  // 優先使用 setMockData 設定的資料
+  const jsonContent = this.mockDataMap.get(videoId)
+  if (jsonContent) {
+    // 解析並返回（已驗證過）
+    return JSON.parse(jsonContent) as TranscriptDTO
   }
 
-  clearMockTranscript(videoId: string): void {
-    this.mockDataMap.delete(videoId)
-  }
-
-  // ITranscriptGenerator 實作
-  async generate(videoId: string): Promise<TranscriptDTO> {
-    // 模擬 AI 處理延遲
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    // 優先使用使用者上傳的 Mock 資料
-    if (this.mockDataMap.has(videoId)) {
-      const data = this.mockDataMap.get(videoId)!
-      this.mockDataMap.delete(videoId)  // 使用後清除
-      return data
-    }
-
-    // 否則返回預設 Mock 資料
-    return this.getDefaultMockData()
-  }
-
-  private getDefaultMockData(): TranscriptDTO {
-    // ... 現有的預設 Mock 資料
-  }
+  // 否則返回預設 Mock 資料
+  return this.getDefaultMockData()
 }
 ```
 
@@ -457,7 +459,6 @@ import { ref, computed } from 'vue'
 import type { Video } from '@/domain/aggregates/Video'
 import type { UploadVideoUseCase } from '@/application/use-cases/UploadVideoUseCase'
 import type { UploadVideoWithMockTranscriptUseCase } from '@/application/use-cases/UploadVideoWithMockTranscriptUseCase'
-import type { TranscriptDTO } from '@/application/dto/TranscriptDTO'
 import { container } from '@/di/container'
 
 export const useVideoStore = defineStore('video', () => {
@@ -474,8 +475,8 @@ export const useVideoStore = defineStore('video', () => {
   const duration = computed(() => video.value?.duration ?? 0)
 
   // 注入 Use Cases
-  const uploadVideoUseCase = container.get<UploadVideoUseCase>('UploadVideoUseCase')
-  const uploadWithMockUseCase = container.get<UploadVideoWithMockTranscriptUseCase>(
+  const uploadVideoUseCase = container.resolve<UploadVideoUseCase>('UploadVideoUseCase')
+  const uploadWithMockUseCase = container.resolve<UploadVideoWithMockTranscriptUseCase>(
     'UploadVideoWithMockTranscriptUseCase'
   )
 
@@ -486,25 +487,30 @@ export const useVideoStore = defineStore('video', () => {
       uploadProgress.value = 0
       error.value = null
 
-      // 如果有轉錄檔案，解析並使用 UploadVideoWithMockTranscriptUseCase
+      // 根據是否有轉錄檔案選擇不同的 Use Case
+      let uploadedVideo: Video
+
       if (transcriptFile) {
-        const transcriptData = await parseTranscriptFile(transcriptFile)
-        const uploadedVideo = await uploadWithMockUseCase.execute(
+        // 使用 UploadVideoWithMockTranscriptUseCase
+        // Use Case 內部會讀取 JSON 並調用 setMockData 進行驗證
+        uploadedVideo = await uploadWithMockUseCase.execute(
           videoFile,
-          transcriptData,
-          (progress) => {
+          transcriptFile,
+          (progress: number) => {
             uploadProgress.value = progress
           }
         )
-        video.value = uploadedVideo
       } else {
-        // 否則使用標準 UploadVideoUseCase
-        const uploadedVideo = await uploadVideoUseCase.execute(videoFile, (progress) => {
-          uploadProgress.value = progress
-        })
-        video.value = uploadedVideo
+        // 使用標準 UploadVideoUseCase
+        uploadedVideo = await uploadVideoUseCase.execute(
+          videoFile,
+          (progress: number) => {
+            uploadProgress.value = progress
+          }
+        )
       }
 
+      video.value = uploadedVideo
       uploadProgress.value = 100
     } catch (err) {
       error.value = (err as Error).message
@@ -518,11 +524,6 @@ export const useVideoStore = defineStore('video', () => {
     video.value = null
     uploadProgress.value = 0
     error.value = null
-  }
-
-  async function parseTranscriptFile(file: File): Promise<TranscriptDTO> {
-    const text = await file.text()
-    return JSON.parse(text) as TranscriptDTO
   }
 
   return {
