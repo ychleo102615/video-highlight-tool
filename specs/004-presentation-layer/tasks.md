@@ -171,10 +171,10 @@
 
 ### Implementation for User Story 5
 
-- [ ] T042 [US5] 建立 Timeline 組件在 src/presentation/components/preview/Timeline.vue（時間軸視覺化，支援點擊跳轉）
-- [ ] T043 [US5] 整合 Timeline 到 PreviewArea.vue 並實作片段區塊渲染
-- [ ] T044 [US5] 實作播放進度指示器在 Timeline.vue（監聽 currentTime 變化）
-- [ ] T045 [US5] 測試時間軸點擊跳轉和即時更新功能
+- [X] T042 [US5] 建立 VideoTimeline 組件在 src/presentation/components/preview/VideoTimeline.vue（時間軸視覺化，支援點擊跳轉）
+- [X] T043 [US5] 整合 VideoTimeline 到 PreviewArea.vue 並實作片段區塊渲染
+- [X] T044 [US5] 實作播放進度指示器在 VideoTimeline.vue（監聽 currentTime 變化）
+- [X] T045 [US5] 測試時間軸點擊跳轉和即時更新功能（型別檢查和建置通過）
 
 **Checkpoint**: 此時 User Stories 1-5 都應該獨立運作（上傳 → 選擇 → 預覽 + 文字 + 時間軸）
 

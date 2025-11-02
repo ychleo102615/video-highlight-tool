@@ -11,7 +11,8 @@ import type {
   HighlightStoreState,
   HighlightStoreGetters,
   HighlightStoreActions,
-  TimeSegment
+  TimeSegment,
+  TimeSegmentWithSelection
 } from '@/presentation/types/store-contracts'
 import { useTranscriptStore } from './transcriptStore'
 
@@ -58,11 +59,30 @@ export const useHighlightStore = defineStore('highlight', () => {
 
   /**
    * 高光片段時間範圍（簡化版，用於播放器）
+   * 只包含選中的句子
    */
   const timeSegments = computed((): TimeSegment[] => {
-    return timeRanges.value.map((range) => ({
-      startTime: range.start.seconds,
-      endTime: range.end.seconds
+    return selectedSentences.value.map((sentence) => ({
+      sentenceId: sentence.id,
+      startTime: sentence.timeRange.start.seconds,
+      endTime: sentence.timeRange.end.seconds
+    }))
+  })
+
+  /**
+   * 所有句子的時間片段（含選中狀態，用於時間軸）
+   * 包含所有句子，每個句子帶有 isSelected 屬性
+   */
+  const allTimeSegmentsWithSelection = computed((): TimeSegmentWithSelection[] => {
+    const transcriptStore = useTranscriptStore()
+    const allSentences = transcriptStore.allSentences
+    const selectedIds = selectedSentenceIds.value
+
+    return allSentences.map((sentence) => ({
+      sentenceId: sentence.id,
+      startTime: sentence.timeRange.start.seconds,
+      endTime: sentence.timeRange.end.seconds,
+      isSelected: selectedIds.has(sentence.id)
     }))
   })
 
@@ -173,6 +193,7 @@ export const useHighlightStore = defineStore('highlight', () => {
     selectedSentences,
     timeRanges,
     timeSegments,
+    allTimeSegmentsWithSelection,
     totalDuration,
     // Actions
     createHighlight,

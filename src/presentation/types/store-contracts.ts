@@ -39,8 +39,19 @@ export interface SentenceDisplayData {
  * 時間片段（播放器專用）
  */
 export interface TimeSegment {
+  sentenceId: string // 句子 ID（用於唯一標識）
   startTime: number  // 秒數
   endTime: number    // 秒數
+}
+
+/**
+ * 時間片段（含選中狀態，時間軸專用）
+ */
+export interface TimeSegmentWithSelection {
+  sentenceId: string // 句子 ID（用於唯一標識）
+  startTime: number  // 秒數
+  endTime: number    // 秒數
+  isSelected: boolean // 是否被選中
 }
 
 // ============================================================================
