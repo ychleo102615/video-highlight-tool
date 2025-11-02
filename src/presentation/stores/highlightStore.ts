@@ -121,6 +121,9 @@ export const useHighlightStore = defineStore('highlight', () => {
     try {
       error.value = null
 
+      // 檢查這個句子切換前是否被選中
+      const wasSelected = selectedSentenceIds.value.has(sentenceId)
+
       // 呼叫 Use Case 切換句子 (它會直接修改 entity 並儲存)
       await toggleSentenceUseCase.execute({
         highlightId: currentHighlight.value.id,
@@ -134,6 +137,14 @@ export const useHighlightStore = defineStore('highlight', () => {
 
       // 強制觸發響應式更新，確保 computed 重新計算
       triggerRef(currentHighlight)
+
+      // Edge case: 如果取消選擇的句子正好是正在播放的句子，清除播放狀態
+      if (wasSelected) {
+        const transcriptStore = useTranscriptStore()
+        if (transcriptStore.playingSentenceId === sentenceId) {
+          transcriptStore.setPlayingSentenceId(null)
+        }
+      }
     } catch (err) {
       error.value = (err as Error).message
       throw err

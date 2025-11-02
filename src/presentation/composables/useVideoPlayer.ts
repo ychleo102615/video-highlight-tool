@@ -38,6 +38,8 @@ export interface UseVideoPlayerReturn {
   togglePlay: () => void
   /** 初始化視頻播放器（用於片段播放） */
   initializePlayer: (videoUrl: string, segments: TimeSegment[]) => void
+  /** 更新片段列表（不重新初始化播放器） */
+  updateSegments: (newSegments: TimeSegment[]) => void
   /** 清理播放器 */
   disposePlayer: () => void
 }
@@ -112,6 +114,21 @@ export function useVideoPlayer(): UseVideoPlayerReturn {
     // 如果有片段，跳轉到第一個片段的起點
     if (segments.length > 0 && segments[0]) {
       seekTo(segments[0].startTime)
+    }
+  }
+
+  /**
+   * 更新片段列表（不重新初始化播放器）
+   * @param newSegments 新的片段列表
+   */
+  function updateSegments(newSegments: TimeSegment[]) {
+    // 更新內部片段列表
+    segments = newSegments
+    currentSegmentIndex = 0
+
+    // 如果播放器存在且有片段，跳轉到第一個片段的起點
+    if (player.value && newSegments.length > 0 && newSegments[0]) {
+      seekTo(newSegments[0].startTime)
     }
   }
 
@@ -249,6 +266,13 @@ export function useVideoPlayer(): UseVideoPlayerReturn {
    */
   function disposePlayer() {
     if (player.value) {
+      // 移除事件監聽器（避免記憶體洩漏）
+      player.value.off('timeupdate', handleTimeUpdate)
+      player.value.off('play')
+      player.value.off('pause')
+      player.value.off('loadedmetadata')
+
+      // 清理播放器實例
       player.value.dispose()
       player.value = null
     }
@@ -282,6 +306,7 @@ export function useVideoPlayer(): UseVideoPlayerReturn {
     pause,
     togglePlay,
     initializePlayer,
+    updateSegments,
     disposePlayer
   }
 }

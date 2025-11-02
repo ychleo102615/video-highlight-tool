@@ -20,6 +20,7 @@
       <!-- 空狀態：無視頻 -->
       <EmptyState
         v-if="!hasVideo"
+        key="empty-no-video"
         message="請先上傳視頻檔案"
         icon="video"
       />
@@ -27,13 +28,15 @@
       <!-- 空狀態：無選中句子 -->
       <EmptyState
         v-else-if="!hasSelectedSentences"
+        key="empty-no-sentences"
         message="請在編輯區選擇至少一個句子來建立高光片段"
         icon="information"
       />
 
       <!-- 視頻播放器 -->
       <VideoPlayer
-        v-else
+        v-else-if="hasSelectedSentences && hasVideo"
+        key="video-player"
         :video-url="videoUrl!"
         :segments="timeSegments"
         @timeupdate="handleTimeUpdate"
@@ -44,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import VideoPlayer from './VideoPlayer.vue'
 import EmptyState from '@/presentation/components/common/EmptyState.vue'
 import { useVideoStore } from '@/presentation/stores/videoStore'
@@ -84,9 +87,20 @@ function handleTimeUpdate(time: number) {
  * 處理播放狀態變化
  */
 function handlePlayStateChange(isPlaying: boolean) {
-  console.log('播放狀態變化:', isPlaying ? '播放中' : '已暫停')
   // 可在此處添加額外的狀態管理邏輯
 }
+
+// 監聽選中句子數量變化，用於調試和清除播放狀態
+watch(
+  () => highlightStore.selectedSentenceIds.size,
+  (newSize, oldSize) => {
+    if (newSize === 0) {
+      // Edge case: 清除播放狀態，避免編輯區仍顯示「播放中」的提示
+      transcriptStore.setPlayingSentenceId(null)
+    }
+  }
+)
+
 </script>
 
 <style scoped>

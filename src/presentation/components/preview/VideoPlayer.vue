@@ -3,13 +3,13 @@
     <!-- Video.js 播放器 -->
     <video
       ref="videoElement"
-      class="video-js vjs-default-skin w-full"
+      class="video-js vjs-big-play-centered"
     ></video>
 
     <!-- 載入狀態 -->
     <div
       v-if="isLoading"
-      class="absolute inset-0 flex items-center justify-center bg-black/50"
+      class="absolute inset-0 flex items-center justify-center bg-black/50 z-10"
     >
       <NSpin size="large" />
     </div>
@@ -39,6 +39,7 @@ const {
   pause,
   togglePlay,
   initializePlayer,
+  updateSegments,
   disposePlayer
 } = useVideoPlayer()
 
@@ -46,7 +47,22 @@ const {
 const isLoading = ref(true)
 
 /**
- * 初始化播放器
+ * 事件處理函數：視頻載入完成
+ */
+function handleLoadedData() {
+  isLoading.value = false
+}
+
+/**
+ * 事件處理函數：視頻載入錯誤
+ */
+function handleError(e: Event) {
+  console.error('VideoPlayer: video loading error', e)
+  isLoading.value = false
+}
+
+/**
+ * 初始化播放器（只在 videoUrl 改變或首次掛載時調用）
  */
 function setupPlayer() {
   if (!props.videoUrl || props.segments.length === 0) {
@@ -60,26 +76,41 @@ function setupPlayer() {
   // 初始化播放器和片段播放
   initializePlayer(props.videoUrl, props.segments)
 
-  // 監聽 loadeddata 事件
+  // 監聽 loadeddata 事件（只在初始化時添加一次）
   if (videoElement.value) {
-    videoElement.value.addEventListener('loadeddata', () => {
-      isLoading.value = false
-    })
+    // 移除舊的監聽器，避免重複添加
+    videoElement.value.removeEventListener('loadeddata', handleLoadedData)
+    videoElement.value.removeEventListener('error', handleError)
 
-    videoElement.value.addEventListener('error', (e) => {
-      console.error('VideoPlayer: video loading error', e)
-      isLoading.value = false
-    })
+    // 添加新的監聽器
+    videoElement.value.addEventListener('loadeddata', handleLoadedData)
+    videoElement.value.addEventListener('error', handleError)
   }
 }
 
-// 監聽 props 變化，重新初始化播放器
+// 監聽 videoUrl 變化，重新初始化播放器
 watch(
-  () => [props.videoUrl, props.segments] as const,
-  () => {
-    setupPlayer()
-  },
-  { immediate: false }
+  () => props.videoUrl,
+  (newUrl, oldUrl) => {
+    if (newUrl !== oldUrl) {
+      setupPlayer()
+    }
+  }
+)
+
+// 監聽 segments 變化，只更新片段列表
+watch(
+  () => props.segments,
+  (newSegments) => {
+    if (newSegments.length === 0) {
+      // segments 變為空，清理播放器
+      disposePlayer()
+      isLoading.value = false
+    } else {
+      // segments 有內容，只更新片段列表（不重新初始化播放器）
+      updateSegments(newSegments)
+    }
+  }
 )
 
 // 監聽播放時間變化，發送 timeupdate 事件
@@ -99,6 +130,12 @@ onMounted(() => {
 
 // 組件卸載時清理播放器
 onUnmounted(() => {
+  // 移除事件監聽器
+  if (videoElement.value) {
+    videoElement.value.removeEventListener('loadeddata', handleLoadedData)
+    videoElement.value.removeEventListener('error', handleError)
+  }
+
   disposePlayer()
 })
 
@@ -114,10 +151,10 @@ defineExpose({
 })
 </script>
 
-<style scoped>
+<style>
 /**
  * Video.js 基礎樣式
- * 使用 video.js 提供的預設樣式
+ * 注意：不使用 scoped，以便 video.js 動態生成的元素可以正確應用樣式
  */
 .video-player-container {
   aspect-ratio: 16 / 9;
@@ -127,15 +164,8 @@ defineExpose({
 /**
  * 確保視頻播放器填滿容器
  */
-.video-js {
+.video-player-container .video-js {
   width: 100%;
   height: 100%;
-}
-
-/**
- * 隱藏原生控制欄（使用 video.js 控制欄）
- */
-.video-js .vjs-tech {
-  pointer-events: none;
 }
 </style>
