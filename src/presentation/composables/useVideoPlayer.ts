@@ -126,8 +126,15 @@ export function useVideoPlayer(): UseVideoPlayerReturn {
     segments = newSegments
     currentSegmentIndex = 0
 
-    // 如果播放器存在且有片段，跳轉到第一個片段的起點
-    if (player.value && newSegments.length > 0 && newSegments[0]) {
+    if (!player.value) return
+
+    // Edge case: 播放時修改句子選擇，暫停播放器避免播放錯誤片段
+    if (!player.value.paused()) {
+      player.value.pause()
+    }
+
+    // 如果有片段，跳轉到第一個片段的起點
+    if (newSegments.length > 0 && newSegments[0]) {
       seekTo(newSegments[0].startTime)
     }
   }

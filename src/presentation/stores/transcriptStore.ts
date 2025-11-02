@@ -4,13 +4,7 @@ import type { Transcript } from '@/domain/aggregates/Transcript/Transcript'
 import type { Sentence } from '@/domain/aggregates/Transcript/Sentence'
 import type { ProcessTranscriptUseCase } from '@/application/use-cases/ProcessTranscriptUseCase'
 import { container } from '@/di/container'
-import type {
-  TranscriptStoreState,
-  TranscriptStoreGetters,
-  TranscriptStoreActions,
-  SectionDisplayData,
-  SentenceDisplayData
-} from '@/presentation/types/store-contracts'
+import type { SectionDisplayData } from '@/presentation/types/store-contracts'
 import { useHighlightStore } from './highlightStore'
 
 export const useTranscriptStore = defineStore('transcript', () => {

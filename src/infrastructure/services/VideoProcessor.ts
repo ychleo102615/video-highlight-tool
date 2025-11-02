@@ -59,7 +59,7 @@ export class VideoProcessor implements IVideoProcessor {
 
             // 返回結果
             resolve(metadata)
-          } catch (error) {
+          } catch {
             URL.revokeObjectURL(video.src)
             reject(new VideoMetadataExtractionError())
           }
@@ -67,7 +67,7 @@ export class VideoProcessor implements IVideoProcessor {
 
         // 載入視頻
         video.src = URL.createObjectURL(file)
-      } catch (error) {
+      } catch {
         reject(new VideoMetadataExtractionError())
       }
     })

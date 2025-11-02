@@ -15,6 +15,7 @@ import type { TimeSegment, SectionDisplayData, SentenceDisplayData } from './sto
  * SplitLayout 組件 Props
  * 響應式分屏佈局容器
  */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface SplitLayoutProps {
   // 無 props，純佈局組件
 }
@@ -52,6 +53,7 @@ export interface VideoUploadEmits {
 /**
  * EditingArea 組件 Props
  */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface EditingAreaProps {
   // 從 Store 獲取資料，無需 props
 }

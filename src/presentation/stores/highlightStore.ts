@@ -8,9 +8,6 @@ import type { ToggleSentenceInHighlightUseCase } from '@/application/use-cases/T
 import type { IHighlightRepository } from '@/domain/repositories/IHighlightRepository'
 import { container } from '@/di/container'
 import type {
-  HighlightStoreState,
-  HighlightStoreGetters,
-  HighlightStoreActions,
   TimeSegment,
   TimeSegmentWithSelection
 } from '@/presentation/types/store-contracts'
@@ -129,6 +126,9 @@ export const useHighlightStore = defineStore('highlight', () => {
     }
   }
 
+  // 追蹤正在處理中的句子切換，用於防抖（50ms）
+  const pendingToggles = new Set<string>()
+
   /**
    * 切換句子選中狀態
    * @param sentenceId 句子 ID
@@ -137,6 +137,14 @@ export const useHighlightStore = defineStore('highlight', () => {
     if (!currentHighlight.value) {
       throw new Error('沒有高光可以切換句子')
     }
+
+    // Debounce: 如果這個句子正在處理中，忽略重複點擊
+    if (pendingToggles.has(sentenceId)) {
+      return
+    }
+
+    // 標記為處理中
+    pendingToggles.add(sentenceId)
 
     try {
       error.value = null
@@ -168,6 +176,11 @@ export const useHighlightStore = defineStore('highlight', () => {
     } catch (err) {
       error.value = (err as Error).message
       throw err
+    } finally {
+      // 延遲 50ms 後移除 pending 標記，實現 debounce 效果
+      setTimeout(() => {
+        pendingToggles.delete(sentenceId)
+      }, 50)
     }
   }
 

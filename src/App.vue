@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { NNotificationProvider } from 'naive-ui'
 import VideoUpload from '@/presentation/components/upload/VideoUpload.vue'
 import EditingArea from '@/presentation/components/editing/EditingArea.vue'
 import PreviewArea from '@/presentation/components/preview/PreviewArea.vue'
@@ -45,19 +46,45 @@ function handleSeekToTime(time: number) {
     seekTime.value = null
   }, 100)
 }
+
+/**
+ * 處理瀏覽器關閉/重新整理提示
+ * 當有視頻上傳時提示使用者
+ */
+function handleBeforeUnload(e: BeforeUnloadEvent) {
+  if (videoStore.hasVideo) {
+    e.preventDefault()
+    // 現代瀏覽器會忽略自訂訊息，顯示預設提示
+    // e.returnValue = ''
+  }
+}
+
+// ========================================
+// Lifecycle
+// ========================================
+
+onMounted(() => {
+  window.addEventListener('beforeunload', handleBeforeUnload)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('beforeunload', handleBeforeUnload)
+})
 </script>
 
 <template>
-  <div class="app min-h-screen bg-gray-50">
-    <!-- Header -->
-    <header class="bg-white shadow-sm">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <h1 class="text-3xl font-bold text-gray-900">視頻高光編輯工具</h1>
-      </div>
-    </header>
+  <!-- 通知系統容器 -->
+  <n-notification-provider>
+    <div class="app min-h-screen bg-gray-50">
+      <!-- Header -->
+      <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <h1 class="text-3xl font-bold text-gray-900">視頻高光編輯工具</h1>
+        </div>
+      </header>
 
-    <!-- Main Content -->
-    <main class="h-[calc(100vh-5rem)]">
+      <!-- Main Content -->
+      <main class="h-[calc(100vh-5rem)]">
       <!-- 上傳區（未上傳視頻時顯示） -->
       <div v-if="showUpload" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <VideoUpload />
@@ -91,7 +118,8 @@ function handleSeekToTime(time: number) {
         <p class="text-gray-500">載入中...</p>
       </div>
     </main>
-  </div>
+    </div>
+  </n-notification-provider>
 </template>
 
 <style scoped>

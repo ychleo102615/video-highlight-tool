@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, type Component } from 'vue'
 import {
   VideoCameraIcon,
   DocumentTextIcon,
@@ -38,7 +38,7 @@ const props = withDefaults(defineProps<EmptyStateProps>(), {
  * 根據 icon prop 選擇對應的 Heroicons 組件
  */
 const iconComponent = computed(() => {
-  const iconMap: Record<string, any> = {
+  const iconMap: Record<string, Component> = {
     video: VideoCameraIcon,
     document: DocumentTextIcon,
     exclamation: ExclamationCircleIcon,

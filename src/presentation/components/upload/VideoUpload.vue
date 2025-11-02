@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useVideoUpload } from '@/presentation/composables/useVideoUpload'
+import { useNotification } from '@/presentation/composables/useNotification'
 import { CloudArrowUpIcon } from '@heroicons/vue/24/solid'
 import { NButton, NProgress } from 'naive-ui'
 
@@ -8,6 +9,7 @@ import { NButton, NProgress } from 'naive-ui'
 // Composable
 // ========================================
 const { isUploading, uploadProgress, error, uploadVideo } = useVideoUpload()
+const notification = useNotification()
 
 // ========================================
 // Local State
@@ -52,13 +54,13 @@ function handleVideoFileChange(event: Event) {
 
   // 驗證文件格式
   if (!SUPPORTED_VIDEO_FORMATS.includes(file.type)) {
-    alert('不支援的視頻格式。請選擇 MP4、MOV 或 WEBM 格式。')
+    notification.error('不支援的視頻格式', '請選擇 MP4、MOV 或 WEBM 格式')
     return
   }
 
   // 驗證文件大小
   if (file.size > MAX_FILE_SIZE) {
-    alert('文件大小超過 100MB 限制。')
+    notification.error('文件大小超過限制', '文件大小不可超過 100MB')
     return
   }
 
@@ -76,7 +78,7 @@ function handleTranscriptFileChange(event: Event) {
 
   // 驗證文件格式
   if (!file.name.endsWith('.json')) {
-    alert('請選擇 JSON 格式的轉錄檔案。')
+    notification.error('格式錯誤', '請選擇 JSON 格式的轉錄檔案')
     return
   }
 
@@ -88,17 +90,18 @@ function handleTranscriptFileChange(event: Event) {
  */
 async function handleUpload() {
   if (!selectedVideoFile.value) {
-    alert('請選擇視頻檔案。')
+    notification.warning('缺少視頻檔案', '請選擇視頻檔案')
     return
   }
 
   if (!selectedTranscriptFile.value) {
-    alert('請選擇轉錄檔案。')
+    notification.warning('缺少轉錄檔案', '請選擇轉錄檔案')
     return
   }
 
   try {
     await uploadVideo(selectedVideoFile.value, selectedTranscriptFile.value)
+    notification.success('上傳成功', '視頻已成功上傳並開始處理')
 
     // 上傳成功，清除選擇
     selectedVideoFile.value = null
@@ -107,7 +110,7 @@ async function handleUpload() {
     if (videoFileInput.value) videoFileInput.value.value = ''
     if (transcriptFileInput.value) transcriptFileInput.value.value = ''
   } catch (err) {
-    console.error('視頻上傳失敗:', err)
+    notification.error('上傳失敗', (err as Error).message || '視頻上傳過程中發生錯誤')
   }
 }
 

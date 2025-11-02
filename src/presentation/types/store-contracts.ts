@@ -7,7 +7,6 @@
 
 import type { Video } from '@/domain/aggregates/Video'
 import type { Transcript } from '@/domain/aggregates/Transcript/Transcript'
-import type { Section } from '@/domain/aggregates/Transcript/Section'
 import type { Sentence } from '@/domain/aggregates/Transcript/Sentence'
 import type { Highlight } from '@/domain/aggregates/Highlight'
 import type { TimeRange } from '@/domain/value-objects/TimeRange'
