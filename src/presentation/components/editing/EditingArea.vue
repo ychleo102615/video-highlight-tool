@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch, nextTick, ref } from 'vue'
+import { computed, watch, nextTick, ref, onErrorCaptured } from 'vue'
 import SectionList from './SectionList.vue'
 import { useTranscriptStore } from '@/presentation/stores/transcriptStore'
 import { useHighlightStore } from '@/presentation/stores/highlightStore'
@@ -21,6 +21,24 @@ import type { EditingAreaProps, EditingAreaEmits } from '@/presentation/types/co
 // ========================================
 defineProps<EditingAreaProps>()
 const emit = defineEmits<EditingAreaEmits>()
+
+// ========================================
+// 錯誤邊界
+// ========================================
+const hasError = ref(false)
+const errorMessage = ref('')
+
+/**
+ * 錯誤邊界：捕獲子組件錯誤
+ * 防止整個應用崩潰
+ */
+onErrorCaptured((err: Error) => {
+  console.error('[EditingArea] Captured error from child component:', err)
+  hasError.value = true
+  errorMessage.value = err.message || '編輯區發生錯誤'
+  // 返回 false 阻止錯誤繼續向上傳播
+  return false
+})
 
 // ========================================
 // Stores
@@ -118,11 +136,33 @@ watch(playingSentenceId, async (newSentenceId) => {
 
 <template>
   <div ref="editingAreaRef" class="h-full overflow-auto bg-gray-50 p-4 lg:p-6">
-    <!-- 標題 -->
-    <div class="mb-6">
-      <h2 class="text-2xl font-bold text-gray-900 mb-2">轉錄內容</h2>
-      <p class="text-sm text-gray-600">點擊句子以選擇/取消選擇，點擊時間戳跳轉到對應位置</p>
+    <!-- 錯誤狀態 -->
+    <div
+      v-if="hasError"
+      class="flex flex-col items-center justify-center py-12 text-center"
+    >
+      <div class="text-red-600">
+        <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p class="text-lg font-semibold mb-2">編輯區錯誤</p>
+        <p class="text-sm text-gray-600 mb-4">{{ errorMessage }}</p>
+        <button
+          @click="hasError = false; errorMessage = ''"
+          class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+        >
+          重試
+        </button>
+      </div>
     </div>
+
+    <!-- 正常內容 -->
+    <template v-else>
+      <!-- 標題 -->
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">轉錄內容</h2>
+        <p class="text-sm text-gray-600">點擊句子以選擇/取消選擇，點擊時間戳跳轉到對應位置</p>
+      </div>
 
     <!-- 載入中狀態 -->
     <div
@@ -142,14 +182,15 @@ watch(playingSentenceId, async (newSentenceId) => {
       <p class="text-sm mt-2">請先上傳視頻以生成轉錄內容</p>
     </div>
 
-    <!-- 段落列表 -->
-    <SectionList
-      v-else
-      :sections="sections"
-      :playing-sentence-id="playingSentenceId"
-      :selected-sentence-ids="selectedSentenceIds"
-      @toggle-sentence="handleToggleSentence"
-      @seek-to-time="handleSeekToTime"
-    />
+      <!-- 段落列表 -->
+      <SectionList
+        v-else
+        :sections="sections"
+        :playing-sentence-id="playingSentenceId"
+        :selected-sentence-ids="selectedSentenceIds"
+        @toggle-sentence="handleToggleSentence"
+        @seek-to-time="handleSeekToTime"
+      />
+    </template>
   </div>
 </template>

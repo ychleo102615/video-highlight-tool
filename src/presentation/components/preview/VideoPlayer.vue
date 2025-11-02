@@ -1,20 +1,42 @@
 <template>
   <div class="video-player-container relative w-full">
+    <!-- 錯誤狀態 -->
+    <div
+      v-if="hasError"
+      class="absolute inset-0 flex flex-col items-center justify-center bg-red-50 z-20 p-6"
+    >
+      <div class="text-red-600 text-center">
+        <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p class="text-lg font-semibold mb-2">視頻播放器錯誤</p>
+        <p class="text-sm text-gray-600">{{ errorMessage }}</p>
+        <button
+          @click="hasError = false; errorMessage = ''"
+          class="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+        >
+          重試
+        </button>
+      </div>
+    </div>
+
     <!-- Video.js 播放器 -->
     <video
+      v-show="!hasError"
       ref="videoElement"
       class="video-js vjs-big-play-centered"
     ></video>
 
     <!-- 文字疊加層 -->
     <TranscriptOverlay
+      v-if="!hasError"
       :current-text="currentTranscriptText"
       :visible="showTranscript"
     />
 
     <!-- 載入狀態 -->
     <div
-      v-if="isLoading"
+      v-if="isLoading && !hasError"
       class="absolute inset-0 flex items-center justify-center bg-black/50 z-10"
     >
       <NSpin size="large" />
@@ -23,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
+import { ref, watch, onMounted, onUnmounted, onErrorCaptured, computed } from 'vue'
 import { NSpin } from 'naive-ui'
 import { useVideoPlayer } from '@/presentation/composables/useVideoPlayer'
 import { useTranscriptStore } from '@/presentation/stores/transcriptStore'
@@ -35,6 +57,22 @@ const props = defineProps<VideoPlayerProps>()
 
 // Emits
 const emit = defineEmits<VideoPlayerEmits>()
+
+// 錯誤狀態
+const hasError = ref(false)
+const errorMessage = ref('')
+
+/**
+ * 錯誤邊界：捕獲子組件錯誤
+ * 防止整個應用崩潰
+ */
+onErrorCaptured((err: Error) => {
+  console.error('[VideoPlayer] Captured error from child component:', err)
+  hasError.value = true
+  errorMessage.value = err.message || '視頻播放器發生錯誤'
+  // 返回 false 阻止錯誤繼續向上傳播
+  return false
+})
 
 // Stores
 const transcriptStore = useTranscriptStore()

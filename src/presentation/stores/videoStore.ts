@@ -4,11 +4,12 @@ import type { Video } from '@/domain/aggregates/Video'
 import type { UploadVideoUseCase } from '@/application/use-cases/UploadVideoUseCase'
 import type { UploadVideoWithMockTranscriptUseCase } from '@/application/use-cases/UploadVideoWithMockTranscriptUseCase'
 import { container } from '@/di/container'
-import type {
-  VideoStoreState,
-  VideoStoreGetters,
-  VideoStoreActions
-} from '@/presentation/types/store-contracts'
+// Store contracts 型別已在檔案中直接實作，不需要額外導入
+// import type {
+//   VideoStoreState,
+//   VideoStoreGetters,
+//   VideoStoreActions
+// } from '@/presentation/types/store-contracts'
 import { useTranscriptStore } from './transcriptStore'
 
 export const useVideoStore = defineStore('video', () => {
