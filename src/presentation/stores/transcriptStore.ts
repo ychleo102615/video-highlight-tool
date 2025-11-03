@@ -121,6 +121,14 @@ export const useTranscriptStore = defineStore('transcript', () => {
     })
   }
 
+  /**
+   * 設定轉錄內容（用於會話恢復）
+   * @param newTranscript 轉錄 Entity
+   */
+  function setTranscript(newTranscript: Transcript): void {
+    transcript.value = newTranscript
+  }
+
   // ========================================
   // Return
   // ========================================
@@ -138,6 +146,7 @@ export const useTranscriptStore = defineStore('transcript', () => {
     // Actions
     processTranscript,
     setPlayingSentenceId,
-    getSentenceAtTime
+    getSentenceAtTime,
+    setTranscript
   }
 })

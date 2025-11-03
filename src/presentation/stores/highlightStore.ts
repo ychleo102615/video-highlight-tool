@@ -192,6 +192,17 @@ export const useHighlightStore = defineStore('highlight', () => {
     return selectedSentenceIds.value.has(sentenceId)
   }
 
+  /**
+   * 設定高光列表（用於會話恢復）
+   * 注意：目前單視頻專案，只使用第一個高光
+   * @param highlights 高光 Entity 陣列
+   */
+  function setHighlights(highlights: Highlight[]): void {
+    if (highlights.length > 0) {
+      currentHighlight.value = highlights[0]!
+    }
+  }
+
   // ========================================
   // Return
   // ========================================
@@ -211,6 +222,7 @@ export const useHighlightStore = defineStore('highlight', () => {
     // Actions
     createHighlight,
     toggleSentence,
-    isSentenceSelected
+    isSentenceSelected,
+    setHighlights
   }
 })

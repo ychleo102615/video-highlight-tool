@@ -5,6 +5,7 @@ import VideoUpload from '@/presentation/components/upload/VideoUpload.vue'
 import EditingArea from '@/presentation/components/editing/EditingArea.vue'
 import PreviewArea from '@/presentation/components/preview/PreviewArea.vue'
 import SplitLayout from '@/presentation/components/layout/SplitLayout.vue'
+import SessionRestorer from '@/presentation/components/SessionRestorer.vue'
 import { useVideoStore } from '@/presentation/stores/videoStore'
 import { useTranscriptStore } from '@/presentation/stores/transcriptStore'
 import { useHighlightStore } from '@/presentation/stores/highlightStore'
@@ -64,6 +65,7 @@ function handleBeforeUnload(e: BeforeUnloadEvent) {
 // ========================================
 
 onMounted(() => {
+  // 註冊瀏覽器關閉/重新整理提示
   window.addEventListener('beforeunload', handleBeforeUnload)
 })
 
@@ -75,6 +77,9 @@ onUnmounted(() => {
 <template>
   <!-- 通知系統容器 -->
   <n-notification-provider>
+    <!-- 會話恢復組件（無 UI，僅執行邏輯） -->
+    <SessionRestorer />
+
     <div class="app min-h-screen bg-gray-50">
       <!-- Header -->
       <header class="bg-white shadow-sm">

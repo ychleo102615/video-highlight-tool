@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import type { Video } from '@/domain/aggregates/Video'
 import type { UploadVideoUseCase } from '@/application/use-cases/UploadVideoUseCase'
 import type { UploadVideoWithMockTranscriptUseCase } from '@/application/use-cases/UploadVideoWithMockTranscriptUseCase'
+import type { RestoreSessionUseCase, RestoreSessionResult } from '@/application/use-cases/RestoreSessionUseCase'
 import { container } from '@/di/container'
 // Store contracts 型別已在檔案中直接實作，不需要額外導入
 // import type {
@@ -11,6 +12,7 @@ import { container } from '@/di/container'
 //   VideoStoreActions
 // } from '@/presentation/types/store-contracts'
 import { useTranscriptStore } from './transcriptStore'
+import { useHighlightStore } from './highlightStore'
 
 export const useVideoStore = defineStore('video', () => {
   // ========================================
@@ -36,6 +38,7 @@ export const useVideoStore = defineStore('video', () => {
   const uploadWithMockUseCase = container.resolve<UploadVideoWithMockTranscriptUseCase>(
     'UploadVideoWithMockTranscriptUseCase'
   )
+  const restoreSessionUseCase = container.resolve<RestoreSessionUseCase>('RestoreSessionUseCase')
 
   // ========================================
   // Actions
@@ -96,6 +99,42 @@ export const useVideoStore = defineStore('video', () => {
     error.value = null
   }
 
+  /**
+   * 恢復會話
+   * User Story 1: 小視頻完整恢復
+   * - 在應用啟動時自動執行
+   * - 檢查 IndexedDB 和 SessionStorage 是否有先前的編輯狀態
+   * - 若存在會話資料，恢復 Video、Transcript、Highlight 狀態
+   *
+   * @returns Promise<RestoreSessionResult | null | Error>
+   *   - RestoreSessionResult: 成功恢復會話
+   *   - null: 無會話資料（首次訪問）
+   *   - Error: 恢復失敗
+   */
+  async function restoreSession(): Promise<RestoreSessionResult | null> {
+    // 執行會話恢復 Use Case
+    const sessionState = await restoreSessionUseCase.execute()
+
+    // 若無會話資料（首次訪問或已清除），靜默返回
+    if (!sessionState) {
+      return null
+    }
+
+    // 更新 videoStore 狀態
+    video.value = sessionState.video
+
+    // 更新 transcriptStore 狀態
+    const transcriptStore = useTranscriptStore()
+    transcriptStore.setTranscript(sessionState.transcript)
+
+    // 更新 highlightStore 狀態
+    const highlightStore = useHighlightStore()
+    highlightStore.setHighlights(sessionState.highlights)
+
+    // 返回會話狀態，由調用方決定如何顯示通知
+    return sessionState
+  }
+
   // ========================================
   // Return
   // ========================================
@@ -112,6 +151,7 @@ export const useVideoStore = defineStore('video', () => {
     duration,
     // Actions
     uploadVideo,
-    clearVideo
+    clearVideo,
+    restoreSession
   }
 })

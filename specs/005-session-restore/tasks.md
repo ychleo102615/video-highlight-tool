@@ -80,13 +80,13 @@
 
 ### Implementation for User Story 1
 
-- [ ] T016 [US1] Add restoreSession() action to videoStore in src/presentation/stores/videoStore.ts (calls RestoreSessionUseCase, updates video state)
-- [ ] T017 [P] [US1] Add setTranscript(transcript: Transcript) method to transcriptStore in src/presentation/stores/transcriptStore.ts (if not exists)
-- [ ] T018 [P] [US1] Add setHighlights(highlights: Highlight[]) method to highlightStore in src/presentation/stores/highlightStore.ts (if not exists)
-- [ ] T019 [US1] Integrate videoStore.restoreSession() with transcriptStore and highlightStore state updates in src/presentation/stores/videoStore.ts
-- [ ] T020 [US1] Verify useNotification composable supports showInfo() and showError() methods in src/presentation/composables/useNotification.ts
-- [ ] T021 [US1] Add notification display logic to restoreSession() action (small video: "已恢復先前的編輯狀態") in src/presentation/stores/videoStore.ts
-- [ ] T022 [US1] Call videoStore.restoreSession() in App.vue onMounted lifecycle hook
+- [X] T016 [US1] Add restoreSession() action to videoStore in src/presentation/stores/videoStore.ts (calls RestoreSessionUseCase, updates video state)
+- [X] T017 [P] [US1] Add setTranscript(transcript: Transcript) method to transcriptStore in src/presentation/stores/transcriptStore.ts (if not exists)
+- [X] T018 [P] [US1] Add setHighlights(highlights: Highlight[]) method to highlightStore in src/presentation/stores/highlightStore.ts (if not exists)
+- [X] T019 [US1] Integrate videoStore.restoreSession() with transcriptStore and highlightStore state updates in src/presentation/stores/videoStore.ts
+- [X] T020 [US1] Verify useNotification composable supports showInfo() and showError() methods in src/presentation/composables/useNotification.ts
+- [X] T021 [US1] Add notification display logic to restoreSession() action (small video: "已恢復先前的編輯狀態") in src/presentation/stores/videoStore.ts
+- [X] T022 [US1] Call videoStore.restoreSession() in App.vue onMounted lifecycle hook
 
 **Checkpoint**: 小視頻完整恢復功能已完成。使用者刷新頁面後，視頻、轉錄文字和高光選擇應該自動恢復。
 
