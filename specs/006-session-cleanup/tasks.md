@@ -28,7 +28,7 @@ description: 'Task list for 會話清除功能 (Session Cleanup)'
 
 **Purpose**: Create foundational structure for session cleanup feature
 
-- [ ] T001 Review existing project structure and dependencies to understand integration points
+- [X] T001 Review existing project structure and dependencies to understand integration points
 
 ---
 
@@ -38,11 +38,11 @@ description: 'Task list for 會話清除功能 (Session Cleanup)'
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T002 [P] Create ISessionRepository interface in src/domain/repositories/ISessionRepository.ts
-- [ ] T003 [P] Create SessionCleanupError class in src/application/errors/SessionCleanupError.ts
-- [ ] T004 Create CleanupSessionUseCase in src/application/use-cases/CleanupSessionUseCase.ts (depends on T002, T003)
-- [ ] T005 Implement SessionRepositoryImpl in src/infrastructure/repositories/SessionRepositoryImpl.ts (depends on T002) - MUST delete all session Entities (Video, Transcript, Highlight) using IndexedDB Transaction to ensure atomicity
-- [ ] T006 Register SessionRepositoryImpl and CleanupSessionUseCase in DI container at src/di/container.ts (depends on T004, T005)
+- [X] T002 [P] Create ISessionRepository interface in src/domain/repositories/ISessionRepository.ts
+- [X] T003 [P] Create SessionCleanupError class in src/application/errors/SessionCleanupError.ts
+- [X] T004 Create CleanupSessionUseCase in src/application/use-cases/CleanupSessionUseCase.ts (depends on T002, T003)
+- [X] T005 Implement SessionRepositoryImpl in src/infrastructure/repositories/SessionRepositoryImpl.ts (depends on T002) - MUST delete all session Entities (Video, Transcript, Highlight) using IndexedDB Transaction to ensure atomicity
+- [X] T006 Register SessionRepositoryImpl and CleanupSessionUseCase in DI container at src/di/container.ts (depends on T004, T005)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 

@@ -14,3 +14,4 @@ export * from './TranscriptGenerationError';
 export * from './HighlightNotFoundError';
 export * from './InvalidHighlightNameError';
 export * from './FileStorageError';
+export * from './SessionCleanupError';

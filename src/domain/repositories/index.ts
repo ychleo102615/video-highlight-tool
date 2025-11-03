@@ -7,3 +7,4 @@
 export type { IVideoRepository } from './IVideoRepository';
 export type { ITranscriptRepository } from './ITranscriptRepository';
 export type { IHighlightRepository } from './IHighlightRepository';
+export type { ISessionRepository } from './ISessionRepository';

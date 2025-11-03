@@ -9,3 +9,4 @@ export * from './ProcessTranscriptUseCase';
 export * from './CreateHighlightUseCase';
 export * from './ToggleSentenceInHighlightUseCase';
 export * from './GenerateHighlightUseCase';
+export * from './CleanupSessionUseCase';

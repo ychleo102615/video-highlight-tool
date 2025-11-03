@@ -293,4 +293,50 @@ export class BrowserStorage {
       console.warn(`Failed to cleanup ${storeName}:`, error);
     }
   }
+
+  // ==================== Session Management ====================
+
+  /**
+   * 刪除所有會話資料
+   *
+   * 包含:
+   * - 所有 Video Entities (videos Object Store)
+   * - 所有 Transcript Entities (transcripts Object Store)
+   * - 所有 Highlight Entities (highlights Object Store)
+   *
+   * 原子性保證:
+   * - 透過 IndexedDB Transaction 包裝所有刪除操作
+   * - 如果任何刪除失敗，整個 Transaction 回滾
+   *
+   * @throws Error 當 Transaction 失敗時
+   */
+  async deleteAllSessionData(): Promise<void> {
+    const tx = this.db.transaction(['videos', 'transcripts', 'highlights'], 'readwrite');
+
+    await Promise.all([
+      tx.objectStore('videos').clear(),
+      tx.objectStore('transcripts').clear(),
+      tx.objectStore('highlights').clear(),
+      tx.done
+    ]);
+  }
+
+  /**
+   * 檢查是否存在會話資料
+   *
+   * 檢查邏輯:
+   * - 只檢查 videos Object Store 的 count
+   * - 如果有 video，必然有對應的 transcript 和 highlight
+   *
+   * @returns true 如果存在任何會話資料
+   */
+  async hasSessionData(): Promise<boolean> {
+    try {
+      const count = await this.db.count('videos');
+      return count > 0;
+    } catch (error) {
+      console.warn('Failed to check session data:', error);
+      return false;
+    }
+  }
 }

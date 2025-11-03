@@ -166,6 +166,15 @@ export async function registerInfrastructureDependencies(): Promise<void> {
     () => new HighlightRepositoryImpl(container.resolve('BrowserStorage'))
   );
 
+  // SessionRepositoryImpl: 實作 ISessionRepository 介面
+  const { SessionRepositoryImpl } = await import(
+    '@/infrastructure/repositories/SessionRepositoryImpl'
+  );
+  container.registerSingleton(
+    'ISessionRepository',
+    () => new SessionRepositoryImpl(container.resolve('BrowserStorage'))
+  );
+
   // ==================== 4. Use Cases ====================
   // 註冊 Application Layer Use Cases（按需載入）
   // 註冊為 Transient，每次使用都是新實例
@@ -243,5 +252,14 @@ export async function registerInfrastructureDependencies(): Promise<void> {
         container.resolve('ITranscriptRepository'),
         container.resolve('IHighlightRepository')
       )
+  );
+
+  // CleanupSessionUseCase: 清除會話
+  const { CleanupSessionUseCase } = await import(
+    '@/application/use-cases/CleanupSessionUseCase'
+  );
+  container.register(
+    'CleanupSessionUseCase',
+    () => new CleanupSessionUseCase(container.resolve('ISessionRepository'))
   );
 }
