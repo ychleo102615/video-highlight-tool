@@ -25,13 +25,7 @@ onMounted(async () => {
 
     // 根據返回結果顯示通知
     if (sessionState) {
-      if (sessionState.needsReupload) {
-        // 大視頻：提示重新上傳
-        notification.info('偵測到先前的編輯內容', '請重新上傳視頻以繼續編輯')
-      } else {
-        // 小視頻：完整恢復
-        notification.info('已恢復先前的編輯狀態')
-      }
+      notification.info('已恢復先前的編輯狀態')
     }
 
     // sessionState 為 null 時（首次訪問）不顯示任何訊息

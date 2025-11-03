@@ -54,11 +54,6 @@ export class DTOMapper {
    * @returns Video Entity
    */
   static videoPersistenceDtoToEntity(dto: VideoPersistenceDTO): Video {
-    // 處理大視頻 (file 為 null) 的情況
-    // 在這種情況下,我們需要創建一個假的 File 物件或者拋出錯誤
-    // 根據設計,file 為 null 時代表需要重新上傳,因此這裡創建一個空的 File
-    const file = dto.file || new File([], dto.metadata.name, { type: dto.metadata.mimeType });
-
     const metadata = new VideoMetadata(
       dto.metadata.duration,
       dto.metadata.width,
@@ -68,7 +63,7 @@ export class DTOMapper {
 
     // 不使用 dto.url,因為刷新後 blob URL 已失效
     // Repository 層會負責重新創建新的 blob URL
-    return new Video(dto.id, file, metadata, undefined);
+    return new Video(dto.id, dto.file, metadata, undefined);
   }
 
   // ==================== Transcript Mapping ====================

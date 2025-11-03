@@ -1,15 +1,14 @@
 /**
- * BrowserStorage - IndexedDB + SessionStorage 封裝
+ * BrowserStorage - IndexedDB 封裝
  *
  * 職責:
  * - 管理 IndexedDB 資料庫初始化
  * - 提供 Entity Persistence DTO 的 CRUD 操作
  * - 管理 sessionId 生命週期
- * - 清理過期資料 (24小時 + sessionId 比對)
+ * - 清理過期資料 (24小時)
  *
  * 儲存策略:
- * - 小視頻 (≤ 50MB): 完整儲存到 IndexedDB
- * - 大視頻 (> 50MB): 僅儲存元資料到 SessionStorage
+ * - 所有視頻統一儲存到 IndexedDB
  */
 
 import { openDB, type IDBPDatabase } from 'idb';
@@ -19,10 +18,8 @@ import type { HighlightPersistenceDTO } from './dto/HighlightPersistenceDTO';
 import {
   DB_NAME,
   DB_VERSION,
-  MAX_VIDEO_SIZE,
   MAX_AGE_MS,
   SESSION_ID_KEY,
-  VIDEO_META_KEY_PREFIX,
 } from '../../config/constants';
 import { generateSessionId } from '../../config/id-generator';
 
@@ -99,27 +96,10 @@ export class BrowserStorage {
 
   /**
    * 儲存視頻
-   * - ≤ 50MB: 儲存到 IndexedDB
-   * - > 50MB: 僅儲存元資料到 SessionStorage
+   * - 統一儲存到 IndexedDB
    */
   async saveVideo(video: VideoPersistenceDTO): Promise<void> {
     try {
-      if (video.metadata.size > MAX_VIDEO_SIZE) {
-        // 大視頻:僅儲存元資料到 SessionStorage
-        const meta = {
-          id: video.id,
-          name: video.metadata.name,
-          size: video.metadata.size,
-          duration: video.metadata.duration,
-          width: video.metadata.width,
-          height: video.metadata.height,
-          mimeType: video.metadata.mimeType,
-        };
-        sessionStorage.setItem(`${VIDEO_META_KEY_PREFIX}${video.id}`, JSON.stringify(meta));
-        return;
-      }
-
-      // 小視頻:完整儲存到 IndexedDB
       await this.db.put('videos', video);
     } catch (error) {
       console.warn('Failed to save video:', error);
@@ -132,32 +112,8 @@ export class BrowserStorage {
    */
   async restoreVideo(id: string): Promise<VideoPersistenceDTO | null> {
     try {
-      // 1. 先查 IndexedDB
       const video = await this.db.get('videos', id);
-      if (video) return video;
-
-      // 2. 查 SessionStorage (大視頻元資料)
-      const metaJson = sessionStorage.getItem(`${VIDEO_META_KEY_PREFIX}${id}`);
-      if (metaJson) {
-        const meta = JSON.parse(metaJson);
-        // 返回僅含元資料的 DTO,file 為 null
-        return {
-          id: meta.id,
-          file: null,
-          metadata: {
-            name: meta.name,
-            size: meta.size,
-            duration: meta.duration,
-            width: meta.width || 0,
-            height: meta.height || 0,
-            mimeType: meta.mimeType || 'video/mp4',
-          },
-          savedAt: 0,
-          sessionId: this.sessionId,
-        };
-      }
-
-      return null;
+      return video || null;
     } catch (error) {
       console.warn('Failed to restore video:', error);
       return null;
@@ -166,38 +122,11 @@ export class BrowserStorage {
 
   /**
    * 恢復所有視頻 (批量查詢)
-   * - 從 IndexedDB 查詢所有小視頻
-   * - 從 SessionStorage 查詢所有大視頻元資料
+   * - 從 IndexedDB 查詢所有視頻
    */
   async restoreAllVideos(): Promise<VideoPersistenceDTO[]> {
     try {
-      // 1. 從 IndexedDB 查詢所有視頻（小視頻）
-      const indexedDbVideos = await this.db.getAll('videos');
-
-      // 2. 從 SessionStorage 查詢大視頻元資料
-      const sessionKeys = Object.keys(sessionStorage).filter((k) =>
-        k.startsWith(VIDEO_META_KEY_PREFIX)
-      );
-
-      const sessionVideos = sessionKeys.map((key) => {
-        const meta = JSON.parse(sessionStorage.getItem(key)!);
-        return {
-          id: meta.id,
-          file: null, // 大視頻無檔案
-          metadata: {
-            name: meta.name,
-            size: meta.size,
-            duration: meta.duration,
-            width: meta.width || 0,
-            height: meta.height || 0,
-            mimeType: meta.mimeType || 'video/mp4',
-          },
-          savedAt: 0,
-          sessionId: this.sessionId,
-        };
-      });
-
-      return [...indexedDbVideos, ...sessionVideos];
+      return await this.db.getAll('videos');
     } catch (error) {
       console.warn('Failed to restore all videos:', error);
       return [];

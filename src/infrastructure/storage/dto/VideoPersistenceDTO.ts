@@ -8,7 +8,7 @@
 export interface VideoPersistenceDTO {
   // Domain 屬性
   id: string;
-  file: File | null;  // IndexedDB 原生支援 File 物件,大視頻 (> 50MB) 時為 null
+  file: File;          // IndexedDB 原生支援 File 物件
   metadata: {
     duration: number;  // 視頻時長 (秒)
     width: number;     // 視頻寬度

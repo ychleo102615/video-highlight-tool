@@ -25,21 +25,6 @@
         icon="video"
       />
 
-      <!-- 空狀態：視頻需要重新上傳 (大視頻恢復) -->
-      <EmptyState
-        v-else-if="hasVideo && !videoUrl"
-        key="empty-need-reupload"
-        message="偵測到先前的編輯內容，但視頻檔案未保存。請重新上傳視頻以繼續編輯。"
-        icon="video"
-      >
-        <button
-          @click="handleReuploadVideo"
-          class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-        >
-          重新上傳視頻
-        </button>
-      </EmptyState>
-
       <!-- 空狀態：無選中句子 -->
       <EmptyState
         v-else-if="!hasSelectedSentences"
@@ -146,14 +131,6 @@ function handleSeek(time: number) {
   if (videoPlayerRef.value) {
     videoPlayerRef.value.seekTo(time)
   }
-}
-
-/**
- * 處理重新上傳視頻請求
- * 清除當前視頻狀態，返回上傳界面
- */
-function handleReuploadVideo() {
-  videoStore.clearVideo()
 }
 
 // 監聽選中句子數量變化，用於調試和清除播放狀態

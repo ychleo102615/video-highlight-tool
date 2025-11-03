@@ -4,12 +4,11 @@
  * 職責:
  * - 協調 Video、Transcript、Highlight 三個 Repository 的恢復邏輯
  * - 檢查是否存在可恢復的會話資料
- * - 判斷是否需要重新上傳視頻 (大視頻恢復場景)
  * - 驗證資料完整性 (必須存在 Video、Transcript、Highlight)
  *
  * 使用場景:
  * - 應用啟動時自動執行 (App.vue onMounted)
- * - 檢查 IndexedDB 和 SessionStorage 是否有先前的編輯狀態
+ * - 檢查 IndexedDB 是否有先前的編輯狀態
  * - 返回完整的會話資料或 null (首次訪問)
  */
 
@@ -27,7 +26,6 @@ export interface RestoreSessionResult {
   video: Video;
   transcript: Transcript;
   highlights: Highlight[];
-  needsReupload: boolean;
 }
 
 /**
@@ -44,7 +42,7 @@ export class RestoreSessionUseCase {
    * 執行會話恢復
    *
    * @returns Promise<RestoreSessionResult | null>
-   *   - 若存在可恢復的會話資料,返回 { video, transcript, highlights, needsReupload }
+   *   - 若存在可恢復的會話資料,返回 { video, transcript, highlights }
    *   - 若無會話資料 (首次訪問或已清除),返回 null
    *
    * @throws Error 當資料不完整時
@@ -58,8 +56,7 @@ export class RestoreSessionUseCase {
    * 4. 若無轉錄,拋出錯誤 (資料不完整)
    * 5. 查詢高光片段 (按 videoId)
    * 6. 若無高光,拋出錯誤 (資料不完整)
-   * 7. 判斷是否需要重新上傳 (video.file === null)
-   * 8. 返回完整的會話資料
+   * 7. 返回完整的會話資料
    *
    * 錯誤處理:
    * - 無會話資料: 返回 null (正常情境,不拋出錯誤)
@@ -90,15 +87,11 @@ export class RestoreSessionUseCase {
       throw new Error('Highlight not found');
     }
 
-    // 5. 判斷是否需要重新上傳 (大視頻恢復時 video.file 為空檔案, size === 0)
-    const needsReupload = video.file === null || video.file.size === 0;
-
-    // 6. 返回完整的會話資料
+    // 5. 返回完整的會話資料
     return {
       video,
       transcript,
       highlights,
-      needsReupload,
     };
   }
 }
