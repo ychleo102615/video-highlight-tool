@@ -582,6 +582,7 @@ watch([currentTime, currentSentenceTime], ([video, sentence]) => {
 - [ ] 效能符合目標
 
 ## Active Technologies
+- TypeScript 5.9.0 + Vue 3.5.22, Pinia 3.0.3, Naive UI 2.43.1, idb 8.0.3 (IndexedDB wrapper), Vue Router (006-session-cleanup)
 
 - TypeScript ^5.0.0 + 無（Domain Layer 不依賴任何外部框架，僅使用 TypeScript 標準庫） (001-domain-layer)
 - N/A（儲存由 Infrastructure Layer 負責，此層僅定義 Repository 介面） (001-domain-layer)
