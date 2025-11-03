@@ -90,8 +90,8 @@ export class RestoreSessionUseCase {
       throw new Error('Highlight not found');
     }
 
-    // 5. 判斷是否需要重新上傳 (大視頻恢復時 video.file === null)
-    const needsReupload = video.file === null;
+    // 5. 判斷是否需要重新上傳 (大視頻恢復時 video.file 為空檔案, size === 0)
+    const needsReupload = video.file === null || video.file.size === 0;
 
     // 6. 返回完整的會話資料
     return {
