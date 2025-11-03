@@ -122,20 +122,44 @@ export function useVideoPlayer(): UseVideoPlayerReturn {
    * @param newSegments 新的片段列表
    */
   function updateSegments(newSegments: TimeSegment[]) {
-    // 更新內部片段列表
-    segments = newSegments
-    currentSegmentIndex = 0
-
     if (!player.value) return
 
-    // Edge case: 播放時修改句子選擇，暫停播放器避免播放錯誤片段
-    if (!player.value.paused()) {
-      player.value.pause()
-    }
+    // 保存當前播放狀態
+    const wasPlaying = !player.value.paused()
+    const currentPlayTime = player.value.currentTime() || 0
 
-    // 如果有片段，跳轉到第一個片段的起點
-    if (newSegments.length > 0 && newSegments[0]) {
-      seekTo(newSegments[0].startTime)
+    // 更新內部片段列表
+    segments = newSegments
+
+    // 檢查當前播放時間是否在新的片段列表中
+    const currentSegmentInNew = newSegments.findIndex(
+      (seg) => currentPlayTime >= seg.startTime && currentPlayTime < seg.endTime
+    )
+
+    if (currentSegmentInNew !== -1) {
+      // 當前時間在新片段中，更新索引但不跳轉，保持播放
+      currentSegmentIndex = currentSegmentInNew
+      // 如果正在播放，繼續播放（不需要做任何事）
+    } else {
+      // 當前時間不在新片段中，需要暫停並跳轉
+      if (wasPlaying) {
+        player.value.pause()
+      }
+
+      // 找最近的片段並跳轉
+      const nearestSegment = findNearestSegment(currentPlayTime, newSegments)
+      if (nearestSegment) {
+        const segmentIndex = newSegments.indexOf(nearestSegment)
+        currentSegmentIndex = segmentIndex
+        seekTo(nearestSegment.startTime)
+      } else if (newSegments.length > 0 && newSegments[0]) {
+        // Fallback: 跳到第一個片段
+        currentSegmentIndex = 0
+        seekTo(newSegments[0].startTime)
+      } else {
+        // 沒有任何片段，重置索引
+        currentSegmentIndex = 0
+      }
     }
   }
 
