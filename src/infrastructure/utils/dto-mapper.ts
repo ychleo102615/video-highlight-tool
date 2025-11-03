@@ -39,12 +39,12 @@ export class DTOMapper {
         height: video.metadata.height,
         size: video.file.size,
         mimeType: video.metadata.format,
-        name: video.file.name,
+        name: video.file.name
       },
       // blob URL 不持久化,因為刷新後會失效
       url: undefined,
       savedAt: Date.now(),
-      sessionId: sessionId,
+      sessionId: sessionId
     };
   }
 
@@ -90,11 +90,11 @@ export class DTOMapper {
           text: sentence.text,
           startTime: sentence.timeRange.start.seconds,
           endTime: sentence.timeRange.end.seconds,
-          isHighlightSuggestion: sentence.isHighlightSuggestion,
-        })),
+          isHighlightSuggestion: sentence.isHighlightSuggestion
+        }))
       })),
       savedAt: Date.now(),
-      sessionId: sessionId,
+      sessionId: sessionId
     };
   }
 
@@ -143,7 +143,7 @@ export class DTOMapper {
       selectedSentenceIds: Array.from(selectedIds), // ReadonlyArray → Array
       selectionOrder: Array.from(selectedIds), // 保持選擇順序
       savedAt: Date.now(),
-      sessionId: sessionId,
+      sessionId: sessionId
     };
   }
 

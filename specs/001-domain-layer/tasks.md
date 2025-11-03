@@ -23,8 +23,8 @@
 
 **目的**: 建立 Domain Layer 的資料夾結構
 
-- [X] T001 建立 Domain Layer 資料夾結構：src/domain/aggregates/, src/domain/value-objects/, src/domain/services/, src/domain/repositories/
-- [X] T002 建立 Transcript 聚合子資料夾：src/domain/aggregates/Transcript/
+- [x] T001 建立 Domain Layer 資料夾結構：src/domain/aggregates/, src/domain/value-objects/, src/domain/services/, src/domain/repositories/
+- [x] T002 建立 Transcript 聚合子資料夾：src/domain/aggregates/Transcript/
 
 ---
 
@@ -36,9 +36,9 @@
 
 **對應**: User Story 4 - 時間值物件 (Priority: P2)
 
-- [X] T003 [P] 實作 TimeStamp 值物件 in src/domain/value-objects/TimeStamp.ts（包含 milliseconds 屬性、seconds/minutes getters、toString(format?)、fromSeconds、fromMilliseconds、fromString 靜態方法，**支援毫秒精度**，驗證 milliseconds >= 0）
-- [X] T004 [P] 實作 VideoMetadata 值物件 in src/domain/value-objects/VideoMetadata.ts（包含 duration, width, height, format 屬性，驗證 duration > 0, width > 0, height > 0, format 以 "video/" 開頭，提供 aspectRatio getter）
-- [X] T005 實作 TimeRange 值物件 in src/domain/value-objects/TimeRange.ts（包含 start, end 屬性，驗證 end.milliseconds >= start.milliseconds，提供 duration getter（毫秒）、durationInSeconds getter、contains(timestamp) 方法）
+- [x] T003 [P] 實作 TimeStamp 值物件 in src/domain/value-objects/TimeStamp.ts（包含 milliseconds 屬性、seconds/minutes getters、toString(format?)、fromSeconds、fromMilliseconds、fromString 靜態方法，**支援毫秒精度**，驗證 milliseconds >= 0）
+- [x] T004 [P] 實作 VideoMetadata 值物件 in src/domain/value-objects/VideoMetadata.ts（包含 duration, width, height, format 屬性，驗證 duration > 0, width > 0, height > 0, format 以 "video/" 開頭，提供 aspectRatio getter）
+- [x] T005 實作 TimeRange 值物件 in src/domain/value-objects/TimeRange.ts（包含 start, end 屬性，驗證 end.milliseconds >= start.milliseconds，提供 duration getter（毫秒）、durationInSeconds getter、contains(timestamp) 方法）
 
 **Checkpoint**: 值物件完成 - User Story 4 的核心部分已實作，實體實作可以開始
 
@@ -52,7 +52,7 @@
 
 ### 實作 User Story 1
 
-- [X] T006 [US1] 實作 Video 聚合根 in src/domain/aggregates/Video.ts（包含 id, file, metadata, url 屬性，提供 duration getter（從 metadata 提取）、isReady getter（檢查 url 是否存在），所有屬性使用 readonly，url 為 optional）
+- [x] T006 [US1] 實作 Video 聚合根 in src/domain/aggregates/Video.ts（包含 id, file, metadata, url 屬性，提供 duration getter（從 metadata 提取）、isReady getter（檢查 url 是否存在），所有屬性使用 readonly，url 為 optional）
 
 **Checkpoint**: User Story 1 完成 - Video 聚合根可獨立運作並測試
 
@@ -66,9 +66,9 @@
 
 ### 實作 User Story 2
 
-- [X] T007 [P] [US2] 實作 Sentence 實體 in src/domain/aggregates/Transcript/Sentence.ts（包含 id, text, timeRange, isHighlightSuggestion 屬性，所有屬性使用 readonly，**不包含** isSelected 狀態）
-- [X] T008 [US2] 實作 Section 實體 in src/domain/aggregates/Transcript/Section.ts（包含 id, title, sentences 屬性，sentences 宣告為 ReadonlyArray<Sentence>，驗證 sentences.length > 0，提供 timeRange getter 計算從第一個到最後一個句子的時間範圍）
-- [X] T009 [US2] 實作 Transcript 聚合根 in src/domain/aggregates/Transcript/Transcript.ts（包含 id, videoId, sections, fullText 屬性，sections 宣告為 ReadonlyArray<Section>，提供 getSentenceById(sentenceId: string)、getAllSentences()、getSectionById(sectionId: string) 查詢方法，使用 flatMap 實作 getAllSentences）
+- [x] T007 [P] [US2] 實作 Sentence 實體 in src/domain/aggregates/Transcript/Sentence.ts（包含 id, text, timeRange, isHighlightSuggestion 屬性，所有屬性使用 readonly，**不包含** isSelected 狀態）
+- [x] T008 [US2] 實作 Section 實體 in src/domain/aggregates/Transcript/Section.ts（包含 id, title, sentences 屬性，sentences 宣告為 ReadonlyArray<Sentence>，驗證 sentences.length > 0，提供 timeRange getter 計算從第一個到最後一個句子的時間範圍）
+- [x] T009 [US2] 實作 Transcript 聚合根 in src/domain/aggregates/Transcript/Transcript.ts（包含 id, videoId, sections, fullText 屬性，sections 宣告為 ReadonlyArray<Section>，提供 getSentenceById(sentenceId: string)、getAllSentences()、getSectionById(sectionId: string) 查詢方法，使用 flatMap 實作 getAllSentences）
 
 **Checkpoint**: User Story 2 完成 - Transcript 聚合可獨立運作，提供完整的轉錄內容查詢功能
 
@@ -82,8 +82,8 @@
 
 ### 實作 User Story 3
 
-- [X] T010 [US3] 實作 Highlight 聚合根 in src/domain/aggregates/Highlight.ts（包含 id, videoId, name 屬性，私有屬性 selectedSentenceIds: Set<string> 和 selectionOrder: string[]，提供 addSentence、removeSentence、toggleSentence、isSelected、getSelectedSentenceIds、getSelectedSentenceCount 方法，**不包含需要傳入 Transcript 的方法**，addSentence 自動去重且不重複記錄在 selectionOrder）
-- [X] T011 [US3] 實作 HighlightService Domain Service in src/domain/services/HighlightService.ts（提供 getSelectedSentences(highlight, transcript, sortBy: 'selection' | 'time')、getTimeRanges(highlight, transcript, sortBy)、getTotalDuration(highlight, transcript) 方法，處理 Highlight 和 Transcript 之間的跨聚合查詢，sortBy='time' 時按 timeRange.start.milliseconds 排序，sortBy='selection' 時保持 selectionOrder 順序）
+- [x] T010 [US3] 實作 Highlight 聚合根 in src/domain/aggregates/Highlight.ts（包含 id, videoId, name 屬性，私有屬性 selectedSentenceIds: Set<string> 和 selectionOrder: string[]，提供 addSentence、removeSentence、toggleSentence、isSelected、getSelectedSentenceIds、getSelectedSentenceCount 方法，**不包含需要傳入 Transcript 的方法**，addSentence 自動去重且不重複記錄在 selectionOrder）
+- [x] T011 [US3] 實作 HighlightService Domain Service in src/domain/services/HighlightService.ts（提供 getSelectedSentences(highlight, transcript, sortBy: 'selection' | 'time')、getTimeRanges(highlight, transcript, sortBy)、getTotalDuration(highlight, transcript) 方法，處理 Highlight 和 Transcript 之間的跨聚合查詢，sortBy='time' 時按 timeRange.start.milliseconds 排序，sortBy='selection' 時保持 selectionOrder 順序）
 
 **Checkpoint**: User Story 3 完成 - Highlight 聚合和 HighlightService 可獨立運作，完整的高光選擇管理功能已實作
 
@@ -97,9 +97,9 @@
 
 ### 實作 User Story 5
 
-- [X] T012 [P] [US5] 定義 IVideoRepository 介面 in src/domain/repositories/IVideoRepository.ts（包含 save(video: Video): Promise<void>、findById(id: string): Promise<Video | null> 方法）
-- [X] T013 [P] [US5] 定義 ITranscriptRepository 介面 in src/domain/repositories/ITranscriptRepository.ts（包含 save(transcript: Transcript): Promise<void>、findById(id: string): Promise<Transcript | null>、findByVideoId(videoId: string): Promise<Transcript | null> 方法）
-- [X] T014 [P] [US5] 定義 IHighlightRepository 介面 in src/domain/repositories/IHighlightRepository.ts（包含 save(highlight: Highlight): Promise<void>、findById(id: string): Promise<Highlight | null>、findByVideoId(videoId: string): Promise<Highlight[]> 方法，注意一個視頻可能有多個高光版本）
+- [x] T012 [P] [US5] 定義 IVideoRepository 介面 in src/domain/repositories/IVideoRepository.ts（包含 save(video: Video): Promise<void>、findById(id: string): Promise<Video | null> 方法）
+- [x] T013 [P] [US5] 定義 ITranscriptRepository 介面 in src/domain/repositories/ITranscriptRepository.ts（包含 save(transcript: Transcript): Promise<void>、findById(id: string): Promise<Transcript | null>、findByVideoId(videoId: string): Promise<Transcript | null> 方法）
+- [x] T014 [P] [US5] 定義 IHighlightRepository 介面 in src/domain/repositories/IHighlightRepository.ts（包含 save(highlight: Highlight): Promise<void>、findById(id: string): Promise<Highlight | null>、findByVideoId(videoId: string): Promise<Highlight[]> 方法，注意一個視頻可能有多個高光版本）
 
 **Checkpoint**: User Story 5 完成 - 所有 Repository 介面已定義，Infrastructure Layer 可以開始實作
 
@@ -109,13 +109,13 @@
 
 **目的**: 跨多個 User Story 的改進和驗證
 
-- [X] T015 [P] 建立 index.ts 導出檔案 in src/domain/aggregates/index.ts（導出 Video, Transcript, Section, Sentence, Highlight）
-- [X] T016 [P] 建立 index.ts 導出檔案 in src/domain/value-objects/index.ts（導出 TimeStamp, TimeRange, VideoMetadata）
-- [X] T017 [P] 建立 index.ts 導出檔案 in src/domain/repositories/index.ts（導出 IVideoRepository, ITranscriptRepository, IHighlightRepository）
-- [X] T018 [P] 建立 index.ts 導出檔案 in src/domain/services/index.ts（導出 HighlightService）
-- [X] T019 執行 TypeScript 型別檢查：npm run type-check（確保 100% 型別覆蓋率，無 any 型別）
-- [X] T020 執行 ESLint 檢查：npm run lint（確保程式碼符合專案規範）
-- [X] T021 驗證 quickstart.md 中的範例程式碼可正常執行
+- [x] T015 [P] 建立 index.ts 導出檔案 in src/domain/aggregates/index.ts（導出 Video, Transcript, Section, Sentence, Highlight）
+- [x] T016 [P] 建立 index.ts 導出檔案 in src/domain/value-objects/index.ts（導出 TimeStamp, TimeRange, VideoMetadata）
+- [x] T017 [P] 建立 index.ts 導出檔案 in src/domain/repositories/index.ts（導出 IVideoRepository, ITranscriptRepository, IHighlightRepository）
+- [x] T018 [P] 建立 index.ts 導出檔案 in src/domain/services/index.ts（導出 HighlightService）
+- [x] T019 執行 TypeScript 型別檢查：npm run type-check（確保 100% 型別覆蓋率，無 any 型別）
+- [x] T020 執行 ESLint 檢查：npm run lint（確保程式碼符合專案規範）
+- [x] T021 驗證 quickstart.md 中的範例程式碼可正常執行
 
 ---
 
@@ -231,15 +231,15 @@ Task: "建立 index.ts 導出檔案 in src/domain/services/index.ts"
 
 根據 plan.md 的估算：
 
-| Component | Tasks | Estimated Time | Priority |
-|-----------|-------|---------------|----------|
-| 值物件 (3 個) | T003-T005 | 2 小時 | P1 |
-| Video (1 個) | T006 | 1 小時 | P1 |
-| Transcript 聚合 (3 個) | T007-T009 | 4 小時 | P1 |
-| Highlight 聚合 + Service (2 個) | T010-T011 | 3 小時 | P1 |
-| Repository 介面 (3 個) | T012-T014 | 1 小時 | P2 |
-| Setup + Polish | T001-T002, T015-T021 | 1 小時 | - |
-| **Total** | **21 tasks** | **12 小時** | **~1.5 天** |
+| Component                       | Tasks                | Estimated Time | Priority    |
+| ------------------------------- | -------------------- | -------------- | ----------- |
+| 值物件 (3 個)                   | T003-T005            | 2 小時         | P1          |
+| Video (1 個)                    | T006                 | 1 小時         | P1          |
+| Transcript 聚合 (3 個)          | T007-T009            | 4 小時         | P1          |
+| Highlight 聚合 + Service (2 個) | T010-T011            | 3 小時         | P1          |
+| Repository 介面 (3 個)          | T012-T014            | 1 小時         | P2          |
+| Setup + Polish                  | T001-T002, T015-T021 | 1 小時         | -           |
+| **Total**                       | **21 tasks**         | **12 小時**    | **~1.5 天** |
 
 **MVP Scope** (P1 User Stories only): T001-T011 + T019-T021 = **14 tasks**, **~10 小時** (~1.25 天)
 

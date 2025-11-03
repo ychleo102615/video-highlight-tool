@@ -1,8 +1,8 @@
-import { computed, readonly } from 'vue'
-import { useTranscriptStore } from '@/presentation/stores/transcriptStore'
-import type { Transcript } from '@/domain/aggregates/Transcript/Transcript'
-import type { Sentence } from '@/domain/aggregates/Transcript/Sentence'
-import type { SectionDisplayData } from '@/presentation/types/store-contracts'
+import { computed, readonly } from 'vue';
+import { useTranscriptStore } from '@/presentation/stores/transcriptStore';
+import type { Transcript } from '@/domain/aggregates/Transcript/Transcript';
+import type { Sentence } from '@/domain/aggregates/Transcript/Sentence';
+import type { SectionDisplayData } from '@/presentation/types/store-contracts';
 
 /**
  * useTranscript Composable
@@ -13,15 +13,15 @@ import type { SectionDisplayData } from '@/presentation/types/store-contracts'
  * - 內部使用 transcriptStore
  */
 export function useTranscript() {
-  const transcriptStore = useTranscriptStore()
+  const transcriptStore = useTranscriptStore();
 
   // ========================================
   // Reactive State (從 Store 取得)
   // ========================================
-  const transcript = computed<Transcript | null>(() => transcriptStore.transcript)
-  const sections = computed<SectionDisplayData[]>(() => transcriptStore.sections)
-  const isProcessing = computed(() => transcriptStore.isProcessing)
-  const playingSentence = computed<Sentence | null>(() => transcriptStore.playingSentence)
+  const transcript = computed<Transcript | null>(() => transcriptStore.transcript);
+  const sections = computed<SectionDisplayData[]>(() => transcriptStore.sections);
+  const isProcessing = computed(() => transcriptStore.isProcessing);
+  const playingSentence = computed<Sentence | null>(() => transcriptStore.playingSentence);
 
   // ========================================
   // Actions
@@ -32,7 +32,7 @@ export function useTranscript() {
    * @param videoId 視頻 ID
    */
   async function processTranscript(videoId: string): Promise<void> {
-    await transcriptStore.processTranscript(videoId)
+    await transcriptStore.processTranscript(videoId);
   }
 
   /**
@@ -40,7 +40,7 @@ export function useTranscript() {
    * @param time 時間（秒數）
    */
   function getSentenceAtTime(time: number): Sentence | undefined {
-    return transcriptStore.getSentenceAtTime(time)
+    return transcriptStore.getSentenceAtTime(time);
   }
 
   // ========================================
@@ -53,5 +53,5 @@ export function useTranscript() {
     playingSentence,
     processTranscript,
     getSentenceAtTime
-  }
+  };
 }

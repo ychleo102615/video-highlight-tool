@@ -84,12 +84,7 @@ export interface ISentence {
 }
 
 export interface ISentenceStatic {
-  new (
-    id: string,
-    text: string,
-    timeRange: ITimeRange,
-    isHighlightSuggestion: boolean
-  ): ISentence;
+  new (id: string, text: string, timeRange: ITimeRange, isHighlightSuggestion: boolean): ISentence;
 }
 
 /**
@@ -142,15 +137,9 @@ export interface IHighlight {
   toggleSentence(sentenceId: string): void;
   isSelected(sentenceId: string): boolean;
 
-  getSelectedSentences(
-    transcript: ITranscript,
-    sortBy: 'selection' | 'time'
-  ): ISentence[];
+  getSelectedSentences(transcript: ITranscript, sortBy: 'selection' | 'time'): ISentence[];
 
-  getTimeRanges(
-    transcript: ITranscript,
-    sortBy: 'selection' | 'time'
-  ): ITimeRange[];
+  getTimeRanges(transcript: ITranscript, sortBy: 'selection' | 'time'): ITimeRange[];
 
   getTotalDuration(transcript: ITranscript): number;
 }

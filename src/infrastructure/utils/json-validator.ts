@@ -85,27 +85,19 @@ export class JSONValidator {
         const sentence = section.sentences[j];
 
         if (!sentence.id) {
-          throw new Error(
-            `JSON 格式錯誤:sections[${i}].sentences[${j}] 缺少必要欄位 "id"`
-          );
+          throw new Error(`JSON 格式錯誤:sections[${i}].sentences[${j}] 缺少必要欄位 "id"`);
         }
 
         if (!sentence.text || typeof sentence.text !== 'string') {
-          throw new Error(
-            `JSON 格式錯誤:sections[${i}].sentences[${j}] 缺少必要欄位 "text"`
-          );
+          throw new Error(`JSON 格式錯誤:sections[${i}].sentences[${j}] 缺少必要欄位 "text"`);
         }
 
         if (typeof sentence.startTime !== 'number') {
-          throw new Error(
-            `JSON 格式錯誤:sections[${i}].sentences[${j}] 缺少必要欄位 "startTime"`
-          );
+          throw new Error(`JSON 格式錯誤:sections[${i}].sentences[${j}] 缺少必要欄位 "startTime"`);
         }
 
         if (typeof sentence.endTime !== 'number') {
-          throw new Error(
-            `JSON 格式錯誤:sections[${i}].sentences[${j}] 缺少必要欄位 "endTime"`
-          );
+          throw new Error(`JSON 格式錯誤:sections[${i}].sentences[${j}] 缺少必要欄位 "endTime"`);
         }
 
         // 5. 時間戳合理性檢查 (警告但不阻斷)

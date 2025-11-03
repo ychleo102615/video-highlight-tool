@@ -269,9 +269,11 @@ import { VideoPersistenceDTO } from '@/infrastructure/storage/dto/VideoPersisten
 const videoDto: VideoPersistenceDTO = {
   id: 'video-123',
   file: smallFile, // ≤ 50MB
-  metadata: { /* ... */ },
+  metadata: {
+    /* ... */
+  },
   savedAt: Date.now(),
-  sessionId: storage.getSessionId(),
+  sessionId: storage.getSessionId()
 };
 await storage.saveVideo(videoDto);
 
@@ -389,7 +391,7 @@ await highlightRepo.save(highlightFull);
 
 // 5. 查詢某視頻的所有高光版本
 const allHighlights = await highlightRepo.findByVideoId('video-123');
-console.log(allHighlights.map(h => h.name)); // ["精華版", "完整版"]
+console.log(allHighlights.map((h) => h.name)); // ["精華版", "完整版"]
 ```
 
 ---
@@ -417,11 +419,11 @@ describe('MockAIService', () => {
               id: 'sent_1',
               text: 'Hello',
               startTime: 0,
-              endTime: 1,
-            },
-          ],
-        },
-      ],
+              endTime: 1
+            }
+          ]
+        }
+      ]
     });
 
     service.setMockData('video-1', json);
@@ -435,9 +437,7 @@ describe('MockAIService', () => {
   it('should throw error if JSON not cached', async () => {
     const service = new MockAIService();
 
-    await expect(service.generate('unknown-id')).rejects.toThrow(
-      '找不到 videoId 的 Mock 資料'
-    );
+    await expect(service.generate('unknown-id')).rejects.toThrow('找不到 videoId 的 Mock 資料');
   });
 });
 ```
@@ -485,6 +485,7 @@ describe('VideoRepositoryImpl', () => {
 **症狀**: 控制台出現 "QuotaExceededError"
 
 **解決方案**:
+
 1. 檢查視頻大小是否超過 50MB（應僅儲存元資料）
 2. 手動清理 IndexedDB 資料（Chrome DevTools → Application → IndexedDB）
 3. 檢查 `cleanupStaleData()` 是否正確執行
@@ -494,11 +495,13 @@ describe('VideoRepositoryImpl', () => {
 **症狀**: Repository.findById() 返回 null
 
 **可能原因**:
+
 1. sessionId 不匹配（被清理）
 2. IndexedDB 未正確初始化
 3. 視頻超過 50MB 且檔案未重新上傳
 
 **檢查步驟**:
+
 ```typescript
 // 1. 檢查 sessionId
 console.log(browserStorage.getSessionId());
@@ -520,11 +523,13 @@ if (meta) {
 **症狀**: MockAIService.generate() 拋出錯誤
 
 **可能原因**:
+
 1. JSON 格式無效（非合法 JSON）
 2. 缺少必要欄位（sections, sentences）
 3. 時間戳格式錯誤
 
 **檢查步驟**:
+
 ```typescript
 try {
   const data = JSON.parse(jsonContent);

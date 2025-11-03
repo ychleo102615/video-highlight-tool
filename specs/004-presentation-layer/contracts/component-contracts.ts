@@ -5,7 +5,7 @@
  * 確保組件介面的型別安全和一致性
  */
 
-import type { TimeSegment } from './store-contracts'
+import type { TimeSegment } from './store-contracts';
 
 // ============================================================================
 // Layout Components
@@ -28,9 +28,9 @@ export interface SplitLayoutProps {
  */
 export interface VideoUploadProps {
   /** 是否正在上傳 */
-  isUploading?: boolean
+  isUploading?: boolean;
   /** 上傳進度（0-100） */
-  uploadProgress?: number
+  uploadProgress?: number;
 }
 
 /**
@@ -42,7 +42,7 @@ export interface VideoUploadEmits {
    * @param videoFile 視頻檔案
    * @param transcriptFile 可選的轉錄 JSON 檔案
    */
-  (e: 'upload', videoFile: File, transcriptFile?: File): void
+  (e: 'upload', videoFile: File, transcriptFile?: File): void;
 }
 
 // ============================================================================
@@ -61,11 +61,11 @@ export interface EditingAreaProps {
  */
 export interface SectionListProps {
   /** 段落列表 */
-  sections: SectionDisplayData[]
+  sections: SectionDisplayData[];
   /** 當前播放的句子 ID */
-  playingSentenceId: string | null
+  playingSentenceId: string | null;
   /** 選中的句子 ID 集合 */
-  selectedSentenceIds: Set<string>
+  selectedSentenceIds: Set<string>;
 }
 
 /**
@@ -76,13 +76,13 @@ export interface SectionListEmits {
    * 使用者點擊句子時觸發
    * @param sentenceId 句子 ID
    */
-  (e: 'toggle-sentence', sentenceId: string): void
+  (e: 'toggle-sentence', sentenceId: string): void;
 
   /**
    * 使用者點擊時間戳時觸發
    * @param time 時間（秒數）
    */
-  (e: 'seek-to-time', time: number): void
+  (e: 'seek-to-time', time: number): void;
 }
 
 /**
@@ -90,15 +90,15 @@ export interface SectionListEmits {
  */
 export interface SectionItemProps {
   /** 段落 ID */
-  id: string
+  id: string;
   /** 段落標題 */
-  title: string
+  title: string;
   /** 句子列表 */
-  sentences: SentenceDisplayData[]
+  sentences: SentenceDisplayData[];
   /** 當前播放的句子 ID */
-  playingSentenceId: string | null
+  playingSentenceId: string | null;
   /** 選中的句子 ID 集合 */
-  selectedSentenceIds: Set<string>
+  selectedSentenceIds: Set<string>;
 }
 
 /**
@@ -106,9 +106,9 @@ export interface SectionItemProps {
  */
 export interface SectionItemEmits {
   /** 轉發 toggle-sentence 事件 */
-  (e: 'toggle-sentence', sentenceId: string): void
+  (e: 'toggle-sentence', sentenceId: string): void;
   /** 轉發 seek-to-time 事件 */
-  (e: 'seek-to-time', time: number): void
+  (e: 'seek-to-time', time: number): void;
 }
 
 /**
@@ -116,17 +116,17 @@ export interface SectionItemEmits {
  */
 export interface SentenceItemProps {
   /** 句子 ID */
-  sentenceId: string
+  sentenceId: string;
   /** 句子文字 */
-  text: string
+  text: string;
   /** 起始時間（格式化為 MM:SS） */
-  timeRange: string
+  timeRange: string;
   /** 起始時間（秒數，用於 seek） */
-  startTime: number
+  startTime: number;
   /** 是否被選中 */
-  isSelected: boolean
+  isSelected: boolean;
   /** 是否為當前播放的句子 */
-  isPlaying: boolean
+  isPlaying: boolean;
 }
 
 /**
@@ -134,19 +134,19 @@ export interface SentenceItemProps {
  */
 export interface SentenceItemEmits {
   /** 使用者點擊句子時觸發 */
-  (e: 'toggle', sentenceId: string): void
+  (e: 'toggle', sentenceId: string): void;
   /** 使用者點擊時間戳時觸發 */
-  (e: 'seek', time: number): void
+  (e: 'seek', time: number): void;
 }
 
 /**
  * SentenceDisplayData（從 store-contracts 重新匯出，供組件使用）
  */
 export interface SentenceDisplayData {
-  id: string
-  text: string
-  startTime: number
-  endTime: number
+  id: string;
+  text: string;
+  startTime: number;
+  endTime: number;
 }
 
 // ============================================================================
@@ -165,9 +165,9 @@ export interface PreviewAreaProps {
  */
 export interface VideoPlayerProps {
   /** 視頻 URL */
-  videoUrl: string
+  videoUrl: string;
   /** 要播放的片段時間範圍列表 */
-  segments: TimeSegment[]
+  segments: TimeSegment[];
 }
 
 /**
@@ -178,13 +178,13 @@ export interface VideoPlayerEmits {
    * 播放時間更新時觸發
    * @param time 當前時間（秒數）
    */
-  (e: 'timeupdate', time: number): void
+  (e: 'timeupdate', time: number): void;
 
   /**
    * 播放狀態改變時觸發
    * @param isPlaying 是否正在播放
    */
-  (e: 'play-state-change', isPlaying: boolean): void
+  (e: 'play-state-change', isPlaying: boolean): void;
 }
 
 /**
@@ -192,9 +192,9 @@ export interface VideoPlayerEmits {
  */
 export interface TranscriptOverlayProps {
   /** 當前顯示的文字 */
-  currentText: string
+  currentText: string;
   /** 是否顯示文字（用於淡入淡出過渡） */
-  visible: boolean
+  visible: boolean;
 }
 
 /**
@@ -202,11 +202,11 @@ export interface TranscriptOverlayProps {
  */
 export interface TimelineProps {
   /** 視頻總時長（秒數） */
-  totalDuration: number
+  totalDuration: number;
   /** 高光片段時間範圍列表 */
-  segments: TimeSegment[]
+  segments: TimeSegment[];
   /** 當前播放時間（秒數） */
-  currentTime: number
+  currentTime: number;
 }
 
 /**
@@ -217,7 +217,7 @@ export interface TimelineEmits {
    * 使用者點擊時間軸時觸發
    * @param time 目標時間（秒數）
    */
-  (e: 'seek', time: number): void
+  (e: 'seek', time: number): void;
 }
 
 // ============================================================================
@@ -230,7 +230,7 @@ export interface TimelineEmits {
  */
 export interface EmptyStateProps {
   /** 提示訊息 */
-  message: string
+  message: string;
   /** 圖示名稱（Heroicons） */
-  icon?: string
+  icon?: string;
 }

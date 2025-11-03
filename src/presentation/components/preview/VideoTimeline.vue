@@ -1,59 +1,59 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 /**
  * Timeline Props
  * 時間軸視覺化組件，顯示高光片段分布和當前播放進度
  */
- 
+
 interface TimelineProps {
   /** 視頻總時長（秒數） */
-  totalDuration: number
+  totalDuration: number;
   /** 高光片段時間範圍列表 */
-  segments: TimeSegment[]
+  segments: TimeSegment[];
   /** 當前播放時間（秒數） */
-  currentTime: number
+  currentTime: number;
 }
 
 interface TimeSegment {
   /** 句子 ID（用於唯一標識） */
-  sentenceId: string
+  sentenceId: string;
   /** 片段起始時間（秒數） */
-  startTime: number
+  startTime: number;
   /** 片段結束時間（秒數） */
-  endTime: number
+  endTime: number;
   /** 是否被選中 */
-  isSelected: boolean
+  isSelected: boolean;
 }
 
-const props = defineProps<TimelineProps>()
+const props = defineProps<TimelineProps>();
 
 /**
  * Emits
  * - seek: 使用者點擊時間軸，請求跳轉到指定時間
  */
 const emit = defineEmits<{
-  seek: [time: number]
-}>()
+  seek: [time: number];
+}>();
 
 /**
  * 計算播放進度百分比（0-100）
  */
 const progressPercent = computed(() => {
-  if (props.totalDuration === 0) return 0
-  return (props.currentTime / props.totalDuration) * 100
-})
+  if (props.totalDuration === 0) return 0;
+  return (props.currentTime / props.totalDuration) * 100;
+});
 
 /**
  * 計算每個片段的位置和寬度（百分比）
  */
 const segmentBlocks = computed(() => {
-  if (props.totalDuration === 0) return []
+  if (props.totalDuration === 0) return [];
 
   return props.segments.map((segment) => {
-    const startPercent = (segment.startTime / props.totalDuration) * 100
-    const endPercent = (segment.endTime / props.totalDuration) * 100
-    const widthPercent = endPercent - startPercent
+    const startPercent = (segment.startTime / props.totalDuration) * 100;
+    const endPercent = (segment.endTime / props.totalDuration) * 100;
+    const widthPercent = endPercent - startPercent;
 
     return {
       sentenceId: segment.sentenceId,
@@ -62,25 +62,25 @@ const segmentBlocks = computed(() => {
       startTime: segment.startTime,
       endTime: segment.endTime,
       isSelected: segment.isSelected
-    }
-  })
-})
+    };
+  });
+});
 
 /**
  * 處理時間軸點擊事件
  * 點擊時直接跳轉到該位置對應的時間
  */
 function handleTimelineClick(event: MouseEvent) {
-  const target = event.currentTarget as HTMLElement
-  const rect = target.getBoundingClientRect()
-  const clickX = event.clientX - rect.left
-  const clickPercent = clickX / rect.width
+  const target = event.currentTarget as HTMLElement;
+  const rect = target.getBoundingClientRect();
+  const clickX = event.clientX - rect.left;
+  const clickPercent = clickX / rect.width;
 
   // 計算點擊位置對應的時間
-  const seekTime = clickPercent * props.totalDuration
+  const seekTime = clickPercent * props.totalDuration;
 
   // 直接跳轉到點擊位置的時間
-  emit('seek', seekTime)
+  emit('seek', seekTime);
 }
 
 /**
@@ -88,33 +88,33 @@ function handleTimelineClick(event: MouseEvent) {
  * 根據點擊位置在片段內的相對位置，計算精確的跳轉時間
  */
 function handleSegmentClick(event: MouseEvent, startTime: number, endTime: number) {
-  event.stopPropagation()
+  event.stopPropagation();
 
   // 獲取片段元素的位置資訊
-  const segmentElement = event.currentTarget as HTMLElement
-  const rect = segmentElement.getBoundingClientRect()
+  const segmentElement = event.currentTarget as HTMLElement;
+  const rect = segmentElement.getBoundingClientRect();
 
   // 計算點擊位置在片段內的相對位置（0-1）
-  const clickX = event.clientX - rect.left
-  const segmentWidth = rect.width
-  const relativePosition = clickX / segmentWidth
+  const clickX = event.clientX - rect.left;
+  const segmentWidth = rect.width;
+  const relativePosition = clickX / segmentWidth;
 
   // 計算片段時長
-  const segmentDuration = endTime - startTime
+  const segmentDuration = endTime - startTime;
 
   // 計算應該跳轉到的時間：片段起點 + 相對位置 × 片段時長
-  const seekTime = startTime + relativePosition * segmentDuration
+  const seekTime = startTime + relativePosition * segmentDuration;
 
-  emit('seek', seekTime)
+  emit('seek', seekTime);
 }
 
 /**
  * 格式化時間顯示（MM:SS）
  */
 function formatTime(seconds: number): string {
-  const minutes = Math.floor(seconds / 60)
-  const secs = Math.floor(seconds % 60)
-  return `${minutes}:${secs.toString().padStart(2, '0')}`
+  const minutes = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${minutes}:${secs.toString().padStart(2, '0')}`;
 }
 </script>
 

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, watch, nextTick, ref, onErrorCaptured } from 'vue'
-import SectionList from './SectionList.vue'
-import { useTranscriptStore } from '@/presentation/stores/transcriptStore'
-import { useHighlightStore } from '@/presentation/stores/highlightStore'
-import type { EditingAreaProps, EditingAreaEmits } from '@/presentation/types/component-contracts'
+import { computed, watch, nextTick, ref, onErrorCaptured } from 'vue';
+import SectionList from './SectionList.vue';
+import { useTranscriptStore } from '@/presentation/stores/transcriptStore';
+import { useHighlightStore } from '@/presentation/stores/highlightStore';
+import type { EditingAreaProps, EditingAreaEmits } from '@/presentation/types/component-contracts';
 
 /**
  * EditingArea 組件
@@ -19,37 +19,37 @@ import type { EditingAreaProps, EditingAreaEmits } from '@/presentation/types/co
 // ========================================
 // Props & Emits
 // ========================================
-defineProps<EditingAreaProps>()
-const emit = defineEmits<EditingAreaEmits>()
+defineProps<EditingAreaProps>();
+const emit = defineEmits<EditingAreaEmits>();
 
 // ========================================
 // 錯誤邊界
 // ========================================
-const hasError = ref(false)
-const errorMessage = ref('')
+const hasError = ref(false);
+const errorMessage = ref('');
 
 /**
  * 錯誤邊界：捕獲子組件錯誤
  * 防止整個應用崩潰
  */
 onErrorCaptured((err: Error) => {
-  console.error('[EditingArea] Captured error from child component:', err)
-  hasError.value = true
-  errorMessage.value = err.message || '編輯區發生錯誤'
+  console.error('[EditingArea] Captured error from child component:', err);
+  hasError.value = true;
+  errorMessage.value = err.message || '編輯區發生錯誤';
   // 返回 false 阻止錯誤繼續向上傳播
-  return false
-})
+  return false;
+});
 
 // ========================================
 // Stores
 // ========================================
-const transcriptStore = useTranscriptStore()
-const highlightStore = useHighlightStore()
+const transcriptStore = useTranscriptStore();
+const highlightStore = useHighlightStore();
 
 // ========================================
 // Refs
 // ========================================
-const editingAreaRef = ref<HTMLDivElement | null>(null)
+const editingAreaRef = ref<HTMLDivElement | null>(null);
 
 // ========================================
 // Computed Properties
@@ -58,27 +58,27 @@ const editingAreaRef = ref<HTMLDivElement | null>(null)
 /**
  * 段落列表（來自 transcriptStore）
  */
-const sections = computed(() => transcriptStore.sections)
+const sections = computed(() => transcriptStore.sections);
 
 /**
  * 當前播放的句子 ID（來自 transcriptStore）
  */
-const playingSentenceId = computed(() => transcriptStore.playingSentenceId)
+const playingSentenceId = computed(() => transcriptStore.playingSentenceId);
 
 /**
  * 選中的句子 ID 集合（來自 highlightStore）
  */
-const selectedSentenceIds = computed(() => highlightStore.selectedSentenceIds)
+const selectedSentenceIds = computed(() => highlightStore.selectedSentenceIds);
 
 /**
  * 是否有轉錄內容
  */
-const hasTranscript = computed(() => transcriptStore.hasTranscript)
+const hasTranscript = computed(() => transcriptStore.hasTranscript);
 
 /**
  * 是否正在處理轉錄
  */
-const isProcessing = computed(() => transcriptStore.isProcessing)
+const isProcessing = computed(() => transcriptStore.isProcessing);
 
 // ========================================
 // Event Handlers
@@ -91,9 +91,9 @@ const isProcessing = computed(() => transcriptStore.isProcessing)
  */
 async function handleToggleSentence(sentenceId: string) {
   try {
-    await highlightStore.toggleSentence(sentenceId)
+    await highlightStore.toggleSentence(sentenceId);
   } catch (error) {
-    console.error('切換句子選中狀態失敗:', error)
+    console.error('切換句子選中狀態失敗:', error);
   }
 }
 
@@ -103,7 +103,7 @@ async function handleToggleSentence(sentenceId: string) {
  * @param time 時間（秒數）
  */
 function handleSeekToTime(time: number) {
-  emit('seek-to-time', time)
+  emit('seek-to-time', time);
 }
 
 // ========================================
@@ -115,40 +115,45 @@ function handleSeekToTime(time: number) {
  * User Story 6 的需求：當前句子不在可見範圍時，編輯區自動滾動使其可見
  */
 watch(playingSentenceId, async (newSentenceId) => {
-  if (!newSentenceId || !editingAreaRef.value) return
+  if (!newSentenceId || !editingAreaRef.value) return;
 
-  await nextTick()
+  await nextTick();
 
   // 尋找對應的句子元素（使用 data-sentence-id 屬性）
   const sentenceElement = editingAreaRef.value.querySelector(
     `[data-sentence-id="${newSentenceId}"]`
-  )
+  );
 
   if (sentenceElement) {
     // 自動滾動到該元素，使其出現在可見區域中央
     sentenceElement.scrollIntoView({
       behavior: 'smooth',
       block: 'center'
-    })
+    });
   }
-})
+});
 </script>
 
 <template>
   <div ref="editingAreaRef" class="h-full overflow-auto bg-gray-50 p-4 lg:p-6">
     <!-- 錯誤狀態 -->
-    <div
-      v-if="hasError"
-      class="flex flex-col items-center justify-center py-12 text-center"
-    >
+    <div v-if="hasError" class="flex flex-col items-center justify-center py-12 text-center">
       <div class="text-red-600">
         <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
         </svg>
         <p class="text-lg font-semibold mb-2">編輯區錯誤</p>
         <p class="text-sm text-gray-600 mb-4">{{ errorMessage }}</p>
         <button
-          @click="hasError = false; errorMessage = ''"
+          @click="
+            hasError = false;
+            errorMessage = '';
+          "
           class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
         >
           重試
@@ -164,23 +169,20 @@ watch(playingSentenceId, async (newSentenceId) => {
         <p class="text-sm text-gray-600">點擊句子以選擇/取消選擇，點擊時間戳跳轉到對應位置</p>
       </div>
 
-    <!-- 載入中狀態 -->
-    <div
-      v-if="isProcessing"
-      class="flex flex-col items-center justify-center py-12 text-center"
-    >
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-      <p class="text-lg text-gray-700">正在處理轉錄內容...</p>
-    </div>
+      <!-- 載入中狀態 -->
+      <div v-if="isProcessing" class="flex flex-col items-center justify-center py-12 text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+        <p class="text-lg text-gray-700">正在處理轉錄內容...</p>
+      </div>
 
-    <!-- 無轉錄內容提示 -->
-    <div
-      v-else-if="!hasTranscript"
-      class="flex flex-col items-center justify-center py-12 text-center text-gray-500"
-    >
-      <p class="text-lg">尚未上傳視頻</p>
-      <p class="text-sm mt-2">請先上傳視頻以生成轉錄內容</p>
-    </div>
+      <!-- 無轉錄內容提示 -->
+      <div
+        v-else-if="!hasTranscript"
+        class="flex flex-col items-center justify-center py-12 text-center text-gray-500"
+      >
+        <p class="text-lg">尚未上傳視頻</p>
+        <p class="text-sm mt-2">請先上傳視頻以生成轉錄內容</p>
+      </div>
 
       <!-- 段落列表 -->
       <SectionList

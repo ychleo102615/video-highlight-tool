@@ -16,6 +16,7 @@
 ## Path Conventions
 
 本專案採用單專案結構（Clean Architecture），路徑位於 repository root：
+
 - Domain Layer: `src/domain/`
 - Application Layer: `src/application/`
 - Infrastructure Layer: `src/infrastructure/`
@@ -29,10 +30,10 @@
 
 **Purpose**: Project structure verification and prerequisites check
 
-- [X] T001 Verify Clean Architecture structure is in place per plan.md
-- [X] T002 Verify existing entities (Video, Transcript, Highlight) in src/domain/aggregates/
-- [X] T003 [P] Verify existing repositories (VideoRepositoryImpl, TranscriptRepositoryImpl, HighlightRepositoryImpl) in src/infrastructure/repositories/
-- [X] T004 [P] Verify BrowserStorage service exists in src/infrastructure/storage/BrowserStorage.ts
+- [x] T001 Verify Clean Architecture structure is in place per plan.md
+- [x] T002 Verify existing entities (Video, Transcript, Highlight) in src/domain/aggregates/
+- [x] T003 [P] Verify existing repositories (VideoRepositoryImpl, TranscriptRepositoryImpl, HighlightRepositoryImpl) in src/infrastructure/repositories/
+- [x] T004 [P] Verify BrowserStorage service exists in src/infrastructure/storage/BrowserStorage.ts
 
 ---
 
@@ -44,29 +45,29 @@
 
 ### Repository Interface Extensions
 
-- [X] T005 [P] Extend IVideoRepository interface with findAll() method in src/domain/repositories/IVideoRepository.ts
-- [X] T006 [P] Extend ITranscriptRepository interface with findByVideoId(videoId: string) method in src/domain/repositories/ITranscriptRepository.ts (已存在)
-- [X] T007 [P] Extend IHighlightRepository interface with findByVideoId(videoId: string) method in src/domain/repositories/IHighlightRepository.ts (已存在)
+- [x] T005 [P] Extend IVideoRepository interface with findAll() method in src/domain/repositories/IVideoRepository.ts
+- [x] T006 [P] Extend ITranscriptRepository interface with findByVideoId(videoId: string) method in src/domain/repositories/ITranscriptRepository.ts (已存在)
+- [x] T007 [P] Extend IHighlightRepository interface with findByVideoId(videoId: string) method in src/domain/repositories/IHighlightRepository.ts (已存在)
 
 ### BrowserStorage Batch Query Methods
 
-- [X] T008 [P] Implement restoreAllVideos() method in src/infrastructure/storage/BrowserStorage.ts (query IndexedDB + SessionStorage)
-- [X] T009 [P] Implement restoreAllTranscripts() method in src/infrastructure/storage/BrowserStorage.ts
-- [X] T010 [P] Implement restoreAllHighlights() method in src/infrastructure/storage/BrowserStorage.ts
+- [x] T008 [P] Implement restoreAllVideos() method in src/infrastructure/storage/BrowserStorage.ts (query IndexedDB + SessionStorage)
+- [x] T009 [P] Implement restoreAllTranscripts() method in src/infrastructure/storage/BrowserStorage.ts
+- [x] T010 [P] Implement restoreAllHighlights() method in src/infrastructure/storage/BrowserStorage.ts
 
 ### Repository Implementation Extensions
 
-- [X] T011 [P] Implement VideoRepositoryImpl.findAll() with auto-restore from BrowserStorage in src/infrastructure/repositories/VideoRepositoryImpl.ts
-- [X] T012 [P] Implement TranscriptRepositoryImpl.findByVideoId() with auto-restore from BrowserStorage in src/infrastructure/repositories/TranscriptRepositoryImpl.ts (已存在)
-- [X] T013 [P] Implement HighlightRepositoryImpl.findByVideoId() with auto-restore from BrowserStorage in src/infrastructure/repositories/HighlightRepositoryImpl.ts (已存在)
+- [x] T011 [P] Implement VideoRepositoryImpl.findAll() with auto-restore from BrowserStorage in src/infrastructure/repositories/VideoRepositoryImpl.ts
+- [x] T012 [P] Implement TranscriptRepositoryImpl.findByVideoId() with auto-restore from BrowserStorage in src/infrastructure/repositories/TranscriptRepositoryImpl.ts (已存在)
+- [x] T013 [P] Implement HighlightRepositoryImpl.findByVideoId() with auto-restore from BrowserStorage in src/infrastructure/repositories/HighlightRepositoryImpl.ts (已存在)
 
 ### RestoreSessionUseCase
 
-- [X] T014 Implement RestoreSessionUseCase.execute() method in src/application/use-cases/RestoreSessionUseCase.ts (coordinates Video/Transcript/Highlight repositories, returns { video, transcript, highlights, needsReupload } or null)
+- [x] T014 Implement RestoreSessionUseCase.execute() method in src/application/use-cases/RestoreSessionUseCase.ts (coordinates Video/Transcript/Highlight repositories, returns { video, transcript, highlights, needsReupload } or null)
 
 ### DI Container Registration
 
-- [X] T015 Register RestoreSessionUseCase in di/container.ts with VideoRepositoryImpl, TranscriptRepositoryImpl, and HighlightRepositoryImpl dependencies
+- [x] T015 Register RestoreSessionUseCase in di/container.ts with VideoRepositoryImpl, TranscriptRepositoryImpl, and HighlightRepositoryImpl dependencies
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -80,13 +81,13 @@
 
 ### Implementation for User Story 1
 
-- [X] T016 [US1] Add restoreSession() action to videoStore in src/presentation/stores/videoStore.ts (calls RestoreSessionUseCase, updates video state)
-- [X] T017 [P] [US1] Add setTranscript(transcript: Transcript) method to transcriptStore in src/presentation/stores/transcriptStore.ts (if not exists)
-- [X] T018 [P] [US1] Add setHighlights(highlights: Highlight[]) method to highlightStore in src/presentation/stores/highlightStore.ts (if not exists)
-- [X] T019 [US1] Integrate videoStore.restoreSession() with transcriptStore and highlightStore state updates in src/presentation/stores/videoStore.ts
-- [X] T020 [US1] Verify useNotification composable supports showInfo() and showError() methods in src/presentation/composables/useNotification.ts
-- [X] T021 [US1] Add notification display logic to restoreSession() action (small video: "已恢復先前的編輯狀態") in src/presentation/stores/videoStore.ts
-- [X] T022 [US1] Call videoStore.restoreSession() in App.vue onMounted lifecycle hook
+- [x] T016 [US1] Add restoreSession() action to videoStore in src/presentation/stores/videoStore.ts (calls RestoreSessionUseCase, updates video state)
+- [x] T017 [P] [US1] Add setTranscript(transcript: Transcript) method to transcriptStore in src/presentation/stores/transcriptStore.ts (if not exists)
+- [x] T018 [P] [US1] Add setHighlights(highlights: Highlight[]) method to highlightStore in src/presentation/stores/highlightStore.ts (if not exists)
+- [x] T019 [US1] Integrate videoStore.restoreSession() with transcriptStore and highlightStore state updates in src/presentation/stores/videoStore.ts
+- [x] T020 [US1] Verify useNotification composable supports showInfo() and showError() methods in src/presentation/composables/useNotification.ts
+- [x] T021 [US1] Add notification display logic to restoreSession() action (small video: "已恢復先前的編輯狀態") in src/presentation/stores/videoStore.ts
+- [x] T022 [US1] Call videoStore.restoreSession() in App.vue onMounted lifecycle hook
 
 **Checkpoint**: 小視頻完整恢復功能已完成。使用者刷新頁面後，視頻、轉錄文字和高光選擇應該自動恢復。
 
@@ -100,9 +101,9 @@
 
 ### Implementation for User Story 2
 
-- [X] T023 [US2] Add large video reupload notification logic to restoreSession() action (needsReupload: "偵測到先前的編輯內容,請重新上傳視頻以繼續編輯") in src/presentation/components/SessionRestorer.vue
-- [X] T024 [US2] Verify video.file === null detection logic in RestoreSessionUseCase returns needsReupload flag correctly in src/application/use-cases/RestoreSessionUseCase.ts
-- [X] T025 [US2] Test large video reupload workflow: verify state updates after user re-uploads video via VideoUpload component
+- [x] T023 [US2] Add large video reupload notification logic to restoreSession() action (needsReupload: "偵測到先前的編輯內容,請重新上傳視頻以繼續編輯") in src/presentation/components/SessionRestorer.vue
+- [x] T024 [US2] Verify video.file === null detection logic in RestoreSessionUseCase returns needsReupload flag correctly in src/application/use-cases/RestoreSessionUseCase.ts
+- [x] T025 [US2] Test large video reupload workflow: verify state updates after user re-uploads video via VideoUpload component
 
 **Checkpoint**: 大視頻恢復功能已完成。使用者刷新頁面後，看到提示訊息並重新上傳視頻後，編輯內容應該恢復。
 
@@ -116,9 +117,9 @@
 
 ### Implementation for User Story 3
 
-- [X] T026 [US3] Verify RestoreSessionUseCase.execute() returns null when no session data exists in src/application/use-cases/RestoreSessionUseCase.ts
-- [X] T027 [US3] Verify videoStore.restoreSession() handles null result silently (no notification) in src/presentation/stores/videoStore.ts
-- [X] T028 [US3] Test first-time visit scenario: clear IndexedDB and SessionStorage, verify normal upload interface displays
+- [x] T026 [US3] Verify RestoreSessionUseCase.execute() returns null when no session data exists in src/application/use-cases/RestoreSessionUseCase.ts
+- [x] T027 [US3] Verify videoStore.restoreSession() handles null result silently (no notification) in src/presentation/stores/videoStore.ts
+- [x] T028 [US3] Test first-time visit scenario: clear IndexedDB and SessionStorage, verify normal upload interface displays
 
 **Checkpoint**: 首次訪問功能已完成。使用者首次訪問或清除資料後，應該看到正常的上傳介面，無任何提示訊息。
 
@@ -132,9 +133,9 @@
 
 ### Implementation for User Story 4
 
-- [X] T029 [US4] Verify BrowserStorage.cleanupStaleData() correctly deletes data older than 24 hours in src/infrastructure/storage/BrowserStorage.ts
-- [X] T030 [US4] Verify BrowserStorage.init() calls cleanupStaleData() on initialization in src/infrastructure/storage/BrowserStorage.ts
-- [X] T031 [US4] Test session expiration scenario: manually modify savedAt timestamp in IndexedDB, verify stale data is cleared on next visit
+- [x] T029 [US4] Verify BrowserStorage.cleanupStaleData() correctly deletes data older than 24 hours in src/infrastructure/storage/BrowserStorage.ts
+- [x] T030 [US4] Verify BrowserStorage.init() calls cleanupStaleData() on initialization in src/infrastructure/storage/BrowserStorage.ts
+- [x] T031 [US4] Test session expiration scenario: manually modify savedAt timestamp in IndexedDB, verify stale data is cleared on next visit
 
 **Checkpoint**: 會話過期處理功能已完成。超過 24 小時的資料應該自動清除，使用者看到全新介面。
 
@@ -146,33 +147,33 @@
 
 ### Error Handling
 
-- [X] T032 [P] Add comprehensive error handling for incomplete data (missing transcript) in RestoreSessionUseCase in src/application/use-cases/RestoreSessionUseCase.ts
-- [X] T033 [P] Add comprehensive error handling for incomplete data (missing highlights) in RestoreSessionUseCase in src/application/use-cases/RestoreSessionUseCase.ts
-- [X] T034 Add error notification display ("恢復會話失敗,請重新上傳視頻") in videoStore.restoreSession() catch block in src/presentation/stores/videoStore.ts
-- [X] T035 [P] Add console error logging for RestoreSession failures in videoStore.restoreSession() in src/presentation/stores/videoStore.ts
+- [x] T032 [P] Add comprehensive error handling for incomplete data (missing transcript) in RestoreSessionUseCase in src/application/use-cases/RestoreSessionUseCase.ts
+- [x] T033 [P] Add comprehensive error handling for incomplete data (missing highlights) in RestoreSessionUseCase in src/application/use-cases/RestoreSessionUseCase.ts
+- [x] T034 Add error notification display ("恢復會話失敗,請重新上傳視頻") in videoStore.restoreSession() catch block in src/presentation/stores/videoStore.ts
+- [x] T035 [P] Add console error logging for RestoreSession failures in videoStore.restoreSession() in src/presentation/stores/videoStore.ts
 
 ### Edge Cases Handling
 
-- [X] T036 [P] Test and handle corrupted video file in IndexedDB (playback error detection)
-- [X] T037 [P] Test and handle storage quota exceeded error (treat as large video)
-- [X] T038 [P] Verify sessionId filtering works correctly in BrowserStorage.cleanupStaleData() (修改：移除 sessionId 檢查，只保留時間檢查以避免誤刪)
+- [x] T036 [P] Test and handle corrupted video file in IndexedDB (playback error detection)
+- [x] T037 [P] Test and handle storage quota exceeded error (treat as large video)
+- [x] T038 [P] Verify sessionId filtering works correctly in BrowserStorage.cleanupStaleData() (修改：移除 sessionId 檢查，只保留時間檢查以避免誤刪)
 
 ### Performance Optimization
 
-- [X] T039 [P] Verify batch query performance (IndexedDB getAll) meets < 150ms target for session restore
-- [X] T040 [P] Verify overall app startup delay stays under 500ms with session restore enabled
-- [X] T041 [P] Verify notification display response time < 100ms
+- [x] T039 [P] Verify batch query performance (IndexedDB getAll) meets < 150ms target for session restore
+- [x] T040 [P] Verify overall app startup delay stays under 500ms with session restore enabled
+- [x] T041 [P] Verify notification display response time < 100ms
 
 ### Documentation
 
-- [X] T042 [P] Update CLAUDE.md if new coding conventions emerged during implementation
-- [X] T043 [P] Update Active Technologies section in CLAUDE.md with session restore feature info
-- [X] T044 Update quickstart.md with manual test scenarios for session restore in specs/005-session-restore/quickstart.md
+- [x] T042 [P] Update CLAUDE.md if new coding conventions emerged during implementation
+- [x] T043 [P] Update Active Technologies section in CLAUDE.md with session restore feature info
+- [x] T044 Update quickstart.md with manual test scenarios for session restore in specs/005-session-restore/quickstart.md
 
 ### Validation
 
-- [X] T045 Run type-check: npm run type-check
-- [X] T046 Run lint: npm run lint
+- [x] T045 Run type-check: npm run type-check
+- [x] T046 Run lint: npm run lint
 - [ ] T047 Manual test on desktop platform (Chrome/Mac or Chrome/Windows)
 - [ ] T048 Manual test on mobile platform (iOS Safari or Android Chrome)
 - [ ] T049 Run quickstart.md validation scenarios
@@ -279,6 +280,7 @@ With multiple developers:
 ## Summary
 
 **Total Tasks**: 49
+
 - Phase 1 (Setup): 4 tasks
 - Phase 2 (Foundational): 11 tasks (BLOCKING)
 - Phase 3 (User Story 1 - P1): 7 tasks 🎯 MVP
@@ -290,6 +292,7 @@ With multiple developers:
 **Parallel Opportunities Identified**: 27 tasks marked [P]
 
 **Independent Test Criteria**:
+
 - US1: Upload 20MB video → select highlights → refresh → verify full restore
 - US2: Upload 100MB video → select highlights → refresh → verify prompt and restore after reupload
 - US3: Clear browser data → visit app → verify normal upload interface
@@ -298,6 +301,7 @@ With multiple developers:
 **Suggested MVP Scope**: User Story 1 only (小視頻完整恢復)
 
 **Format Validation**: ✅ All tasks follow the required checklist format:
+
 - [x] Checkbox format: `- [ ]`
 - [x] Task ID: Sequential (T001-T049)
 - [x] [P] marker: Present on parallelizable tasks

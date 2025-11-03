@@ -50,24 +50,29 @@ const sessionId = generateSessionId(); // "session_1234567890_def456"
 ## 常數分類
 
 ### Database 相關
+
 - `DB_NAME`: IndexedDB 資料庫名稱
 - `DB_VERSION`: IndexedDB 資料庫版本
 
 ### Storage 相關
+
 - `MAX_VIDEO_SIZE_MB`: 最大視頻大小 (MB 單位，用於顯示)
 - `MAX_VIDEO_SIZE`: 最大視頻大小 (bytes 單位，用於比較)
 - `MAX_AGE_MS`: 資料最大保存時間 (24小時)
 
 ### File Validation 相關
+
 - `ALLOWED_VIDEO_FORMATS`: 允許上傳的視頻格式
 - `MAX_FILE_SIZE_MB`: 最大上傳檔案大小 (MB 單位，用於顯示)
 - `MAX_FILE_SIZE`: 最大上傳檔案大小 (bytes 單位，用於比較)
 
 ### SessionStorage Keys
+
 - `SESSION_ID_KEY`: SessionStorage 中儲存 sessionId 的 key
 - `VIDEO_META_KEY_PREFIX`: 大視頻元資料的 key 前綴
 
 ### ID Prefixes
+
 - `SESSION_ID_PREFIX`: Session ID 前綴
 - `VIDEO_ID_PREFIX`: Video ID 前綴
 - `TRANSCRIPT_ID_PREFIX`: Transcript ID 前綴
@@ -77,6 +82,7 @@ const sessionId = generateSessionId(); // "session_1234567890_def456"
 ## ID 生成函式
 
 ### 可用函式
+
 - `generateSessionId()`: 生成 Session ID
 - `generateVideoId()`: 生成 Video ID
 - `generateTranscriptId()`: 生成 Transcript ID
@@ -84,9 +90,11 @@ const sessionId = generateSessionId(); // "session_1234567890_def456"
 - `generateSentenceId()`: 生成 Sentence ID
 
 ### ID 格式
+
 所有 ID 都遵循統一格式：`${prefix}${timestamp}_${randomString}`
 
 範例：
+
 - `video_1699876543210_abc123def`
 - `session_1699876543210_xyz789ghi`
 
@@ -100,12 +108,14 @@ type AllowedVideoFormat = 'video/mp4' | 'video/quicktime' | 'video/webm';
 ## 維護指南
 
 ### 新增常數
+
 1. 在 `constants.ts` 中定義新常數
 2. 加入清楚的 JSDoc 註解說明用途
 3. 依照分類加入適當的分組
 4. 更新此 README 文件
 
 ### 新增 ID 類型
+
 1. 在 `constants.ts` 中定義 ID 前綴常數
 2. 在 `id-generator.ts` 中建立對應的生成函式
 3. 更新此 README 文件

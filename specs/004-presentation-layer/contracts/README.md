@@ -5,27 +5,33 @@
 ## 檔案說明
 
 ### 1. `store-contracts.ts`
+
 定義所有 Pinia Store 的 State、Getters、Actions 型別介面。
 
 **包含**：
+
 - `VideoStoreState`, `VideoStoreGetters`, `VideoStoreActions`
 - `TranscriptStoreState`, `TranscriptStoreGetters`, `TranscriptStoreActions`
 - `HighlightStoreState`, `HighlightStoreGetters`, `HighlightStoreActions`
 - 通用型別：`SectionDisplayData`, `SentenceDisplayData`, `TimeSegment`
 
 ### 2. `component-contracts.ts`
+
 定義所有 Vue 組件的 Props 和 Emits 型別介面。
 
 **包含**：
+
 - Layout 組件：`SplitLayoutProps`
 - Upload 組件：`VideoUploadProps`, `VideoUploadEmits`
 - Editing 組件：`EditingAreaProps`, `SectionListProps`, `SentenceItemProps` 及其 Emits
 - Preview 組件：`VideoPlayerProps`, `TranscriptOverlayProps`, `TimelineProps` 及其 Emits
 
 ### 3. `application-layer-updates.ts`
+
 記錄為支援 Presentation Layer 功能，需要對 Application Layer 進行的更新。
 
 **包含**：
+
 - 新增 Port：`IMockDataProvider`
 - 新增 Use Case：`UploadVideoWithMockTranscriptUseCase`
 - 更新現有 Port：`IFileStorage`（新增 onProgress 參數）
@@ -46,8 +52,8 @@ cp contracts/component-contracts.ts src/presentation/types/
 然後在組件或 Store 中引用：
 
 ```typescript
-import type { VideoStoreState } from '@/presentation/types/store-contracts'
-import type { SentenceItemProps } from '@/presentation/types/component-contracts'
+import type { VideoStoreState } from '@/presentation/types/store-contracts';
+import type { SentenceItemProps } from '@/presentation/types/component-contracts';
 ```
 
 ### 在 Application Layer 中使用

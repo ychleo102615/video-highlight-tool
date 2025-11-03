@@ -15,16 +15,19 @@
 **Decision**: 使用 TypeScript Class 定義實體和值物件
 
 **Rationale**:
+
 1. **封裝性**: Class 提供私有屬性和方法，確保業務規則不被繞過
 2. **型別安全**: TypeScript 編譯時檢查，避免執行時錯誤
 3. **可讀性**: Class 語法清晰表達實體的屬性和行為
 4. **可測試性**: 易於實例化和 mock
 
 **Alternatives Considered**:
+
 - **Interface + Factory Function**: 較輕量，但缺乏封裝性和私有屬性保護
 - **Plain Object**: 無法強制業務規則，不適合 DDD
 
 **Best Practices**:
+
 ```typescript
 // ✅ 推薦：使用 Class 定義實體
 export class Video {
@@ -60,15 +63,18 @@ export interface Video {
 **Decision**: 使用 `readonly` 修飾符和 `ReadonlyArray` 確保編譯時不可變性
 
 **Rationale**:
+
 1. **編譯時保護**: TypeScript 在編譯時阻止修改 readonly 屬性
 2. **業務規則強制**: Transcript 生成後不可修改的業務規則編碼到型別系統
 3. **簡單易懂**: 無需引入額外的不可變性庫（如 Immutable.js）
 
 **Alternatives Considered**:
+
 - **Immutable.js**: 功能強大，但增加學習成本和 bundle 大小
 - **Object.freeze()**: 運行時保護，但無編譯時檢查
 
 **Best Practices**:
+
 ```typescript
 // ✅ 推薦：使用 readonly 和 ReadonlyArray
 export class Transcript {
@@ -91,6 +97,7 @@ export class Section {
 ```
 
 **Limitations**:
+
 - `readonly` 只在編譯時有效，運行時仍可強制修改（通過 `any` 或 `as`）
 - 需要通過代碼審查和測試確保不被繞過
 
@@ -101,15 +108,18 @@ export class Section {
 **Decision**: 在建構函式中執行驗證，驗證失敗時拋出 Error
 
 **Rationale**:
+
 1. **快速失敗**: 在建立實例時立即發現問題，避免錯誤數據傳播
 2. **清晰語義**: 驗證規則在建構函式中集中管理，易於理解
 3. **型別安全**: 一旦建立成功，保證數據合法
 
 **Alternatives Considered**:
+
 - **靜態工廠方法**: 返回 `Result<T, Error>`，更函數式，但增加複雜度
 - **延遲驗證**: 在使用時驗證，但可能導致錯誤數據傳播
 
 **Best Practices**:
+
 ```typescript
 // ✅ 推薦：在建構函式中驗證，支援毫秒精度
 export class TimeStamp {
@@ -185,18 +195,22 @@ export class TimeRange {
   }
 
   contains(timestamp: TimeStamp): boolean {
-    return timestamp.milliseconds >= this.start.milliseconds &&
-           timestamp.milliseconds <= this.end.milliseconds;
+    return (
+      timestamp.milliseconds >= this.start.milliseconds &&
+      timestamp.milliseconds <= this.end.milliseconds
+    );
   }
 }
 ```
 
 **設計理由 - 為何使用毫秒？**
+
 - 視頻播放需要毫秒級精度，秒級精度不足以滿足準確的字幕同步
 - 瀏覽器 video 元素的 `currentTime` 屬性返回浮點數秒，需要精確到毫秒
 - 內部儲存毫秒，提供 `seconds` getter 方便使用
 - toString 支援兩種格式：預設不顯示毫秒（簡潔），可選顯示毫秒（精確）
-```
+
+````
 
 ---
 
@@ -252,9 +266,10 @@ export class Highlight {
     return this.selectedSentenceIds.has(sentenceId);
   }
 }
-```
+````
 
 **Performance Analysis**:
+
 - `addSentence`: O(1) - Set.add()
 - `removeSentence`: O(n) - Array.filter()，但 n 通常很小（< 100）
 - `toggleSentence`: O(1) 或 O(n)
@@ -267,16 +282,19 @@ export class Highlight {
 **Decision**: 使用 HighlightService (Domain Service) 協調 Highlight 和 Transcript 之間的互動
 
 **Rationale**:
+
 1. **符合 DDD 原則**: 當兩個 Aggregate 需要協作時，應使用 Domain Service，而非在一個 Aggregate 的方法中傳入另一個 Aggregate
 2. **聚合獨立性**: Highlight 只管理選擇關係（sentenceIds），不依賴 Transcript
 3. **職責清晰**: HighlightService 負責協調跨聚合查詢，保持 Aggregate 的純粹性
 4. **無狀態服務**: Domain Service 是無狀態的，所有方法都是純函數
 
 **Alternatives Considered**:
+
 - **在 Highlight 中傳入 Transcript 參數**: 違反 DDD 原則，Aggregate 不應依賴其他 Aggregate
 - **在 Application Layer 處理**: 會導致業務邏輯洩漏到 Application Layer，Domain Layer 失去核心邏輯
 
 **Best Practices**:
+
 ```typescript
 // ✅ 推薦：使用 Domain Service 協調跨聚合查詢
 export class HighlightService {
@@ -287,12 +305,12 @@ export class HighlightService {
   ): Sentence[] {
     const sentenceIds = highlight.getSelectedSentenceIds();
     const sentences = sentenceIds
-      .map(id => transcript.getSentenceById(id))
+      .map((id) => transcript.getSentenceById(id))
       .filter((s): s is Sentence => s !== undefined);
 
     if (sortBy === 'time') {
-      return sentences.sort((a, b) =>
-        a.timeRange.start.milliseconds - b.timeRange.start.milliseconds
+      return sentences.sort(
+        (a, b) => a.timeRange.start.milliseconds - b.timeRange.start.milliseconds
       );
     }
 
@@ -300,8 +318,10 @@ export class HighlightService {
   }
 
   getTotalDuration(highlight: Highlight, transcript: Transcript): number {
-    return this.getSelectedSentences(highlight, transcript, 'time')
-      .reduce((total, s) => total + s.timeRange.duration, 0);
+    return this.getSelectedSentences(highlight, transcript, 'time').reduce(
+      (total, s) => total + s.timeRange.duration,
+      0
+    );
   }
 }
 
@@ -325,6 +345,7 @@ export class Highlight {
 ```
 
 **Trade-offs**:
+
 - **優點**:
   - 符合 DDD Domain Service 模式
   - 聚合保持獨立性
@@ -341,11 +362,13 @@ export class Highlight {
 **Decision**: 只有 Aggregate Root 才有 Repository 介面
 
 **Rationale**:
+
 1. **符合 DDD 原則**: Aggregate Root 是聚合的唯一入口
 2. **一致性保證**: 通過 Aggregate Root 操作，確保聚合內部一致性
 3. **簡化設計**: 減少 Repository 數量，降低複雜度
 
 **Best Practices**:
+
 ```typescript
 // ✅ 正確：Video 是 Aggregate Root，有 Repository
 export interface IVideoRepository {
@@ -375,6 +398,7 @@ export interface IHighlightRepository {
 ```
 
 **Key Insight**:
+
 - Section 和 Sentence 的生命週期由 Transcript 管理
 - 儲存或查詢 Section/Sentence 時，透過 Transcript Repository 操作整個聚合
 
@@ -385,11 +409,13 @@ export interface IHighlightRepository {
 **Decision**: 所有公開 API 明確定義型別，避免使用 `any`
 
 **Rationale**:
+
 1. **編譯時檢查**: 捕獲型別錯誤，減少執行時 bug
 2. **IDE 支援**: 提供完整的自動補全和型別提示
 3. **文檔作用**: 型別定義即文檔，提高代碼可讀性
 
 **Best Practices**:
+
 ```typescript
 // ✅ 推薦：明確的型別定義
 export class Transcript {
@@ -402,24 +428,25 @@ export class Transcript {
 
   getSentenceById(sentenceId: string): Sentence | undefined {
     for (const section of this.sections) {
-      const sentence = section.sentences.find(s => s.id === sentenceId);
+      const sentence = section.sentences.find((s) => s.id === sentenceId);
       if (sentence) return sentence;
     }
     return undefined;
   }
 
   getAllSentences(): Sentence[] {
-    return this.sections.flatMap(section => [...section.sentences]);
+    return this.sections.flatMap((section) => [...section.sentences]);
   }
 
   getSectionById(sectionId: string): Section | undefined {
-    return this.sections.find(s => s.id === sectionId);
+    return this.sections.find((s) => s.id === sectionId);
   }
 }
 
 // ❌ 避免使用 any
 export class Transcript {
-  getSentenceById(sentenceId: any): any { // 不好：失去型別安全
+  getSentenceById(sentenceId: any): any {
+    // 不好：失去型別安全
     // ...
   }
 }
@@ -464,16 +491,16 @@ export class Transcript {
 
 ## Key Decisions Summary
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| 實體定義方式 | TypeScript Class | 封裝性、型別安全、可讀性 |
-| 不可變性實作 | `readonly` + `ReadonlyArray` | 編譯時保護、簡單易懂 |
-| 值物件驗證 | 建構函式驗證 + 拋出 Error | 快速失敗、清晰語義 |
-| **時間精度** | **毫秒（milliseconds）** | **視頻播放需要毫秒級精度** |
-| 高光選擇儲存 | `Set<string>` + `string[]` | 去重 + 效能 + 記錄順序 |
-| **跨聚合協作** | **Domain Service (HighlightService)** | **符合 DDD，聚合保持獨立** |
-| Repository 設計 | 只有 Aggregate Root 有 Repository | 符合 DDD、簡化設計 |
-| 型別定義 | 明確型別，避免 `any` | 型別安全、IDE 支援 |
+| Decision        | Choice                                | Rationale                  |
+| --------------- | ------------------------------------- | -------------------------- |
+| 實體定義方式    | TypeScript Class                      | 封裝性、型別安全、可讀性   |
+| 不可變性實作    | `readonly` + `ReadonlyArray`          | 編譯時保護、簡單易懂       |
+| 值物件驗證      | 建構函式驗證 + 拋出 Error             | 快速失敗、清晰語義         |
+| **時間精度**    | **毫秒（milliseconds）**              | **視頻播放需要毫秒級精度** |
+| 高光選擇儲存    | `Set<string>` + `string[]`            | 去重 + 效能 + 記錄順序     |
+| **跨聚合協作**  | **Domain Service (HighlightService)** | **符合 DDD，聚合保持獨立** |
+| Repository 設計 | 只有 Aggregate Root 有 Repository     | 符合 DDD、簡化設計         |
+| 型別定義        | 明確型別，避免 `any`                  | 型別安全、IDE 支援         |
 
 ---
 

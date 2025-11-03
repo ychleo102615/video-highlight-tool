@@ -103,6 +103,7 @@ export class TimeStamp {
 ```
 
 **Quick Test**:
+
 ```typescript
 const t = TimeStamp.fromSeconds(125.5);
 console.log(t.toString()); // "02:05"
@@ -135,18 +136,18 @@ export class TimeRange {
   }
 
   contains(timestamp: TimeStamp): boolean {
-    return timestamp.milliseconds >= this.start.milliseconds &&
-           timestamp.milliseconds <= this.end.milliseconds;
+    return (
+      timestamp.milliseconds >= this.start.milliseconds &&
+      timestamp.milliseconds <= this.end.milliseconds
+    );
   }
 }
 ```
 
 **Quick Test**:
+
 ```typescript
-const range = new TimeRange(
-  TimeStamp.fromSeconds(10),
-  TimeStamp.fromSeconds(25)
-);
+const range = new TimeRange(TimeStamp.fromSeconds(10), TimeStamp.fromSeconds(25));
 console.log(range.duration); // 15000 (毫秒)
 console.log(range.durationInSeconds); // 15 (秒)
 ```
@@ -264,18 +265,18 @@ export class Transcript {
 
   getSentenceById(sentenceId: string): Sentence | undefined {
     for (const section of this.sections) {
-      const sentence = section.sentences.find(s => s.id === sentenceId);
+      const sentence = section.sentences.find((s) => s.id === sentenceId);
       if (sentence) return sentence;
     }
     return undefined;
   }
 
   getAllSentences(): Sentence[] {
-    return this.sections.flatMap(section => [...section.sentences]);
+    return this.sections.flatMap((section) => [...section.sentences]);
   }
 
   getSectionById(sectionId: string): Section | undefined {
-    return this.sections.find(s => s.id === sectionId);
+    return this.sections.find((s) => s.id === sectionId);
   }
 }
 ```
@@ -308,7 +309,7 @@ export class Highlight {
   removeSentence(sentenceId: string): void {
     if (this.selectedSentenceIds.has(sentenceId)) {
       this.selectedSentenceIds.delete(sentenceId);
-      this.selectionOrder = this.selectionOrder.filter(id => id !== sentenceId);
+      this.selectionOrder = this.selectionOrder.filter((id) => id !== sentenceId);
     }
   }
 
@@ -361,13 +362,13 @@ export class HighlightService {
   ): Sentence[] {
     const sentenceIds = highlight.getSelectedSentenceIds();
     const sentences = sentenceIds
-      .map(id => transcript.getSentenceById(id))
+      .map((id) => transcript.getSentenceById(id))
       .filter((s): s is Sentence => s !== undefined);
 
     if (sortBy === 'time') {
       // 按時間順序排序
-      return sentences.sort((a, b) =>
-        a.timeRange.start.milliseconds - b.timeRange.start.milliseconds
+      return sentences.sort(
+        (a, b) => a.timeRange.start.milliseconds - b.timeRange.start.milliseconds
       );
     }
 
@@ -383,19 +384,17 @@ export class HighlightService {
     transcript: Transcript,
     sortBy: 'selection' | 'time'
   ): TimeRange[] {
-    return this.getSelectedSentences(highlight, transcript, sortBy)
-      .map(s => s.timeRange);
+    return this.getSelectedSentences(highlight, transcript, sortBy).map((s) => s.timeRange);
   }
 
   /**
    * 計算選中句子的總時長（毫秒）
    */
-  getTotalDuration(
-    highlight: Highlight,
-    transcript: Transcript
-  ): number {
-    return this.getSelectedSentences(highlight, transcript, 'time')
-      .reduce((total, s) => total + s.timeRange.duration, 0);
+  getTotalDuration(highlight: Highlight, transcript: Transcript): number {
+    return this.getSelectedSentences(highlight, transcript, 'time').reduce(
+      (total, s) => total + s.timeRange.duration,
+      0
+    );
   }
 }
 ```
@@ -489,20 +488,26 @@ console.log('✅ Video created, isReady:', video.isReady); // false
 const sentence1 = new Sentence(
   'sent-001',
   '大家好，歡迎來到今天的分享。',
-  new TimeRange(
-    TimeStamp.fromSeconds(0),
-    TimeStamp.fromSeconds(3.5)
-  ),
+  new TimeRange(TimeStamp.fromSeconds(0), TimeStamp.fromSeconds(3.5)),
   true
 );
 console.log('✅ Sentence created');
 
 // 4. 建立 Section
 const section = new Section('sec-001', '開場介紹', [sentence1]);
-console.log('✅ Section created, timeRange duration:', section.timeRange.durationInSeconds, 'seconds');
+console.log(
+  '✅ Section created, timeRange duration:',
+  section.timeRange.durationInSeconds,
+  'seconds'
+);
 
 // 5. 建立 Transcript
-const transcript = new Transcript('trans-001', 'video-001', [section], '大家好，歡迎來到今天的分享。');
+const transcript = new Transcript(
+  'trans-001',
+  'video-001',
+  [section],
+  '大家好，歡迎來到今天的分享。'
+);
 console.log('✅ Transcript created, sentences count:', transcript.getAllSentences().length);
 
 // 6. 建立 Highlight
@@ -527,6 +532,7 @@ console.log('\n🎉 All Domain Layer entities working correctly!');
 ```
 
 執行測試：
+
 ```bash
 npx tsx test-domain.ts
 ```
@@ -576,16 +582,12 @@ export class TimeStamp {
 ```typescript
 // ❌ 錯誤：可變陣列
 export class Transcript {
-  constructor(
-    public sections: Section[]
-  ) {}
+  constructor(public sections: Section[]) {}
 }
 
 // ✅ 正確：唯讀陣列
 export class Transcript {
-  constructor(
-    public readonly sections: ReadonlyArray<Section>
-  ) {}
+  constructor(public readonly sections: ReadonlyArray<Section>) {}
 }
 ```
 

@@ -5,7 +5,7 @@
  * 這些更新符合 Clean Architecture 原則，透過新增 Port 和 Use Case 實現
  */
 
-import type { TranscriptDTO } from '@/application/dto/TranscriptDTO'
+import type { TranscriptDTO } from '@/application/dto/TranscriptDTO';
 
 // ============================================================================
 // 新增 Port：IMockDataProvider
@@ -31,7 +31,7 @@ export interface IMockDataProvider {
    * @param jsonContent JSON 字串內容
    * @throws Error 如果 JSON 格式無效
    */
-  setMockData(videoId: string, jsonContent: string): void
+  setMockData(videoId: string, jsonContent: string): void;
 }
 
 // ============================================================================
@@ -63,7 +63,7 @@ export interface IUploadVideoWithMockTranscriptUseCase {
     videoFile: File,
     transcriptFile: File,
     onProgress?: (progress: number) => void
-  ): Promise<Video>
+  ): Promise<Video>;
 }
 
 // ============================================================================
@@ -82,13 +82,13 @@ export interface IFileStorage {
    * @param onProgress 進度回調（0-100），可選
    * @returns 文件 URL（本地 Blob URL 或雲端 URL）
    */
-  save(file: File, onProgress?: (progress: number) => void): Promise<string>
+  save(file: File, onProgress?: (progress: number) => void): Promise<string>;
 
   /**
    * 刪除文件
    * @param url 文件 URL
    */
-  delete(url: string): Promise<void>
+  delete(url: string): Promise<void>;
 }
 
 // ============================================================================
@@ -107,7 +107,7 @@ export interface IUploadVideoUseCase {
    * @param onProgress 上傳進度回調（0-100），可選
    * @returns 上傳的 Video Entity
    */
-  execute(file: File, onProgress?: (progress: number) => void): Promise<Video>
+  execute(file: File, onProgress?: (progress: number) => void): Promise<Video>;
 }
 
 // ============================================================================
@@ -120,30 +120,30 @@ export interface IUploadVideoUseCase {
  * 注意：實際的 MockAIService 已實作完整功能，包含 JSONValidator 驗證
  */
 export class MockAIServiceExample implements ITranscriptGenerator, IMockDataProvider {
-  private mockDataMap = new Map<string, string>() // 存儲 JSON 字串
+  private mockDataMap = new Map<string, string>(); // 存儲 JSON 字串
 
   // IMockDataProvider 實作
   setMockData(videoId: string, jsonContent: string): void {
     // 1. 驗證 JSON 格式（使用 JSONValidator）
     // 2. 補完非必要欄位
     // 3. 存儲到 mockDataMap
-    this.mockDataMap.set(videoId, jsonContent)
+    this.mockDataMap.set(videoId, jsonContent);
   }
 
   // ITranscriptGenerator 實作
   async generate(videoId: string): Promise<TranscriptDTO> {
-    const jsonContent = this.mockDataMap.get(videoId)
+    const jsonContent = this.mockDataMap.get(videoId);
     if (!jsonContent) {
-      throw new Error(`找不到 videoId "${videoId}" 的 Mock 資料`)
+      throw new Error(`找不到 videoId "${videoId}" 的 Mock 資料`);
     }
 
     // 解析並返回（已驗證過）
-    const data = JSON.parse(jsonContent) as TranscriptDTO
+    const data = JSON.parse(jsonContent) as TranscriptDTO;
 
     // 使用後自動清除（一次性使用）
-    this.mockDataMap.delete(videoId)
+    this.mockDataMap.delete(videoId);
 
-    return data
+    return data;
   }
 }
 
@@ -151,8 +151,8 @@ export class MockAIServiceExample implements ITranscriptGenerator, IMockDataProv
  * UploadVideoWithMockTranscriptUseCase 實作範例（Application Layer）
  */
 export class UploadVideoWithMockTranscriptUseCaseExample
-  implements IUploadVideoWithMockTranscriptUseCase {
-
+  implements IUploadVideoWithMockTranscriptUseCase
+{
   constructor(
     private uploadVideoUseCase: IUploadVideoUseCase,
     private mockDataProvider: IMockDataProvider
@@ -164,15 +164,15 @@ export class UploadVideoWithMockTranscriptUseCaseExample
     onProgress?: (progress: number) => void
   ): Promise<Video> {
     // 1. 上傳視頻（重用現有 Use Case）
-    const video = await this.uploadVideoUseCase.execute(videoFile, onProgress)
+    const video = await this.uploadVideoUseCase.execute(videoFile, onProgress);
 
     // 2. 讀取轉錄 JSON 檔案內容
-    const jsonContent = await transcriptFile.text()
+    const jsonContent = await transcriptFile.text();
 
     // 3. 設定 Mock 資料（setMockData 會進行驗證、補完非必要欄位、檢查時間戳）
-    this.mockDataProvider.setMockData(video.id, jsonContent)
+    this.mockDataProvider.setMockData(video.id, jsonContent);
 
-    return video
+    return video;
   }
 }
 
@@ -182,13 +182,13 @@ export class UploadVideoWithMockTranscriptUseCaseExample
 export class FileStorageServiceExample implements IFileStorage {
   async save(file: File, onProgress?: (progress: number) => void): Promise<string> {
     // 本地環境：立即完成
-    onProgress?.(100)
-    const url = URL.createObjectURL(file)
-    return url
+    onProgress?.(100);
+    const url = URL.createObjectURL(file);
+    return url;
   }
 
   async delete(url: string): Promise<void> {
-    URL.revokeObjectURL(url)
+    URL.revokeObjectURL(url);
   }
 }
 
@@ -198,34 +198,34 @@ export class FileStorageServiceExample implements IFileStorage {
 export class CloudFileStorageServiceExample implements IFileStorage {
   async save(file: File, onProgress?: (progress: number) => void): Promise<string> {
     return new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest()
+      const xhr = new XMLHttpRequest();
 
       // 監聽上傳進度
       xhr.upload.addEventListener('progress', (e) => {
         if (e.lengthComputable) {
-          const progress = Math.round((e.loaded / e.total) * 100)
-          onProgress?.(progress)
+          const progress = Math.round((e.loaded / e.total) * 100);
+          onProgress?.(progress);
         }
-      })
+      });
 
       xhr.addEventListener('load', () => {
-        const { url } = JSON.parse(xhr.responseText)
-        resolve(url)
-      })
+        const { url } = JSON.parse(xhr.responseText);
+        resolve(url);
+      });
 
-      xhr.addEventListener('error', () => reject(new Error('Upload failed')))
+      xhr.addEventListener('error', () => reject(new Error('Upload failed')));
 
-      xhr.open('POST', '/api/upload')
-      const formData = new FormData()
-      formData.append('file', file)
-      xhr.send(formData)
-    })
+      xhr.open('POST', '/api/upload');
+      const formData = new FormData();
+      formData.append('file', file);
+      xhr.send(formData);
+    });
   }
 
   async delete(url: string): Promise<void> {
     await fetch(`/api/delete?url=${encodeURIComponent(url)}`, {
       method: 'DELETE'
-    })
+    });
   }
 }
 
@@ -238,25 +238,31 @@ export class CloudFileStorageServiceExample implements IFileStorage {
  */
 export function registerPresentationLayerDependencies(container: DIContainer) {
   // 註冊 MockAIService（同時實作 ITranscriptGenerator 和 IMockDataProvider）
-  const mockAIService = new MockAIService()
-  container.register('TranscriptGenerator', mockAIService)
-  container.register('MockDataProvider', mockAIService)
+  const mockAIService = new MockAIService();
+  container.register('TranscriptGenerator', mockAIService);
+  container.register('MockDataProvider', mockAIService);
 
   // 註冊 FileStorageService
-  container.register('FileStorage', new FileStorageService())
+  container.register('FileStorage', new FileStorageService());
 
   // 註冊 UploadVideoUseCase
-  container.register('UploadVideoUseCase', () => new UploadVideoUseCase(
-    container.get('VideoRepository'),
-    container.get('FileStorage'),
-    container.get('VideoProcessor')
-  ))
+  container.register(
+    'UploadVideoUseCase',
+    () =>
+      new UploadVideoUseCase(
+        container.get('VideoRepository'),
+        container.get('FileStorage'),
+        container.get('VideoProcessor')
+      )
+  );
 
   // 註冊 UploadVideoWithMockTranscriptUseCase
-  container.register('UploadVideoWithMockTranscriptUseCase', () =>
-    new UploadVideoWithMockTranscriptUseCase(
-      container.get('UploadVideoUseCase'),
-      container.get('MockDataProvider')
-    )
-  )
+  container.register(
+    'UploadVideoWithMockTranscriptUseCase',
+    () =>
+      new UploadVideoWithMockTranscriptUseCase(
+        container.get('UploadVideoUseCase'),
+        container.get('MockDataProvider')
+      )
+  );
 }

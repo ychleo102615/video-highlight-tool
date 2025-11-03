@@ -54,5 +54,6 @@
 ### Recommendation:
 
 ✅ 規格文件品質良好，可以直接進入下一階段：
+
 - `/speckit.plan` - 進行實作規劃
 - `/speckit.clarify` - 如需進一步澄清細節（目前不需要）

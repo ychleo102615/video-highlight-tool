@@ -1,7 +1,7 @@
-import { computed } from 'vue'
-import type { Sentence } from '@/domain/aggregates/Transcript/Sentence'
-import { useHighlightStore } from '@/presentation/stores/highlightStore'
-import { useTranscriptStore } from '@/presentation/stores/transcriptStore'
+import { computed } from 'vue';
+import type { Sentence } from '@/domain/aggregates/Transcript/Sentence';
+import { useHighlightStore } from '@/presentation/stores/highlightStore';
+import { useTranscriptStore } from '@/presentation/stores/transcriptStore';
 
 /**
  * useHighlight Composable
@@ -12,8 +12,8 @@ import { useTranscriptStore } from '@/presentation/stores/transcriptStore'
  * - 提供 UI 層常用的計算屬性和方法
  */
 export function useHighlight() {
-  const highlightStore = useHighlightStore()
-  const transcriptStore = useTranscriptStore()
+  const highlightStore = useHighlightStore();
+  const transcriptStore = useTranscriptStore();
 
   // ========================================
   // Computed Properties
@@ -22,37 +22,37 @@ export function useHighlight() {
   /**
    * 當前高光（來自 store）
    */
-  const currentHighlight = computed(() => highlightStore.currentHighlight)
+  const currentHighlight = computed(() => highlightStore.currentHighlight);
 
   /**
    * 選中的句子 ID 集合（來自 store）
    */
-  const selectedSentenceIds = computed(() => highlightStore.selectedSentenceIds)
+  const selectedSentenceIds = computed(() => highlightStore.selectedSentenceIds);
 
   /**
    * 選中的句子列表（來自 store）
    */
-  const selectedSentences = computed(() => highlightStore.selectedSentences)
+  const selectedSentences = computed(() => highlightStore.selectedSentences);
 
   /**
    * 高光時間範圍（Domain 型別，來自 store）
    */
-  const highlightRanges = computed(() => highlightStore.timeRanges)
+  const highlightRanges = computed(() => highlightStore.timeRanges);
 
   /**
    * 高光時間範圍（簡化版，用於播放器，來自 store）
    */
-  const timeSegments = computed(() => highlightStore.timeSegments)
+  const timeSegments = computed(() => highlightStore.timeSegments);
 
   /**
    * 總時長（秒數，來自 store）
    */
-  const totalDuration = computed(() => highlightStore.totalDuration)
+  const totalDuration = computed(() => highlightStore.totalDuration);
 
   /**
    * 是否載入中（來自 store）
    */
-  const isLoading = computed(() => highlightStore.isLoading)
+  const isLoading = computed(() => highlightStore.isLoading);
 
   // ========================================
   // Methods
@@ -64,7 +64,7 @@ export function useHighlight() {
    * @returns 是否被選中
    */
   function isSentenceSelected(sentenceId: string): boolean {
-    return highlightStore.isSentenceSelected(sentenceId)
+    return highlightStore.isSentenceSelected(sentenceId);
   }
 
   /**
@@ -72,7 +72,7 @@ export function useHighlight() {
    * @param sentenceId 句子 ID
    */
   async function toggleSentence(sentenceId: string): Promise<void> {
-    await highlightStore.toggleSentence(sentenceId)
+    await highlightStore.toggleSentence(sentenceId);
   }
 
   /**
@@ -81,7 +81,7 @@ export function useHighlight() {
    * @returns 對應的句子，若無則返回 undefined
    */
   function getCurrentSentence(currentTime: number): Sentence | undefined {
-    return transcriptStore.getSentenceAtTime(currentTime)
+    return transcriptStore.getSentenceAtTime(currentTime);
   }
 
   // ========================================
@@ -98,5 +98,5 @@ export function useHighlight() {
     isSentenceSelected,
     toggleSentence,
     getCurrentSentence
-  }
+  };
 }

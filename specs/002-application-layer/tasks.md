@@ -25,9 +25,9 @@
 
 **Purpose**: Project initialization and basic structure for Application Layer
 
-- [X] T001 Create Application Layer directory structure in src/application/ (use-cases/, dto/, ports/, errors/)
-- [X] T002 [P] Create barrel export file in src/application/index.ts for clean imports
-- [X] T003 [P] Verify Domain Layer dependencies are available (Video, Transcript, Highlight entities and repositories)
+- [x] T001 Create Application Layer directory structure in src/application/ (use-cases/, dto/, ports/, errors/)
+- [x] T002 [P] Create barrel export file in src/application/index.ts for clean imports
+- [x] T003 [P] Verify Domain Layer dependencies are available (Video, Transcript, Highlight entities and repositories)
 
 **Checkpoint**: Directory structure ready for Use Case implementation ✅
 
@@ -41,30 +41,30 @@
 
 ### DTOs and Shared Types
 
-- [X] T004 [P] Create TranscriptDTO interface in src/application/dto/TranscriptDTO.ts (with SectionDTO and SentenceDTO)
-- [X] T005 [P] Create VideoDTO interface in src/application/dto/VideoDTO.ts
-- [X] T006 [P] Create barrel export in src/application/dto/index.ts
+- [x] T004 [P] Create TranscriptDTO interface in src/application/dto/TranscriptDTO.ts (with SectionDTO and SentenceDTO)
+- [x] T005 [P] Create VideoDTO interface in src/application/dto/VideoDTO.ts
+- [x] T006 [P] Create barrel export in src/application/dto/index.ts
 
 ### Port Interfaces
 
-- [X] T007 [P] Create ITranscriptGenerator port interface in src/application/ports/ITranscriptGenerator.ts
-- [X] T008 [P] Create IFileStorage port interface in src/application/ports/IFileStorage.ts
-- [X] T009 [P] Create IVideoProcessor port interface in src/application/ports/IVideoProcessor.ts (with extractMetadata method)
-- [X] T010 Create barrel export in src/application/ports/index.ts (depends on T007, T008, T009)
+- [x] T007 [P] Create ITranscriptGenerator port interface in src/application/ports/ITranscriptGenerator.ts
+- [x] T008 [P] Create IFileStorage port interface in src/application/ports/IFileStorage.ts
+- [x] T009 [P] Create IVideoProcessor port interface in src/application/ports/IVideoProcessor.ts (with extractMetadata method)
+- [x] T010 Create barrel export in src/application/ports/index.ts (depends on T007, T008, T009)
 
 ### Error Definitions
 
-- [X] T011 Create ApplicationError base class in src/application/errors/ApplicationError.ts
-- [X] T012 [P] Create VideoNotFoundError in src/application/errors/VideoNotFoundError.ts
-- [X] T013 [P] Create InvalidVideoFormatError in src/application/errors/InvalidVideoFormatError.ts
-- [X] T014 [P] Create VideoFileTooLargeError in src/application/errors/VideoFileTooLargeError.ts
-- [X] T015 [P] Create VideoMetadataExtractionError in src/application/errors/VideoMetadataExtractionError.ts
-- [X] T016 [P] Create TranscriptNotFoundError in src/application/errors/TranscriptNotFoundError.ts
-- [X] T017 [P] Create TranscriptGenerationError in src/application/errors/TranscriptGenerationError.ts
-- [X] T018 [P] Create HighlightNotFoundError in src/application/errors/HighlightNotFoundError.ts
-- [X] T019 [P] Create InvalidHighlightNameError in src/application/errors/InvalidHighlightNameError.ts
-- [X] T020 [P] Create FileStorageError in src/application/errors/FileStorageError.ts
-- [X] T021 Create barrel export in src/application/errors/index.ts (depends on T012-T020)
+- [x] T011 Create ApplicationError base class in src/application/errors/ApplicationError.ts
+- [x] T012 [P] Create VideoNotFoundError in src/application/errors/VideoNotFoundError.ts
+- [x] T013 [P] Create InvalidVideoFormatError in src/application/errors/InvalidVideoFormatError.ts
+- [x] T014 [P] Create VideoFileTooLargeError in src/application/errors/VideoFileTooLargeError.ts
+- [x] T015 [P] Create VideoMetadataExtractionError in src/application/errors/VideoMetadataExtractionError.ts
+- [x] T016 [P] Create TranscriptNotFoundError in src/application/errors/TranscriptNotFoundError.ts
+- [x] T017 [P] Create TranscriptGenerationError in src/application/errors/TranscriptGenerationError.ts
+- [x] T018 [P] Create HighlightNotFoundError in src/application/errors/HighlightNotFoundError.ts
+- [x] T019 [P] Create InvalidHighlightNameError in src/application/errors/InvalidHighlightNameError.ts
+- [x] T020 [P] Create FileStorageError in src/application/errors/FileStorageError.ts
+- [x] T021 Create barrel export in src/application/errors/index.ts (depends on T012-T020)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel ✅
 
@@ -78,10 +78,10 @@
 
 ### Implementation for User Story 1
 
-- [X] T022 [US1] Create UploadVideoUseCase in src/application/use-cases/UploadVideoUseCase.ts
-- [X] T023 [US1] Implement validateInput private method in UploadVideoUseCase (format and size validation)
-- [X] T024 [US1] Implement execute method in UploadVideoUseCase (orchestrate validation, IFileStorage.save(), IVideoProcessor.extractMetadata(), Video Entity creation, repository save)
-- [X] T025 [US1] Add JSDoc documentation to UploadVideoUseCase
+- [x] T022 [US1] Create UploadVideoUseCase in src/application/use-cases/UploadVideoUseCase.ts
+- [x] T023 [US1] Implement validateInput private method in UploadVideoUseCase (format and size validation)
+- [x] T024 [US1] Implement execute method in UploadVideoUseCase (orchestrate validation, IFileStorage.save(), IVideoProcessor.extractMetadata(), Video Entity creation, repository save)
+- [x] T025 [US1] Add JSDoc documentation to UploadVideoUseCase
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - developers can upload videos with proper validation ✅
 
@@ -95,12 +95,12 @@
 
 ### Implementation for User Story 2
 
-- [X] T027 [US2] Create ProcessTranscriptUseCase in src/application/use-cases/ProcessTranscriptUseCase.ts
-- [X] T028 [US2] Implement convertToEntity private method in ProcessTranscriptUseCase (DTO → Domain Entity conversion)
-- [X] T029 [US2] Implement convertSectionToEntity private helper method in ProcessTranscriptUseCase
-- [X] T030 [US2] Implement convertSentenceToEntity private helper method in ProcessTranscriptUseCase
-- [X] T031 [US2] Implement execute method in ProcessTranscriptUseCase (video validation, transcript generation, DTO conversion, persistence)
-- [X] T032 [US2] Add JSDoc documentation to ProcessTranscriptUseCase
+- [x] T027 [US2] Create ProcessTranscriptUseCase in src/application/use-cases/ProcessTranscriptUseCase.ts
+- [x] T028 [US2] Implement convertToEntity private method in ProcessTranscriptUseCase (DTO → Domain Entity conversion)
+- [x] T029 [US2] Implement convertSectionToEntity private helper method in ProcessTranscriptUseCase
+- [x] T030 [US2] Implement convertSentenceToEntity private helper method in ProcessTranscriptUseCase
+- [x] T031 [US2] Implement execute method in ProcessTranscriptUseCase (video validation, transcript generation, DTO conversion, persistence)
+- [x] T032 [US2] Add JSDoc documentation to ProcessTranscriptUseCase
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently - developers can upload videos and process transcripts ✅
 
@@ -114,10 +114,10 @@
 
 ### Implementation for User Story 3
 
-- [X] T033 [US3] Create CreateHighlightUseCase in src/application/use-cases/CreateHighlightUseCase.ts
-- [X] T034 [US3] Implement validateInput private method in CreateHighlightUseCase (video existence and name validation)
-- [X] T035 [US3] Implement execute method in CreateHighlightUseCase (validation, highlight creation, persistence)
-- [X] T036 [US3] Add JSDoc documentation to CreateHighlightUseCase
+- [x] T033 [US3] Create CreateHighlightUseCase in src/application/use-cases/CreateHighlightUseCase.ts
+- [x] T034 [US3] Implement validateInput private method in CreateHighlightUseCase (video existence and name validation)
+- [x] T035 [US3] Implement execute method in CreateHighlightUseCase (validation, highlight creation, persistence)
+- [x] T036 [US3] Add JSDoc documentation to CreateHighlightUseCase
 
 **Checkpoint**: User Stories 1, 2, AND 3 should all work independently - full upload → transcript → highlight creation flow available ✅
 
@@ -131,9 +131,9 @@
 
 ### Implementation for User Story 4
 
-- [X] T037 [US4] Create ToggleSentenceInHighlightUseCase in src/application/use-cases/ToggleSentenceInHighlightUseCase.ts
-- [X] T038 [US4] Implement execute method in ToggleSentenceInHighlightUseCase (fetch highlight, toggle sentence, persist)
-- [X] T039 [US4] Add JSDoc documentation to ToggleSentenceInHighlightUseCase
+- [x] T037 [US4] Create ToggleSentenceInHighlightUseCase in src/application/use-cases/ToggleSentenceInHighlightUseCase.ts
+- [x] T038 [US4] Implement execute method in ToggleSentenceInHighlightUseCase (fetch highlight, toggle sentence, persist)
+- [x] T039 [US4] Add JSDoc documentation to ToggleSentenceInHighlightUseCase
 
 **Checkpoint**: Highlight editing workflow complete - developers can create highlights and toggle sentence selections ✅
 
@@ -147,9 +147,9 @@
 
 ### Implementation for User Story 5
 
-- [X] T040 [US5] Create GenerateHighlightUseCase in src/application/use-cases/GenerateHighlightUseCase.ts
-- [X] T041 [US5] Implement execute method in GenerateHighlightUseCase (fetch aggregates, coordinate highlight and transcript, calculate time ranges and duration)
-- [X] T042 [US5] Add JSDoc documentation to GenerateHighlightUseCase
+- [x] T040 [US5] Create GenerateHighlightUseCase in src/application/use-cases/GenerateHighlightUseCase.ts
+- [x] T041 [US5] Implement execute method in GenerateHighlightUseCase (fetch aggregates, coordinate highlight and transcript, calculate time ranges and duration)
+- [x] T042 [US5] Add JSDoc documentation to GenerateHighlightUseCase
 
 **Checkpoint**: All user stories complete - full application workflow from upload to highlight preview generation is available ✅
 
@@ -159,13 +159,13 @@
 
 **Purpose**: Improvements that affect multiple user stories and ensure code quality
 
-- [X] T043 [P] Create barrel export in src/application/use-cases/index.ts (export all Use Cases)
-- [X] T044 [P] Add TypeScript strict mode checks to all Use Cases
-- [X] T045 [P] Verify no circular dependencies between Application and Domain layers
-- [X] T046 Review and update documentation in specs/002-application-layer/ if implementation differs from plan
-- [X] T047 [P] Run type checking: npm run type-check
-- [X] T048 [P] Run linting: npm run lint
-- [X] T049 Verify all Use Cases follow single responsibility principle (< 100 lines per execute method)
+- [x] T043 [P] Create barrel export in src/application/use-cases/index.ts (export all Use Cases)
+- [x] T044 [P] Add TypeScript strict mode checks to all Use Cases
+- [x] T045 [P] Verify no circular dependencies between Application and Domain layers
+- [x] T046 Review and update documentation in specs/002-application-layer/ if implementation differs from plan
+- [x] T047 [P] Run type checking: npm run type-check
+- [x] T048 [P] Run linting: npm run lint
+- [x] T049 Verify all Use Cases follow single responsibility principle (< 100 lines per execute method)
 
 ---
 
@@ -199,18 +199,22 @@
 ### Parallel Opportunities
 
 **Phase 1 Setup**:
+
 - T002 and T003 can run in parallel
 
 **Phase 2 Foundational**:
+
 - DTOs (T004, T005) can run in parallel
 - Ports (T007, T008) can run in parallel
 - All error classes (T011-T019) can run in parallel
 
 **Phase 3-7 User Stories**:
+
 - Once Phase 2 is complete, ALL user stories (Phase 3, 4, 5, 6, 7) can be implemented in parallel by different developers
 - Each Use Case is in a separate file with no shared state
 
 **Phase 8 Polish**:
+
 - T042, T043, T044, T046, T047 can run in parallel
 
 ---
@@ -315,6 +319,7 @@ With multiple developers:
 **MVP = User Stories 1 & 2 (both P1 priority)**
 
 This provides:
+
 - Video upload with validation (format, size)
 - Video metadata extraction
 - File storage integration
@@ -323,6 +328,7 @@ This provides:
 - Full error handling
 
 This MVP enables testing the complete "upload → transcript" workflow and validates:
+
 - Application Layer architecture
 - Port interfaces design
 - Error handling strategy

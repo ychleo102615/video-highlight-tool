@@ -13,8 +13,8 @@
  */
 
 defineOptions({
-  name: 'SplitLayout',
-})
+  name: 'SplitLayout'
+});
 </script>
 
 <template>

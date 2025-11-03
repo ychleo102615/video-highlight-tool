@@ -23,9 +23,10 @@
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
 **Phase 0 Check**:
+
 - ✅ **Clean Architecture**: 遵循四層架構 (Domain → Application → Infrastructure/Presentation)
 - ✅ **Infrastructure/Presentation 分離**: Use Case 在 Application Layer，Repository 在 Infrastructure，Store 在 Presentation
 - ✅ **Port 解耦**: RestoreSessionUseCase 依賴 IVideoRepository/ITranscriptRepository/IHighlightRepository (已定義)
@@ -37,6 +38,7 @@
 - ✅ **反幻覺指示**: 所有不確定的實作細節標註為「NEEDS CLARIFICATION」，在 Phase 0 research 中解決
 
 **Phase 1 Re-check**:
+
 - ✅ **Clean Architecture**: 設計遵循四層架構，RestoreSessionUseCase 在 Application Layer，Repository 實作在 Infrastructure，Store 在 Presentation
 - ✅ **Infrastructure/Presentation 分離**: BrowserStorage 和 Repository 實作在 Infrastructure，Store 和 composables 在 Presentation，無直接依賴
 - ✅ **Port 解耦**: RestoreSessionUseCase 依賴 Repository 介面（IVideoRepository 等），不直接依賴實作類別
@@ -153,6 +155,7 @@ tests/
 ```
 
 **Structure Decision**: 本專案採用 Clean Architecture 單專案結構，分為四層：Domain (核心業務)、Application (應用服務)、Infrastructure (技術實作)、Presentation (UI)。本功能主要涉及：
+
 1. **Application Layer**: 新增 RestoreSessionUseCase 和 SessionStateDTO
 2. **Infrastructure Layer**: 擴充 BrowserStorage 和三個 Repository 的批量查詢功能
 3. **Presentation Layer**: 擴充 videoStore 和通知顯示，在 App.vue 啟動時調用

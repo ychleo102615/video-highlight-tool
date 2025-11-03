@@ -5,7 +5,7 @@
 **Status**: Draft
 **Input**: User description: "開發 Domain Layer - 定義核心業務實體、值物件和儲存庫介面"
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - 視頻實體管理 (Priority: P1)
 
@@ -110,7 +110,7 @@
 - **時間範圍 - 相同時間**: 當 TimeRange 的 start 和 end 相同時,duration 應為 0,且合法
 - **跨聚合查詢 - Transcript 不存在**: 當 Highlight 調用 `getSelectedSentences` 但傳入的 Transcript 不包含選中的句子 ID 時,應該過濾掉不存在的句子,而非拋出錯誤
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -176,7 +176,7 @@
 - **TimeRange (Value Object)**: 代表一個時間範圍,提供時長計算和包含檢查功能,確保範圍的合法性。
 - **VideoMetadata (Value Object)**: 封裝視頻的元數據(時長、尺寸、格式等),作為 Video 實體的屬性。
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

@@ -16,6 +16,7 @@
 ## Path Conventions
 
 本專案為單一 Vue 3 TypeScript 專案:
+
 - **Source**: `src/` (repository root)
 - **Tests**: `tests/` (repository root)
 
@@ -25,10 +26,10 @@
 
 **Purpose**: 專案初始化和基礎結構建立
 
-- [X] T001 安裝 idb 套件依賴 (執行 `npm install idb`)
-- [X] T002 [P] 建立專案級 DI 目錄結構 (src/di/)
-- [X] T003 [P] 建立 Infrastructure Layer 目錄結構 (src/infrastructure/{api,repositories,storage,utils})
-- [X] T004 [P] 建立測試目錄結構 (tests/unit/infrastructure/, tests/unit/di/)
+- [x] T001 安裝 idb 套件依賴 (執行 `npm install idb`)
+- [x] T002 [P] 建立專案級 DI 目錄結構 (src/di/)
+- [x] T003 [P] 建立 Infrastructure Layer 目錄結構 (src/infrastructure/{api,repositories,storage,utils})
+- [x] T004 [P] 建立測試目錄結構 (tests/unit/infrastructure/, tests/unit/di/)
 
 ---
 
@@ -38,15 +39,15 @@
 
 **⚠️ CRITICAL**: 所有 User Story 工作都依賴此階段完成
 
-- [X] T005 建立 DI Container 基礎結構 (src/di/container.ts) - 建立 Container 類別,提供 register() 和 resolve() 方法
-- [X] T006 在 DI Container 中實作 Singleton 生命週期管理 - 確保 BrowserStorage 等共享實例僅建立一次
-- [X] T007 建立 Persistence DTO 定義 (src/infrastructure/storage/dto/VideoPersistenceDTO.ts)
-- [X] T008 [P] 建立 Persistence DTO 定義 (src/infrastructure/storage/dto/TranscriptPersistenceDTO.ts)
-- [X] T009 [P] 建立 Persistence DTO 定義 (src/infrastructure/storage/dto/HighlightPersistenceDTO.ts)
-- [X] T010 建立 DTO Mapper 工具類別 (src/infrastructure/utils/dto-mapper.ts) - 包含 Entity ↔ PersistenceDTO 雙向轉換
-- [X] T011 [P] 建立 JSON Validator 工具類別 (src/infrastructure/utils/json-validator.ts) - 驗證 Mock AI JSON 格式
-- [X] T012 實作 BrowserStorage 內部工具類別 (src/infrastructure/storage/BrowserStorage.ts) - 封裝 IndexedDB + SessionStorage 操作,包含 init(), save/restore 方法, cleanupStaleData()
-- [X] T013 在 DI Container 中註冊 BrowserStorage 為 Singleton - 確保所有 Repository 共用同一個 BrowserStorage 實例
+- [x] T005 建立 DI Container 基礎結構 (src/di/container.ts) - 建立 Container 類別,提供 register() 和 resolve() 方法
+- [x] T006 在 DI Container 中實作 Singleton 生命週期管理 - 確保 BrowserStorage 等共享實例僅建立一次
+- [x] T007 建立 Persistence DTO 定義 (src/infrastructure/storage/dto/VideoPersistenceDTO.ts)
+- [x] T008 [P] 建立 Persistence DTO 定義 (src/infrastructure/storage/dto/TranscriptPersistenceDTO.ts)
+- [x] T009 [P] 建立 Persistence DTO 定義 (src/infrastructure/storage/dto/HighlightPersistenceDTO.ts)
+- [x] T010 建立 DTO Mapper 工具類別 (src/infrastructure/utils/dto-mapper.ts) - 包含 Entity ↔ PersistenceDTO 雙向轉換
+- [x] T011 [P] 建立 JSON Validator 工具類別 (src/infrastructure/utils/json-validator.ts) - 驗證 Mock AI JSON 格式
+- [x] T012 實作 BrowserStorage 內部工具類別 (src/infrastructure/storage/BrowserStorage.ts) - 封裝 IndexedDB + SessionStorage 操作,包含 init(), save/restore 方法, cleanupStaleData()
+- [x] T013 在 DI Container 中註冊 BrowserStorage 為 Singleton - 確保所有 Repository 共用同一個 BrowserStorage 實例
 
 **Checkpoint**: 基礎設施就緒 - User Story 實作可開始進行
 
@@ -60,14 +61,14 @@
 
 ### Implementation for User Story 1
 
-- [X] T014 [US1] 實作 MockAIService 類別基本結構 (src/infrastructure/api/MockAIService.ts) - 實作 ITranscriptGenerator 介面,建立 mockDataMap: Map<string, string>
-- [X] T015 [US1] 實作 setMockData(videoId, jsonContent) 公開方法 - 暫存 JSON 字串到記憶體 Map
-- [X] T016 [US1] 實作 generate(videoId) 方法 - 從 Map 讀取 JSON,若不存在則拋出錯誤「找不到 videoId 的 Mock 資料,請先上傳 JSON 檔案」
-- [X] T017 [US1] 在 generate() 中整合 JSONValidator - 驗證必要欄位 (sections, sentences),缺失則拋出明確錯誤訊息
-- [X] T018 [US1] 在 generate() 中實作寬鬆補完邏輯 - isHighlightSuggestion 預設 false, fullText 由句子 text 拼接生成
-- [X] T019 [US1] 在 generate() 中實作時間戳合理性檢查 - 時間重疊或順序錯誤發出 console.warn 但不阻斷
-- [X] T020 [US1] 在 generate() 中添加 1.5 秒模擬延遲 (使用 setTimeout/Promise.delay)
-- [X] T021 [US1] 在 generate() 中使用 DTOMapper 將解析結果轉換為 TranscriptDTO (Application Layer DTO)
+- [x] T014 [US1] 實作 MockAIService 類別基本結構 (src/infrastructure/api/MockAIService.ts) - 實作 ITranscriptGenerator 介面,建立 mockDataMap: Map<string, string>
+- [x] T015 [US1] 實作 setMockData(videoId, jsonContent) 公開方法 - 暫存 JSON 字串到記憶體 Map
+- [x] T016 [US1] 實作 generate(videoId) 方法 - 從 Map 讀取 JSON,若不存在則拋出錯誤「找不到 videoId 的 Mock 資料,請先上傳 JSON 檔案」
+- [x] T017 [US1] 在 generate() 中整合 JSONValidator - 驗證必要欄位 (sections, sentences),缺失則拋出明確錯誤訊息
+- [x] T018 [US1] 在 generate() 中實作寬鬆補完邏輯 - isHighlightSuggestion 預設 false, fullText 由句子 text 拼接生成
+- [x] T019 [US1] 在 generate() 中實作時間戳合理性檢查 - 時間重疊或順序錯誤發出 console.warn 但不阻斷
+- [x] T020 [US1] 在 generate() 中添加 1.5 秒模擬延遲 (使用 setTimeout/Promise.delay)
+- [x] T021 [US1] 在 generate() 中使用 DTOMapper 將解析結果轉換為 TranscriptDTO (Application Layer DTO)
 
 **Checkpoint**: MockAIService 完整功能可獨立測試 - setMockData() → generate() → 返回正確 TranscriptDTO
 
@@ -81,10 +82,10 @@
 
 ### Implementation for User Story 2
 
-- [X] T022 [US2] 實作 FileStorageService 類別 (src/infrastructure/storage/FileStorageService.ts) - 實作 IFileStorage 介面
-- [X] T023 [US2] 實作 save(file: File) 方法 - 使用 URL.createObjectURL() 生成 blob URL,返回 URL 字串
-- [X] T024 [US2] 實作 delete(url: string) 方法 - 使用 URL.revokeObjectURL() 釋放資源
-- [X] T025 [US2] 添加錯誤處理 - 捕獲 URL 操作失敗,發出 console.warn 但不拋出例外
+- [x] T022 [US2] 實作 FileStorageService 類別 (src/infrastructure/storage/FileStorageService.ts) - 實作 IFileStorage 介面
+- [x] T023 [US2] 實作 save(file: File) 方法 - 使用 URL.createObjectURL() 生成 blob URL,返回 URL 字串
+- [x] T024 [US2] 實作 delete(url: string) 方法 - 使用 URL.revokeObjectURL() 釋放資源
+- [x] T025 [US2] 添加錯誤處理 - 捕獲 URL 操作失敗,發出 console.warn 但不拋出例外
 
 **Checkpoint**: FileStorageService 完整功能可獨立測試 - save() 生成有效 URL, delete() 釋放資源
 
@@ -98,14 +99,14 @@
 
 ### Implementation for User Story 3
 
-- [X] T026 [US3] 實作 VideoRepositoryImpl 類別 (src/infrastructure/repositories/VideoRepositoryImpl.ts) - 實作 IVideoRepository 介面,建立 videos: Map<string, Video>
-- [X] T027 [US3] 在建構函式注入 BrowserStorage 依賴 - private browserStorage: BrowserStorage
-- [X] T028 [US3] 實作 save(video: Video) 方法 - 儲存到記憶體 Map,並調用 browserStorage.saveVideo(persistenceDto)
-- [X] T029 [US3] 在 save() 中使用 DTOMapper 轉換 Entity → VideoPersistenceDTO (包含 savedAt, sessionId)
-- [X] T030 [US3] 實作 findById(id: string) 方法 - 先查記憶體 Map,找不到則調用 browserStorage.restoreVideo()
-- [X] T031 [US3] 在 findById() 中使用 DTOMapper 轉換 VideoPersistenceDTO → Entity (若從 IndexedDB 恢復)
-- [X] T032 [US3] 確保 findById() 查詢不存在 ID 時返回 null (不拋出例外)
-- [X] T033 [US3] 添加錯誤處理 - 捕獲 BrowserStorage 錯誤,記錄 console.warn 但不阻斷主流程
+- [x] T026 [US3] 實作 VideoRepositoryImpl 類別 (src/infrastructure/repositories/VideoRepositoryImpl.ts) - 實作 IVideoRepository 介面,建立 videos: Map<string, Video>
+- [x] T027 [US3] 在建構函式注入 BrowserStorage 依賴 - private browserStorage: BrowserStorage
+- [x] T028 [US3] 實作 save(video: Video) 方法 - 儲存到記憶體 Map,並調用 browserStorage.saveVideo(persistenceDto)
+- [x] T029 [US3] 在 save() 中使用 DTOMapper 轉換 Entity → VideoPersistenceDTO (包含 savedAt, sessionId)
+- [x] T030 [US3] 實作 findById(id: string) 方法 - 先查記憶體 Map,找不到則調用 browserStorage.restoreVideo()
+- [x] T031 [US3] 在 findById() 中使用 DTOMapper 轉換 VideoPersistenceDTO → Entity (若從 IndexedDB 恢復)
+- [x] T032 [US3] 確保 findById() 查詢不存在 ID 時返回 null (不拋出例外)
+- [x] T033 [US3] 添加錯誤處理 - 捕獲 BrowserStorage 錯誤,記錄 console.warn 但不阻斷主流程
 
 **Checkpoint**: VideoRepositoryImpl 完整功能可獨立測試 - save() → findById() → 返回正確 Entity,刷新後可從 IndexedDB 恢復
 
@@ -119,15 +120,15 @@
 
 ### Implementation for User Story 4
 
-- [X] T034 [US4] 實作 TranscriptRepositoryImpl 類別 (src/infrastructure/repositories/TranscriptRepositoryImpl.ts) - 實作 ITranscriptRepository 介面,建立 transcripts: Map<string, Transcript>
-- [X] T035 [US4] 在建構函式注入 BrowserStorage 依賴 - private browserStorage: BrowserStorage
-- [X] T036 [US4] 實作 save(transcript: Transcript) 方法 - 儲存到記憶體 Map,並調用 browserStorage.saveTranscript(persistenceDto)
-- [X] T037 [US4] 在 save() 中使用 DTOMapper 轉換 Entity → TranscriptPersistenceDTO (包含 savedAt, sessionId)
-- [X] T038 [US4] 實作 findById(id: string) 方法 - 先查記憶體 Map,找不到則調用 browserStorage.restoreTranscript()
-- [X] T039 [US4] 實作 findByVideoId(videoId: string) 方法 - 先查記憶體 Map (遍歷比對 videoId),找不到則調用 browserStorage.restoreTranscriptByVideoId()
-- [X] T040 [US4] 在 findById() 和 findByVideoId() 中使用 DTOMapper 轉換 TranscriptPersistenceDTO → Entity
-- [X] T041 [US4] 確保查詢方法返回 null (而非拋出例外) 當資料不存在時
-- [X] T042 [US4] 添加錯誤處理 - 捕獲 BrowserStorage 錯誤,記錄 console.warn 但不阻斷主流程
+- [x] T034 [US4] 實作 TranscriptRepositoryImpl 類別 (src/infrastructure/repositories/TranscriptRepositoryImpl.ts) - 實作 ITranscriptRepository 介面,建立 transcripts: Map<string, Transcript>
+- [x] T035 [US4] 在建構函式注入 BrowserStorage 依賴 - private browserStorage: BrowserStorage
+- [x] T036 [US4] 實作 save(transcript: Transcript) 方法 - 儲存到記憶體 Map,並調用 browserStorage.saveTranscript(persistenceDto)
+- [x] T037 [US4] 在 save() 中使用 DTOMapper 轉換 Entity → TranscriptPersistenceDTO (包含 savedAt, sessionId)
+- [x] T038 [US4] 實作 findById(id: string) 方法 - 先查記憶體 Map,找不到則調用 browserStorage.restoreTranscript()
+- [x] T039 [US4] 實作 findByVideoId(videoId: string) 方法 - 先查記憶體 Map (遍歷比對 videoId),找不到則調用 browserStorage.restoreTranscriptByVideoId()
+- [x] T040 [US4] 在 findById() 和 findByVideoId() 中使用 DTOMapper 轉換 TranscriptPersistenceDTO → Entity
+- [x] T041 [US4] 確保查詢方法返回 null (而非拋出例外) 當資料不存在時
+- [x] T042 [US4] 添加錯誤處理 - 捕獲 BrowserStorage 錯誤,記錄 console.warn 但不阻斷主流程
 
 **Checkpoint**: TranscriptRepositoryImpl 完整功能可獨立測試 - save() → findByVideoId() → 返回正確 Transcript
 
@@ -141,16 +142,16 @@
 
 ### Implementation for User Story 5
 
-- [X] T043 [US5] 實作 HighlightRepositoryImpl 類別 (src/infrastructure/repositories/HighlightRepositoryImpl.ts) - 實作 IHighlightRepository 介面,建立 highlights: Map<string, Highlight>
-- [X] T044 [US5] 在建構函式注入 BrowserStorage 依賴 - private browserStorage: BrowserStorage
-- [X] T045 [US5] 實作 save(highlight: Highlight) 方法 - 儲存到記憶體 Map,並調用 browserStorage.saveHighlight(persistenceDto)
-- [X] T046 [US5] 在 save() 中使用 DTOMapper 轉換 Entity → HighlightPersistenceDTO (selectedSentenceIds Set → Array)
-- [X] T047 [US5] 實作 findById(id: string) 方法 - 先查記憶體 Map,找不到則調用 browserStorage.restoreHighlight()
-- [X] T048 [US5] 實作 findByVideoId(videoId: string) 方法 - 先查記憶體 Map (遍歷比對 videoId),找不到則調用 browserStorage.restoreHighlightsByVideoId()
-- [X] T049 [US5] 在 findById() 和 findByVideoId() 中使用 DTOMapper 轉換 HighlightPersistenceDTO → Entity
-- [X] T050 [US5] 在 DTOMapper 中處理 Highlight 恢復邏輯 - 逐一調用 addSentence() 重建內部狀態
-- [X] T051 [US5] 確保 findByVideoId() 返回空陣列 (而非 null) 當沒有資料時
-- [X] T052 [US5] 添加錯誤處理 - 捕獲 BrowserStorage 錯誤,記錄 console.warn 但不阻斷主流程
+- [x] T043 [US5] 實作 HighlightRepositoryImpl 類別 (src/infrastructure/repositories/HighlightRepositoryImpl.ts) - 實作 IHighlightRepository 介面,建立 highlights: Map<string, Highlight>
+- [x] T044 [US5] 在建構函式注入 BrowserStorage 依賴 - private browserStorage: BrowserStorage
+- [x] T045 [US5] 實作 save(highlight: Highlight) 方法 - 儲存到記憶體 Map,並調用 browserStorage.saveHighlight(persistenceDto)
+- [x] T046 [US5] 在 save() 中使用 DTOMapper 轉換 Entity → HighlightPersistenceDTO (selectedSentenceIds Set → Array)
+- [x] T047 [US5] 實作 findById(id: string) 方法 - 先查記憶體 Map,找不到則調用 browserStorage.restoreHighlight()
+- [x] T048 [US5] 實作 findByVideoId(videoId: string) 方法 - 先查記憶體 Map (遍歷比對 videoId),找不到則調用 browserStorage.restoreHighlightsByVideoId()
+- [x] T049 [US5] 在 findById() 和 findByVideoId() 中使用 DTOMapper 轉換 HighlightPersistenceDTO → Entity
+- [x] T050 [US5] 在 DTOMapper 中處理 Highlight 恢復邏輯 - 逐一調用 addSentence() 重建內部狀態
+- [x] T051 [US5] 確保 findByVideoId() 返回空陣列 (而非 null) 當沒有資料時
+- [x] T052 [US5] 添加錯誤處理 - 捕獲 BrowserStorage 錯誤,記錄 console.warn 但不阻斷主流程
 
 **Checkpoint**: HighlightRepositoryImpl 完整功能可獨立測試 - save() → findByVideoId() → 返回所有相關 Highlight Entity
 
@@ -164,15 +165,15 @@
 
 ### Implementation for User Story 6
 
-- [X] T053 [US6] 在 BrowserStorage.init() 中實作 sessionId 生成或讀取邏輯 - 格式 `session_${timestamp}_${random}`,儲存到 SessionStorage
-- [X] T054 [US6] 在 BrowserStorage.saveVideo() 中實作視頻大小檢查 - ≤ 50MB 儲存到 IndexedDB (包含 File 物件),> 50MB 僅儲存元資料到 SessionStorage
-- [X] T055 [US6] 在 BrowserStorage.saveVideo() 中為所有 PersistenceDTO 添加 savedAt 和 sessionId
-- [X] T056 [US6] 實作 BrowserStorage.cleanupStaleData() 方法 - 刪除 sessionId 不匹配的資料 (屬於已關閉 Tab)
-- [X] T057 [US6] 在 cleanupStaleData() 中實作 24 小時過期檢查 - 刪除 savedAt 距今超過 24 小時的資料
-- [X] T058 [US6] 在 BrowserStorage.init() 啟動時調用 cleanupStaleData() - 確保啟動時清理過期資料
-- [X] T059 [US6] 在 BrowserStorage.restoreVideo() 中處理大視頻恢復邏輯 - 從 SessionStorage 讀取元資料,file 為 null
-- [X] T060 [US6] 添加 IndexedDB 錯誤處理 - 配額不足時降級為 SessionStorage 模式,發出 console.warn 並提示用戶清理瀏覽器資料
-- [X] T061 [US6] 確保所有 BrowserStorage 方法的錯誤處理一致 - catch 錯誤後 console.warn,返回 null/空陣列,不拋出例外
+- [x] T053 [US6] 在 BrowserStorage.init() 中實作 sessionId 生成或讀取邏輯 - 格式 `session_${timestamp}_${random}`,儲存到 SessionStorage
+- [x] T054 [US6] 在 BrowserStorage.saveVideo() 中實作視頻大小檢查 - ≤ 50MB 儲存到 IndexedDB (包含 File 物件),> 50MB 僅儲存元資料到 SessionStorage
+- [x] T055 [US6] 在 BrowserStorage.saveVideo() 中為所有 PersistenceDTO 添加 savedAt 和 sessionId
+- [x] T056 [US6] 實作 BrowserStorage.cleanupStaleData() 方法 - 刪除 sessionId 不匹配的資料 (屬於已關閉 Tab)
+- [x] T057 [US6] 在 cleanupStaleData() 中實作 24 小時過期檢查 - 刪除 savedAt 距今超過 24 小時的資料
+- [x] T058 [US6] 在 BrowserStorage.init() 啟動時調用 cleanupStaleData() - 確保啟動時清理過期資料
+- [x] T059 [US6] 在 BrowserStorage.restoreVideo() 中處理大視頻恢復邏輯 - 從 SessionStorage 讀取元資料,file 為 null
+- [x] T060 [US6] 添加 IndexedDB 錯誤處理 - 配額不足時降級為 SessionStorage 模式,發出 console.warn 並提示用戶清理瀏覽器資料
+- [x] T061 [US6] 確保所有 BrowserStorage 方法的錯誤處理一致 - catch 錯誤後 console.warn,返回 null/空陣列,不拋出例外
 
 **Checkpoint**: BrowserStorage 完整持久化功能可獨立測試 - 小視頻刷新後完整恢復,大視頻刷新後元資料恢復
 
@@ -182,16 +183,16 @@
 
 **Purpose**: 跨多個 User Story 的改進和最終整合
 
-- [X] T062 [P] 程式碼審查與重構 - 確保符合 Clean Architecture 分層原則,無違反依賴規則
-- [X] T063 [P] 添加 TypeScript 型別完整性檢查 - 確保型別覆蓋率 > 90%
-- [X] T064 在 DI Container 中註冊 MockAIService - 註冊為 Singleton,提供給 Use Case 使用
-- [X] T065 [P] 在 DI Container 中註冊 FileStorageService - 註冊為 Singleton
-- [X] T066 在 DI Container 中註冊所有 Repository 實作 - VideoRepositoryImpl, TranscriptRepositoryImpl, HighlightRepositoryImpl (依賴 BrowserStorage)
-- [X] T067 驗證 DI Container 可正確解析所有依賴 - 透過單元測試驗證 resolve() 方法返回正確實例
-- [X] T068 驗證 quickstart.md 中的所有使用範例 - 確保程式碼範例可執行且正確
+- [x] T062 [P] 程式碼審查與重構 - 確保符合 Clean Architecture 分層原則,無違反依賴規則
+- [x] T063 [P] 添加 TypeScript 型別完整性檢查 - 確保型別覆蓋率 > 90%
+- [x] T064 在 DI Container 中註冊 MockAIService - 註冊為 Singleton,提供給 Use Case 使用
+- [x] T065 [P] 在 DI Container 中註冊 FileStorageService - 註冊為 Singleton
+- [x] T066 在 DI Container 中註冊所有 Repository 實作 - VideoRepositoryImpl, TranscriptRepositoryImpl, HighlightRepositoryImpl (依賴 BrowserStorage)
+- [x] T067 驗證 DI Container 可正確解析所有依賴 - 透過單元測試驗證 resolve() 方法返回正確實例
+- [x] T068 驗證 quickstart.md 中的所有使用範例 - 確保程式碼範例可執行且正確
 - [ ] T069 [P] 效能驗證 - 確保 Repository CRUD < 10ms, MockAI generate() ≈ 1.5s, IndexedDB 讀寫 < 100ms
 - [ ] T070 [P] 安全性檢查 - 確保無 XSS, 注入等漏洞,blob URL 生命週期正確管理
-- [X] T071 文件更新 - 更新 main.ts 初始化 DI Container,添加錯誤處理和啟動日誌
+- [x] T071 文件更新 - 更新 main.ts 初始化 DI Container,添加錯誤處理和啟動日誌
 
 ---
 

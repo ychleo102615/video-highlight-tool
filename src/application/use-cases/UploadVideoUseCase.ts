@@ -94,5 +94,4 @@ export class UploadVideoUseCase {
       throw new VideoFileTooLargeError(file.size, MAX_FILE_SIZE);
     }
   }
-
 }

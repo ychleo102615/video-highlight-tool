@@ -49,9 +49,10 @@
 ✅ **PASS** - Testable requirements: Each functional requirement (FR-001 through FR-020) is specific and verifiable. For example, "FR-003: MockAIService MUST 模擬 1.5 秒的處理延遲" can be objectively tested.
 
 ✅ **PASS** - Measurable success criteria: All success criteria (SC-001 through SC-007) include specific metrics:
-  - SC-001: "2 秒內" and "至少 5 個段落和 15 個句子"
-  - SC-002: "少於 10 毫秒"
-  - SC-004: "測試覆蓋率達到 90% 以上"
+
+- SC-001: "2 秒內" and "至少 5 個段落和 15 個句子"
+- SC-002: "少於 10 毫秒"
+- SC-004: "測試覆蓋率達到 90% 以上"
 
 ✅ **PASS** - Technology-agnostic criteria: Success criteria focus on outcomes (response time, data completeness, resource management) rather than implementation details.
 
@@ -78,6 +79,7 @@
 All validation items passed successfully after adding persistence requirements. The specification is complete, unambiguous, and ready for the planning phase (`/speckit.plan`).
 
 **Notable Strengths**:
+
 1. Well-structured prioritization (P1 for core data sources, P2 for persistence and repositories, P3 for advanced features)
 2. Comprehensive edge case coverage (11 scenarios including persistence failures, storage quotas, and cross-tab behavior)
 3. Clear separation between in-scope (IndexedDB + SessionStorage for refresh recovery) and out-of-scope (long-term storage, cross-tab sync)
@@ -86,6 +88,7 @@ All validation items passed successfully after adding persistence requirements. 
 6. Persistence strategy is pragmatic: 50MB threshold balances user experience with implementation complexity
 
 **Changes in Update (2025-10-30 - Revision 2)**:
+
 - Added User Story 6: Basic Persistence for Accidental Refresh (Priority P2)
 - Added FR-021 to FR-027: BrowserStorage (internal helper) requirements
 - **CRITICAL ARCHITECTURE CORRECTION**: Replaced `IPersistenceService` interface with `BrowserStorage` internal tool class
@@ -100,6 +103,7 @@ All validation items passed successfully after adding persistence requirements. 
 - Updated Out of Scope: Clarified that long-term storage and cross-tab sync are excluded
 
 **Implementation Approach**:
+
 - Repository handles in-memory Map + delegates to BrowserStorage for persistence
 - BrowserStorage is injected into Repository via constructor (concrete class, not interface)
 - Small videos (≤ 50MB): Full file recovery via IndexedDB
@@ -108,12 +112,14 @@ All validation items passed successfully after adding persistence requirements. 
 - Automatic cleanup: BrowserStorage checks sessionId on init(), cleans stale data from closed tabs
 
 **Architecture Compliance**:
+
 - ✅ Infrastructure Layer does NOT define new interfaces
 - ✅ Only implements interfaces from Domain Layer (IVideoRepository) and Application Layer (ITranscriptGenerator, IFileStorage)
 - ✅ BrowserStorage is an internal implementation detail, not exposed as port
 - ✅ No changes needed to 002-application-layer spec
 
 **Minor Observations**:
+
 - FR-003, FR-008, FR-009, FR-021 mention specific technologies (setTimeout, URL.createObjectURL, IndexedDB) which are acceptable for Infrastructure Layer specs as they define technical implementation requirements.
 - Success criteria reference specific tools (Chrome DevTools Memory Profiler) for validation clarity.
 - The 50MB threshold is documented as an assumption (adjustable based on testing)

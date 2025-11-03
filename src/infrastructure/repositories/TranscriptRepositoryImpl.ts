@@ -65,7 +65,7 @@ export class TranscriptRepositoryImpl implements ITranscriptRepository {
       console.warn('TranscriptRepository: 儲存轉錄時發生錯誤', {
         transcriptId: transcript.id,
         videoId: transcript.videoId,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? error.message : String(error)
       });
       // 不拋出例外,優雅降級 (記憶體儲存已成功)
     }
@@ -112,7 +112,7 @@ export class TranscriptRepositoryImpl implements ITranscriptRepository {
     } catch (error) {
       console.warn('TranscriptRepository: 查找轉錄時發生錯誤', {
         transcriptId: id,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? error.message : String(error)
       });
       return null; // 優雅降級,返回 null
     }
@@ -160,7 +160,7 @@ export class TranscriptRepositoryImpl implements ITranscriptRepository {
     } catch (error) {
       console.warn('TranscriptRepository: 按視頻 ID 查找轉錄時發生錯誤', {
         videoId: videoId,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? error.message : String(error)
       });
       return null; // 優雅降級,返回 null
     }

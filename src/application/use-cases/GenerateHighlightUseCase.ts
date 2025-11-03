@@ -106,16 +106,13 @@ export class GenerateHighlightUseCase {
     const timeRanges = sortedSentences.map((sentence) => sentence.timeRange);
 
     // 7. 計算總時長
-    const totalDuration = timeRanges.reduce(
-      (total, range) => total + range.durationInSeconds,
-      0
-    );
+    const totalDuration = timeRanges.reduce((total, range) => total + range.durationInSeconds, 0);
 
     // 8. 返回結果
     return {
       sentences: sortedSentences,
       timeRanges,
-      totalDuration,
+      totalDuration
     };
   }
 

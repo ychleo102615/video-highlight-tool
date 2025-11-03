@@ -9,6 +9,7 @@
 ### 1. 視頻上傳模組 (Video Upload Module)
 
 #### 1.1 基本上傳功能
+
 - **功能**: 用戶可以上傳視頻文件
 - **技術需求**:
   - 支援常見視頻格式 (MP4, MOV, WEBM)
@@ -24,6 +25,7 @@
 ### 2. 模擬 AI 處理模組 (Mock AI Processing Module)
 
 #### 2.1 Mock API 設計
+
 - **功能**: 模擬 AI 處理並返回結構化數據
 - **數據結構**:
   ```json
@@ -55,6 +57,7 @@
 ### 3. 用戶界面模組 (User Interface Module)
 
 #### 3.1 整體佈局 (Layout)
+
 - **功能**: 分屏設計
 - **技術需求**:
   - 響應式設計 (RWD)
@@ -68,6 +71,7 @@
   - [ ] 在 iOS/Android Chrome/Safari 上正常運行
 
 #### 3.2 編輯區域 (Editing Area - Left)
+
 - **功能**: 顯示和編輯轉錄內容
 - **子功能**:
   - 顯示段落標題
@@ -85,6 +89,7 @@
   - [ ] 自動滾動保持當前句子可見
 
 #### 3.3 預覽區域 (Preview Area - Right)
+
 - **功能**: 顯示編輯後的高光片段
 - **子功能**:
   - 視頻播放器
@@ -101,6 +106,7 @@
   - [ ] 片段之間過渡流暢（無明顯卡頓）
 
 #### 3.4 雙向同步機制 (Synchronization)
+
 - **編輯區 → 預覽區**:
   - 點擊時間戳 → 更新預覽時間軸
   - 選擇/取消選擇句子 → 更新預覽內容
@@ -116,6 +122,7 @@
 ### 4. 轉錄文字疊加模組 (Transcript Overlay Module)
 
 #### 4.1 文字疊加功能
+
 - **功能**: 在視頻上顯示同步文字
 - **技術需求**:
   - 文字定位（居中、底部等）
@@ -131,23 +138,27 @@
 ## 非功能需求
 
 ### 5.1 性能需求
+
 - 視頻加載時間 < 3 秒（中等大小文件）
 - 句子選擇響應時間 < 100ms
 - 預覽更新延遲 < 200ms
 
 ### 5.2 用戶體驗需求
+
 - 直觀的操作界面
 - 清晰的視覺反饋
 - 流暢的動畫過渡
 - 適當的加載狀態提示
 
 ### 5.3 代碼質量需求
+
 - TypeScript 型別覆蓋率 > 90%
 - 遵循 Clean Architecture 和 DDD 原則
 - 組件可測試性
 - 代碼文檔完整
 
 ### 5.4 瀏覽器兼容性
+
 - **桌面**:
   - Windows & Mac 最新版 Chrome
 - **移動**:
@@ -157,12 +168,14 @@
 ## 開發任務清單
 
 ### Phase 1: 專案設置與基礎架構
+
 - [ ] 初始化 Vue 3 專案（使用 Vite）
 - [ ] 設置 TypeScript 配置
 - [ ] 設置 Clean Architecture 資料夾結構
 - [ ] 配置 Pinia 狀態管理
 
 ### Phase 2: Domain Layer 開發
+
 - [x] 定義 Video Entity
 - [x] 定義 Transcript Entity (Section, Sentence)
 - [x] 定義 Highlight Entity
@@ -170,6 +183,7 @@
 - [x] 定義 Repository Interfaces
 
 ### Phase 3: Application Layer 開發
+
 - [ ] 定義 Port 介面 (ITranscriptGenerator, IFileStorage)
 - [ ] 實作 UploadVideo Use Case
 - [ ] 實作 ProcessTranscript Use Case
@@ -178,6 +192,7 @@
 - [ ] 實作 GenerateHighlight Use Case
 
 ### Phase 4: Infrastructure Layer 開發
+
 - [ ] 實作 Repository Implementations
 - [ ] VideoRepositoryImpl
 - [ ] TranscriptRepositoryImpl
@@ -186,6 +201,7 @@
 - [ ] 實作 FileStorageService (IFileStorage)
 
 ### Phase 5: Presentation Layer 開發
+
 - [ ] 設置 Pinia Stores
 - [ ] videoStore
 - [ ] transcriptStore
@@ -207,6 +223,7 @@
 - [ ] 實作雙向同步邏輯
 
 ### Phase 6: 功能整合與優化
+
 - [ ] 整合所有模組
 - [ ] 實作響應式設計 (RWD)
 - [ ] 性能優化（懶加載、防抖等）
@@ -214,6 +231,7 @@
 - [ ] 動畫和過渡效果優化
 
 ### Phase 7: 測試與部署
+
 - [ ] 單元測試（關鍵 Use Cases）
 - [ ] 組件測試（主要 UI 組件）
 - [ ] 跨瀏覽器測試
@@ -224,6 +242,7 @@
 ## Mock 數據設計考慮
 
 ### 數據真實性
+
 - 使用合理的視頻時長（2-5 分鐘）
 - 轉錄內容應該合理分段（5-10 個段落）
 - 每個段落 3-8 個句子
@@ -231,6 +250,7 @@
 - 建議高光佔總內容的 20-30%
 
 ### 數據多樣性
+
 - 準備 2-3 組不同主題的 Mock 數據
 - 包含不同長度的句子
 - 包含不同密度的高光分布
@@ -238,6 +258,7 @@
 ## 評估重點提醒
 
 根據 README.md，評估將基於以下標準：
+
 1. ✅ 必要功能的實現
 2. ✅ 代碼質量和組織（Clean Architecture & DDD）
 3. ✅ 文檔質量

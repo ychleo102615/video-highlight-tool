@@ -12,11 +12,12 @@
 本功能使用以下現有的 Domain Entity，**不需要修改**：
 
 ### Video Entity
+
 ```typescript
 // @src/domain/aggregates/Video.ts
 class Video {
   id: string;
-  file: File | null;  // 大視頻恢復時為 null
+  file: File | null; // 大視頻恢復時為 null
   url: string;
   duration: number;
   metadata: VideoMetadata;
@@ -25,10 +26,12 @@ class Video {
 ```
 
 **會話恢復相關欄位**:
+
 - `file`: 小視頻（≤ 50MB）恢復時有值，大視頻（> 50MB）恢復時為 `null`
 - 透過 `file === null` 判斷 `needsReupload` 旗標
 
 ### Transcript Entity
+
 ```typescript
 // @src/domain/aggregates/Transcript/Transcript.ts
 class Transcript {
@@ -40,10 +43,12 @@ class Transcript {
 ```
 
 **會話恢復使用**:
+
 - 透過 `videoId` 關聯到 Video
 - 完整恢復所有 sections 和 sentences
 
 ### Highlight Entity
+
 ```typescript
 // @src/domain/aggregates/Highlight.ts
 class Highlight {
@@ -56,6 +61,7 @@ class Highlight {
 ```
 
 **會話恢復使用**:
+
 - 透過 `videoId` 關聯到 Video
 - 恢復所有選中的句子 ID 和選擇順序
 
@@ -64,6 +70,7 @@ class Highlight {
 需要擴充以下 Repository 介面，新增批量查詢方法：
 
 ### IVideoRepository (擴充)
+
 ```typescript
 // @src/domain/repositories/IVideoRepository.ts
 
@@ -77,12 +84,14 @@ export interface IVideoRepository {
 ```
 
 **findAll() 行為**:
+
 1. 若記憶體 Map 不為空，直接返回記憶體中的所有視頻
 2. 若記憶體 Map 為空，從 BrowserStorage 恢復所有視頻
 3. 恢復後自動填充記憶體 Map
 4. 返回視頻陣列（包含小視頻和大視頻元資料）
 
 ### ITranscriptRepository (擴充)
+
 ```typescript
 // @src/domain/repositories/ITranscriptRepository.ts
 
@@ -96,12 +105,14 @@ export interface ITranscriptRepository {
 ```
 
 **findByVideoId() 行為**:
+
 1. 先嘗試從記憶體 Map 查詢（遍歷查找 videoId 匹配的 Transcript）
 2. 若記憶體中找不到，從 BrowserStorage 恢復
 3. 恢復後填充記憶體 Map
 4. 返回找到的 Transcript，若不存在返回 null
 
 ### IHighlightRepository (擴充)
+
 ```typescript
 // @src/domain/repositories/IHighlightRepository.ts
 
@@ -115,6 +126,7 @@ export interface IHighlightRepository {
 ```
 
 **findByVideoId() 行為**:
+
 1. 先嘗試從記憶體 Map 查詢（遍歷查找 videoId 匹配的 Highlight）
 2. 若記憶體中找不到，從 BrowserStorage 恢復
 3. 恢復後填充記憶體 Map
@@ -125,6 +137,7 @@ export interface IHighlightRepository {
 需要在 BrowserStorage 新增以下批量查詢方法：
 
 ### restoreAllVideos()
+
 ```typescript
 // @src/infrastructure/storage/BrowserStorage.ts
 
@@ -164,6 +177,7 @@ async restoreAllVideos(): Promise<VideoPersistenceDTO[]> {
 ```
 
 ### restoreAllTranscripts()
+
 ```typescript
 async restoreAllTranscripts(): Promise<TranscriptPersistenceDTO[]> {
   try {
@@ -176,6 +190,7 @@ async restoreAllTranscripts(): Promise<TranscriptPersistenceDTO[]> {
 ```
 
 ### restoreAllHighlights()
+
 ```typescript
 async restoreAllHighlights(): Promise<HighlightPersistenceDTO[]> {
   try {
@@ -207,6 +222,7 @@ export class RestoreSessionUseCase {
 ```
 
 **型別說明**:
+
 - `video`: Video Entity（可能沒有 file）
 - `transcript`: Transcript Entity
 - `highlights`: Highlight[] Entity 陣列
@@ -218,6 +234,7 @@ export class RestoreSessionUseCase {
 以下 Persistence DTO 已存在，**不需要修改**：
 
 ### VideoPersistenceDTO
+
 ```typescript
 // @src/infrastructure/storage/dto/VideoPersistenceDTO.ts
 export interface VideoPersistenceDTO {
@@ -237,6 +254,7 @@ export interface VideoPersistenceDTO {
 ```
 
 ### TranscriptPersistenceDTO
+
 ```typescript
 // @src/infrastructure/storage/dto/TranscriptPersistenceDTO.ts
 export interface TranscriptPersistenceDTO {
@@ -250,6 +268,7 @@ export interface TranscriptPersistenceDTO {
 ```
 
 ### HighlightPersistenceDTO
+
 ```typescript
 // @src/infrastructure/storage/dto/HighlightPersistenceDTO.ts
 export interface HighlightPersistenceDTO {
@@ -266,6 +285,7 @@ export interface HighlightPersistenceDTO {
 ## Data Flow
 
 ### 1. 應用啟動流程
+
 ```
 App.vue (onMounted)
   → videoStore.restoreSession()
@@ -286,6 +306,7 @@ App.vue (onMounted)
 ```
 
 ### 2. 資料恢復流程
+
 ```
 Repository.findAll() / findByVideoId()
   ↓
@@ -305,6 +326,7 @@ DTOMapper.toDomain()
 ```
 
 ### 3. 小視頻 vs 大視頻
+
 ```
 小視頻 (≤ 50MB):
   IndexedDB: 完整儲存 (file + metadata)
@@ -320,6 +342,7 @@ DTOMapper.toDomain()
 ## Repository Implementation Changes
 
 ### VideoRepositoryImpl.findAll()
+
 ```typescript
 async findAll(): Promise<Video[]> {
   // 若記憶體不為空，直接返回
@@ -340,6 +363,7 @@ async findAll(): Promise<Video[]> {
 ```
 
 ### TranscriptRepositoryImpl.findByVideoId()
+
 ```typescript
 async findByVideoId(videoId: string): Promise<Transcript | null> {
   // 先查記憶體（遍歷查找）
@@ -361,6 +385,7 @@ async findByVideoId(videoId: string): Promise<Transcript | null> {
 ```
 
 ### HighlightRepositoryImpl.findByVideoId()
+
 ```typescript
 async findByVideoId(videoId: string): Promise<Highlight[]> {
   // 先查記憶體（遍歷查找）
@@ -386,27 +411,32 @@ async findByVideoId(videoId: string): Promise<Highlight[]> {
 ## Error Handling
 
 ### Repository Layer
+
 - IndexedDB 查詢失敗: 返回空陣列 / null（優雅降級）
 - DTO 轉換錯誤: 記錄 console.warn，返回空結果
 
 ### Use Case Layer
+
 - 無會話資料 (videos.length === 0): 返回 `null`
 - 資料不完整 (無 transcript): 拋出 `Error('Transcript not found')`
 - 資料不完整 (無 highlights): 拋出 `Error('Highlight not found')`
 
 ### Store Layer
+
 - Use Case 返回 null: 不顯示訊息，正常啟動
 - Use Case 拋出錯誤: 捕獲錯誤，顯示 `showError('恢復會話失敗，請重新上傳視頻')`
 
 ## Validation Rules
 
 ### RestoreSessionUseCase
+
 1. ✅ 必須存在至少一個 Video
 2. ✅ 必須存在對應的 Transcript（videoId 匹配）
 3. ✅ 必須存在至少一個 Highlight（videoId 匹配）
 4. ❌ 不驗證 Video.file 是否存在（由 needsReupload 旗標處理）
 
 ### BrowserStorage.cleanupStaleData()
+
 1. ✅ 刪除 sessionId 不匹配的資料（其他 Tab 的資料）
 2. ✅ 刪除 savedAt 超過 24 小時的資料
 3. ✅ 在 init() 時自動執行
@@ -414,16 +444,19 @@ async findByVideoId(videoId: string): Promise<Highlight[]> {
 ## Performance Considerations
 
 ### 批量查詢優化
+
 - 使用 `getAll()` 一次性查詢，而非迴圈 `get(id)`
 - 批量查詢時間複雜度: O(n)，n 為資料筆數
 - 預期資料量: 單視頻專案，~10 筆以內
 
 ### 記憶體快取策略
+
 - 首次查詢後填充記憶體 Map
 - 後續查詢直接從記憶體返回（O(1)）
 - 記憶體使用: 小視頻 ~50MB，大視頻 ~1KB（僅元資料）
 
 ### 啟動時間影響
+
 - IndexedDB 查詢: ~50-100ms
 - DTO 轉換: ~10ms
 - 總計影響: < 150ms（符合 < 500ms 目標）
@@ -431,12 +464,14 @@ async findByVideoId(videoId: string): Promise<Highlight[]> {
 ## Testing Considerations
 
 ### 單元測試場景
+
 1. RestoreSessionUseCase 無會話資料 → 返回 null
 2. RestoreSessionUseCase 小視頻恢復 → needsReupload = false
 3. RestoreSessionUseCase 大視頻恢復 → needsReupload = true
 4. RestoreSessionUseCase 資料不完整 → 拋出錯誤
 
 ### E2E 測試場景
+
 1. 小視頻完整恢復 → 視頻可播放，編輯內容完整
 2. 大視頻提示重新上傳 → 顯示提示訊息，編輯內容保留
 3. 首次訪問 → 顯示上傳介面，無提示訊息

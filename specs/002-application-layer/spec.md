@@ -5,7 +5,7 @@
 **Status**: Draft
 **Input**: User description: "實作 Application Layer 開發：定義 Port 介面、實作 5 個 Use Cases"
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - 上傳視頻並儲存 (Priority: P1)
 
@@ -101,7 +101,7 @@
 - 當並發執行多個 ToggleSentenceInHighlightUseCase 時，如何確保狀態一致性？
 - 當視頻文件元數據提取失敗時（如損壞的視頻），UploadVideoUseCase 應該如何處理？
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -138,7 +138,7 @@
 - **Port Interfaces**: ITranscriptGenerator（轉錄生成服務）、IFileStorage（文件儲存服務）、IVideoProcessor（視頻處理服務）
 - **Use Cases**: UploadVideoUseCase, ProcessTranscriptUseCase, CreateHighlightUseCase, ToggleSentenceInHighlightUseCase, GenerateHighlightUseCase
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

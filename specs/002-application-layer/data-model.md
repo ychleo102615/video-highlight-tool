@@ -34,6 +34,7 @@ export interface VideoDTO {
 ```
 
 **範例**:
+
 ```typescript
 {
   duration: 180.5,
@@ -44,6 +45,7 @@ export interface VideoDTO {
 ```
 
 **驗證規則**:
+
 - `duration` 必須 > 0
 - `width` 和 `height` 必須 > 0
 - `format` 必須為支援的 MIME type
@@ -96,6 +98,7 @@ export interface SentenceDTO {
 ```
 
 **範例**:
+
 ```typescript
 {
   videoId: 'video_001',
@@ -139,6 +142,7 @@ export interface SentenceDTO {
 ```
 
 **驗證規則**:
+
 - `videoId` 不可為空
 - `sections` 不可為空陣列
 - 每個 `SentenceDTO` 的 `endTime` 必須 > `startTime`
@@ -167,17 +171,19 @@ export interface ITranscriptGenerator {
 ```
 
 **職責**:
+
 - 接受視頻 ID，調用 AI 服務生成轉錄
 - 返回結構化的 TranscriptDTO
 - 處理 AI 服務錯誤並拋出領域錯誤
 
 **實作範例** (Infrastructure Layer):
+
 ```typescript
 // infrastructure/api/MockAIService.ts
 export class MockAIService implements ITranscriptGenerator {
   async generate(videoId: string): Promise<TranscriptDTO> {
     // 模擬 1.5 秒處理延遲
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
     // 返回 Mock 數據
     return mockTranscriptData;
@@ -212,10 +218,12 @@ export interface IFileStorage {
 ```
 
 **職責**:
+
 - `save`: 儲存文件並返回可用於播放的 URL
 - `delete`: 清理文件資源
 
 **實作範例** (Infrastructure Layer):
+
 ```typescript
 // infrastructure/storage/FileStorageService.ts
 export class FileStorageService implements IFileStorage {
@@ -249,9 +257,11 @@ export interface IVideoProcessor {
 ```
 
 **職責**:
+
 - `extractMetadata`: 從視頻文件中提取元數據（時長、尺寸、格式）
 
 **實作範例** (Infrastructure Layer):
+
 ```typescript
 // infrastructure/video/VideoProcessorService.ts
 export class VideoProcessorService implements IVideoProcessor {
@@ -260,12 +270,7 @@ export class VideoProcessorService implements IVideoProcessor {
       const video = document.createElement('video');
       video.preload = 'metadata';
       video.onloadedmetadata = () => {
-        resolve(new VideoMetadata(
-          video.duration,
-          video.videoWidth,
-          video.videoHeight,
-          file.type
-        ));
+        resolve(new VideoMetadata(video.duration, video.videoWidth, video.videoHeight, file.type));
         URL.revokeObjectURL(video.src);
       };
       video.onerror = () => reject(new VideoMetadataExtractionError());
@@ -276,6 +281,7 @@ export class VideoProcessorService implements IVideoProcessor {
 ```
 
 **使用場景**:
+
 - 在 `UploadVideoUseCase` 中使用，用於上傳視頻時提取元數據
 
 ---
@@ -289,19 +295,23 @@ Use Cases 代表完整的用戶操作流程，協調 Domain Layer 和 Infrastruc
 **職責**: 處理視頻上傳，驗證文件，提取元數據，儲存視頻
 
 **輸入**:
+
 ```typescript
 execute(file: File): Promise<Video>
 ```
 
 **輸出**:
+
 - 成功: 返回建立的 `Video` Entity
 - 失敗: 拋出錯誤
 
 **依賴**:
+
 - `IVideoRepository` (Domain Layer)
 - `IFileStorage` (Application Port)
 
 **流程**:
+
 1. 驗證視頻格式（僅允許 mp4, mov, webm）
 2. 驗證視頻大小（最大 100MB）
 3. 透過 `IFileStorage.save()` 儲存文件，獲取 URL
@@ -311,12 +321,14 @@ execute(file: File): Promise<Video>
 7. 返回 `Video`
 
 **錯誤處理**:
+
 - `InvalidVideoFormatError`: 格式不支援
 - `VideoFileTooLargeError`: 文件過大
 - `VideoMetadataExtractionError`: 元數據提取失敗
 - `FileStorageError`: 儲存失敗
 
 **範例**:
+
 ```typescript
 const uploadVideoUseCase = new UploadVideoUseCase(videoRepository, fileStorage);
 const video = await uploadVideoUseCase.execute(file);
@@ -330,20 +342,24 @@ console.log(`Video uploaded: ${video.id}`);
 **職責**: 處理視頻轉錄，調用 AI 服務，轉換 DTO 為 Domain Entity
 
 **輸入**:
+
 ```typescript
 execute(videoId: string): Promise<Transcript>
 ```
 
 **輸出**:
+
 - 成功: 返回建立的 `Transcript` Entity
 - 失敗: 拋出錯誤
 
 **依賴**:
+
 - `ITranscriptGenerator` (Application Port)
 - `ITranscriptRepository` (Domain Layer)
 - `IVideoRepository` (Domain Layer, 用於驗證視頻存在性)
 
 **流程**:
+
 1. 透過 `IVideoRepository.findById()` 驗證視頻存在
 2. 透過 `ITranscriptGenerator.generate()` 生成轉錄 DTO
 3. 將 `TranscriptDTO` 轉換為 `Transcript` Entity（包含 Section 和 Sentence）
@@ -351,6 +367,7 @@ execute(videoId: string): Promise<Transcript>
 5. 返回 `Transcript`
 
 **DTO → Entity 轉換邏輯**:
+
 ```typescript
 private convertToEntity(dto: TranscriptDTO): Transcript {
   const sections = dto.sections.map(sectionDTO => {
@@ -379,10 +396,12 @@ private convertToEntity(dto: TranscriptDTO): Transcript {
 ```
 
 **錯誤處理**:
+
 - `VideoNotFoundError`: 視頻不存在
 - `TranscriptGenerationError`: AI 服務失敗
 
 **範例**:
+
 ```typescript
 const processTranscriptUseCase = new ProcessTranscriptUseCase(
   transcriptGenerator,
@@ -400,6 +419,7 @@ console.log(`Transcript created: ${transcript.id}`);
 **職責**: 建立新的高光版本，驗證視頻存在性
 
 **輸入**:
+
 ```typescript
 execute(input: CreateHighlightInput): Promise<Highlight>
 
@@ -410,14 +430,17 @@ interface CreateHighlightInput {
 ```
 
 **輸出**:
+
 - 成功: 返回建立的 `Highlight` Entity（初始狀態：無選中句子）
 - 失敗: 拋出錯誤
 
 **依賴**:
+
 - `IHighlightRepository` (Domain Layer)
 - `IVideoRepository` (Domain Layer, 用於驗證視頻存在性)
 
 **流程**:
+
 1. 透過 `IVideoRepository.findById()` 驗證視頻存在
 2. 驗證高光名稱不為空
 3. 建立 `Highlight` Entity（初始 `selectedSentenceIds` 為空）
@@ -425,15 +448,14 @@ interface CreateHighlightInput {
 5. 返回 `Highlight`
 
 **錯誤處理**:
+
 - `VideoNotFoundError`: 視頻不存在
 - `InvalidHighlightNameError`: 名稱為空
 
 **範例**:
+
 ```typescript
-const createHighlightUseCase = new CreateHighlightUseCase(
-  highlightRepository,
-  videoRepository
-);
+const createHighlightUseCase = new CreateHighlightUseCase(highlightRepository, videoRepository);
 const highlight = await createHighlightUseCase.execute({
   videoId: 'video_001',
   name: '精華版'
@@ -448,6 +470,7 @@ console.log(`Highlight created: ${highlight.id}`);
 **職責**: 切換句子在高光中的選中狀態
 
 **輸入**:
+
 ```typescript
 execute(input: ToggleSentenceInput): Promise<void>
 
@@ -458,21 +481,26 @@ interface ToggleSentenceInput {
 ```
 
 **輸出**:
+
 - 成功: `void`（狀態已更新並持久化）
 - 失敗: 拋出錯誤
 
 **依賴**:
+
 - `IHighlightRepository` (Domain Layer)
 
 **流程**:
+
 1. 透過 `IHighlightRepository.findById()` 獲取 Highlight
 2. 調用 `highlight.toggleSentence(sentenceId)` 切換狀態
 3. 透過 `IHighlightRepository.save()` 持久化變更
 
 **錯誤處理**:
+
 - `HighlightNotFoundError`: 高光不存在
 
 **範例**:
+
 ```typescript
 const toggleSentenceUseCase = new ToggleSentenceInHighlightUseCase(highlightRepository);
 await toggleSentenceUseCase.execute({
@@ -489,6 +517,7 @@ console.log('Sentence toggled');
 **職責**: 生成高光預覽數據，協調 Highlight 和 Transcript 兩個聚合
 
 **輸入**:
+
 ```typescript
 execute(input: GenerateHighlightInput): Promise<GenerateHighlightOutput>
 
@@ -499,6 +528,7 @@ interface GenerateHighlightInput {
 ```
 
 **輸出**:
+
 ```typescript
 interface GenerateHighlightOutput {
   /** 選中的句子列表（已排序） */
@@ -513,10 +543,12 @@ interface GenerateHighlightOutput {
 ```
 
 **依賴**:
+
 - `IHighlightRepository` (Domain Layer)
 - `ITranscriptRepository` (Domain Layer)
 
 **流程**:
+
 1. 透過 `IHighlightRepository.findById()` 獲取 Highlight
 2. 透過 `ITranscriptRepository.findByVideoId()` 獲取對應的 Transcript
 3. 調用 `highlight.getSelectedSentences(transcript, sortBy)` 獲取選中的句子
@@ -524,14 +556,17 @@ interface GenerateHighlightOutput {
 5. 返回結果
 
 **排序邏輯**:
+
 - `sortBy: 'selection'`: 按用戶選擇順序排序（`selectionOrder`）
 - `sortBy: 'time'`: 按句子時間順序排序（`startTime`）
 
 **錯誤處理**:
+
 - `HighlightNotFoundError`: 高光不存在
 - `TranscriptNotFoundError`: 轉錄不存在
 
 **範例**:
+
 ```typescript
 const generateHighlightUseCase = new GenerateHighlightUseCase(
   highlightRepository,
@@ -553,7 +588,10 @@ Application Layer 定義的錯誤類別：
 
 ```typescript
 export class ApplicationError extends Error {
-  constructor(message: string, public readonly code: string) {
+  constructor(
+    message: string,
+    public readonly code: string
+  ) {
     super(message);
     this.name = this.constructor.name;
   }
@@ -574,10 +612,7 @@ export class InvalidVideoFormatError extends ApplicationError {
 
 export class VideoFileTooLargeError extends ApplicationError {
   constructor(size: number, maxSize: number) {
-    super(
-      `Video file too large: ${size} bytes. Maximum: ${maxSize} bytes`,
-      'VIDEO_FILE_TOO_LARGE'
-    );
+    super(`Video file too large: ${size} bytes. Maximum: ${maxSize} bytes`, 'VIDEO_FILE_TOO_LARGE');
   }
 }
 

@@ -28,12 +28,14 @@ Follow-up TODOs: None
 ### I. Clean Architecture (NON-NEGOTIABLE)
 
 採用嚴格的分層架構組織程式碼：
+
 - **Domain Layer**: 核心業務邏輯
 - **Application Layer**: 應用服務層，定義 Use Case 和 Port（介面）
 - **Infrastructure Layer**: 技術基礎設施（Repository 實作、API 服務、檔案儲存）
 - **Presentation Layer**: UI 展示層（組件、狀態管理、Composables）
 
 **依賴規則**:
+
 - 內層不得依賴外層
 - Infrastructure 和 Presentation 同層，職責不同，彼此不應直接依賴
 - 通過 Application Layer 定義的 Port（介面）解耦
@@ -96,6 +98,7 @@ src/
 ```
 
 **依賴方向**:
+
 ```
 Infrastructure Layer          Presentation Layer
       ↓                             ↓
@@ -105,6 +108,7 @@ Infrastructure Layer          Presentation Layer
 ```
 
 **強制規則**:
+
 - **Domain Layer**: 只能使用 TypeScript 標準庫與純函式工具庫（需最小化）
 - **Application Layer**: 可依賴 Domain，定義 Use Case、DTO 和 Port（介面）
 - **Infrastructure Layer**: 可依賴 Application 與 Domain，實作 Repository、API 服務、檔案儲存等 Port
@@ -113,26 +117,26 @@ Infrastructure Layer          Presentation Layer
 
 ### 命名規範 (MUST FOLLOW)
 
-| 類型 | 規範 | 範例 |
-|------|------|------|
-| Entity | PascalCase, 名詞 | `Video`, `Transcript` |
-| Value Object | PascalCase, 名詞 | `TimeStamp`, `TimeRange` |
-| Use Case | PascalCase + UseCase 後綴 | `UploadVideoUseCase` |
-| Repository | PascalCase + Repository 後綴 | `VideoRepository` |
-| Store | camelCase + Store 後綴 | `videoStore`, `transcriptStore` |
-| Component | PascalCase | `VideoPlayer.vue` |
-| Composable | camelCase, use 前綴 | `useVideoPlayer`, `useHighlight` |
+| 類型         | 規範                         | 範例                             |
+| ------------ | ---------------------------- | -------------------------------- |
+| Entity       | PascalCase, 名詞             | `Video`, `Transcript`            |
+| Value Object | PascalCase, 名詞             | `TimeStamp`, `TimeRange`         |
+| Use Case     | PascalCase + UseCase 後綴    | `UploadVideoUseCase`             |
+| Repository   | PascalCase + Repository 後綴 | `VideoRepository`                |
+| Store        | camelCase + Store 後綴       | `videoStore`, `transcriptStore`  |
+| Component    | PascalCase                   | `VideoPlayer.vue`                |
+| Composable   | camelCase, use 前綴          | `useVideoPlayer`, `useHighlight` |
 
 ### 性能基準目標
 
-| 指標 | 目標值 | 違反時必須說明 |
-|------|--------|----------------|
-| 首次內容繪製 (FCP) | < 1.5s | 需提供優化計劃 |
-| 最大內容繪製 (LCP) | < 2.5s | 需提供優化計劃 |
-| 視頻上傳回應 | < 100ms | 需說明延遲原因 |
-| 句子選擇回應 | < 50ms | 需說明延遲原因 |
-| 預覽更新延遲 | < 200ms | 需說明延遲原因 |
-| Bundle 大小 | < 500KB (gzip) | 需說明大小合理性 |
+| 指標               | 目標值         | 違反時必須說明   |
+| ------------------ | -------------- | ---------------- |
+| 首次內容繪製 (FCP) | < 1.5s         | 需提供優化計劃   |
+| 最大內容繪製 (LCP) | < 2.5s         | 需提供優化計劃   |
+| 視頻上傳回應       | < 100ms        | 需說明延遲原因   |
+| 句子選擇回應       | < 50ms         | 需說明延遲原因   |
+| 預覽更新延遲       | < 200ms        | 需說明延遲原因   |
+| Bundle 大小        | < 500KB (gzip) | 需說明大小合理性 |
 
 ## Development Workflow
 
@@ -146,6 +150,7 @@ Infrastructure Layer          Presentation Layer
 ### Use Case 建立時機
 
 當符合以下任一條件時，必須建立新的 Use Case：
+
 1. 用戶的一個完整操作流程（如「上傳視頻」）
 2. 需要協調多個 Entity 的操作
 3. 包含業務規則驗證
@@ -154,6 +159,7 @@ Infrastructure Layer          Presentation Layer
 ### Repository Pattern 實作要求
 
 每個 Repository 必須：
+
 1. 在 Domain Layer 定義介面（`IVideoRepository`）
 2. 在 Adapter Layer 提供實作（`VideoRepositoryImpl`）
 3. 透過 DI Container 注入到 Use Case
@@ -161,6 +167,7 @@ Infrastructure Layer          Presentation Layer
 ### Mock 數據品質標準
 
 Mock 數據必須滿足：
+
 - 視頻時長: 2-5 分鐘
 - 段落數: 5-10 個
 - 每段句子數: 3-8 個
@@ -177,6 +184,7 @@ Mock 數據必須滿足：
 ### 修正程序
 
 修正憲法需要：
+
 1. 提出修正提案，說明理由與影響範圍
 2. 更新相關模板（plan-template.md、spec-template.md、tasks-template.md）
 3. 更新 CLAUDE.md 中的相關指示
@@ -186,6 +194,7 @@ Mock 數據必須滿足：
 ### 複雜度豁免
 
 若必須違反某原則（如性能基準），必須：
+
 1. 在 `plan.md` 的 Complexity Tracking 表格中記錄
 2. 說明為何需要違反
 3. 說明為何更簡單的替代方案不可行
@@ -200,6 +209,7 @@ Mock 數據必須滿足：
 ### 合規審查
 
 每個 feature 的 `/speckit.plan` 輸出必須包含 Constitution Check 區塊，驗證：
+
 - ✅ 遵循 Clean Architecture 分層架構（Domain → Application → Infrastructure/Presentation）
 - ✅ Infrastructure 和 Presentation 職責分離，不相互依賴
 - ✅ 通過 Application Layer 的 Port（介面）解耦
@@ -213,6 +223,7 @@ Mock 數據必須滿足：
 ### 執行時開發指導
 
 執行時開發指導請參考 `CLAUDE.md`，其中包含：
+
 - 反幻覺指示的具體執行規則
 - 架構原則的實作範例
 - 常見問題 (FAQ)

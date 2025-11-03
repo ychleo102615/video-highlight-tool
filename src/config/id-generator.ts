@@ -9,7 +9,7 @@ import {
   VIDEO_ID_PREFIX,
   TRANSCRIPT_ID_PREFIX,
   HIGHLIGHT_ID_PREFIX,
-  SENTENCE_ID_PREFIX,
+  SENTENCE_ID_PREFIX
 } from './constants';
 
 /**
@@ -21,7 +21,9 @@ import {
  */
 function generateId(prefix: string, length = 9): string {
   const timestamp = Date.now();
-  const randomString = Math.random().toString(36).substring(2, 2 + length);
+  const randomString = Math.random()
+    .toString(36)
+    .substring(2, 2 + length);
   return `${prefix}${timestamp}_${randomString}`;
 }
 

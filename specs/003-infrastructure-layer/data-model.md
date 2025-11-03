@@ -6,6 +6,7 @@
 ## Overview
 
 本文件定義 Infrastructure Layer 的資料模型設計，包含：
+
 1. **Persistence DTOs**: 用於 IndexedDB 儲存的 Plain Objects（Infrastructure Layer 定義）
 2. **Application DTOs**: 用於跨層傳輸的資料結構（已在 Application Layer 定義）
 3. **DTO ↔ Domain Entity 映射規則**
@@ -17,14 +18,14 @@
 
 本專案中有**兩組** DTO，用途不同但有部分重疊：
 
-| 特性 | Application Layer DTO | Infrastructure Persistence DTO |
-|------|----------------------|-------------------------------|
-| **檔案位置** | `src/application/dto/` | `src/infrastructure/storage/dto/` |
-| **用途** | 跨層資料傳輸（Port 介面） | IndexedDB 持久化儲存 |
-| **使用者** | Use Case, MockAIService | BrowserStorage, Repository |
-| **是否包含 savedAt** | ❌ 否 | ✅ 是 |
-| **是否包含 sessionId** | ❌ 否 | ✅ 是 |
-| **命名規範** | `TranscriptDTO` | `TranscriptPersistenceDTO` 或 `StoredTranscript` |
+| 特性                   | Application Layer DTO     | Infrastructure Persistence DTO                   |
+| ---------------------- | ------------------------- | ------------------------------------------------ |
+| **檔案位置**           | `src/application/dto/`    | `src/infrastructure/storage/dto/`                |
+| **用途**               | 跨層資料傳輸（Port 介面） | IndexedDB 持久化儲存                             |
+| **使用者**             | Use Case, MockAIService   | BrowserStorage, Repository                       |
+| **是否包含 savedAt**   | ❌ 否                     | ✅ 是                                            |
+| **是否包含 sessionId** | ❌ 否                     | ✅ 是                                            |
+| **命名規範**           | `TranscriptDTO`           | `TranscriptPersistenceDTO` 或 `StoredTranscript` |
 
 **重疊的原因**: 兩者都需要表示相同的業務資料，但 Persistence DTO 額外包含持久化元資料（savedAt, sessionId）。
 
@@ -47,30 +48,32 @@
 export interface VideoPersistenceDTO {
   // Domain 屬性
   id: string;
-  file: File;                    // IndexedDB 原生支援 File 物件
+  file: File; // IndexedDB 原生支援 File 物件
   metadata: {
-    duration: number;            // 視頻時長（秒）
-    width: number;               // 視頻寬度
-    height: number;              // 視頻高度
-    size: number;                // 檔案大小（bytes）
-    mimeType: string;            // MIME 類型
-    name: string;                // 檔案名稱
+    duration: number; // 視頻時長（秒）
+    width: number; // 視頻寬度
+    height: number; // 視頻高度
+    size: number; // 檔案大小（bytes）
+    mimeType: string; // MIME 類型
+    name: string; // 檔案名稱
   };
-  url?: string;                  // blob URL（不持久化，運行時生成）
+  url?: string; // blob URL（不持久化，運行時生成）
 
   // Persistence 元資料
-  savedAt: number;               // 儲存時間戳（毫秒）
-  sessionId: string;             // 會話 ID
+  savedAt: number; // 儲存時間戳（毫秒）
+  sessionId: string; // 會話 ID
 }
 ```
 
 **Constraints**:
+
 - `id` 為主鍵（Primary Key）
 - `file` 僅在視頻 ≤ 50MB 時儲存，否則為 null
 - `url` 不儲存到 IndexedDB（運行時由 FileStorageService 生成）
 - `sessionId` 用於識別會話，清理時比對
 
 **Validation Rules**:
+
 - `id` 不可為空
 - `metadata.size` 必須 > 0
 - `savedAt` 必須為有效時間戳
@@ -88,9 +91,9 @@ export interface VideoPersistenceDTO {
 export interface TranscriptPersistenceDTO {
   // Domain 屬性
   id: string;
-  videoId: string;               // 關聯的視頻 ID
-  fullText: string;              // 完整轉錄文字
-  sections: SectionDTO[];        // 段落陣列
+  videoId: string; // 關聯的視頻 ID
+  fullText: string; // 完整轉錄文字
+  sections: SectionDTO[]; // 段落陣列
 
   // Persistence 元資料
   savedAt: number;
@@ -106,18 +109,20 @@ export interface SectionDTO {
 export interface SentenceDTO {
   id: string;
   text: string;
-  startTime: number;             // 起始時間（秒）
-  endTime: number;               // 結束時間（秒）
+  startTime: number; // 起始時間（秒）
+  endTime: number; // 結束時間（秒）
   isHighlightSuggestionSuggestion: boolean; // AI 建議的高光標記
 }
 ```
 
 **Constraints**:
+
 - `id` 為主鍵
 - `videoId` 為外鍵（關聯到 VideoDTO）
 - `sections` 和 `sentences` 內嵌儲存（非關聯式，因為 IndexedDB 是 NoSQL）
 
 **Validation Rules**:
+
 - `sections` 不可為空陣列
 - `sentences[].endTime` ≥ `sentences[].startTime`
 - `sentences[].text` 不可為空字串
@@ -135,10 +140,10 @@ export interface SentenceDTO {
 export interface HighlightPersistenceDTO {
   // Domain 屬性
   id: string;
-  videoId: string;               // 關聯的視頻 ID
-  name: string;                  // 高光名稱
+  videoId: string; // 關聯的視頻 ID
+  name: string; // 高光名稱
   selectedSentenceIds: string[]; // 選中的句子 ID 陣列
-  selectionOrder: string[];      // 選擇順序記錄
+  selectionOrder: string[]; // 選擇順序記錄
 
   // Persistence 元資料
   savedAt: number;
@@ -147,11 +152,13 @@ export interface HighlightPersistenceDTO {
 ```
 
 **Constraints**:
+
 - `id` 為主鍵
 - `videoId` 為外鍵
 - `selectedSentenceIds` 和 `selectionOrder` 應該一致（Set 轉換為陣列）
 
 **Validation Rules**:
+
 - `name` 不可為空字串
 - `selectedSentenceIds` 可為空陣列（初始狀態）
 - `selectionOrder.length` == `selectedSentenceIds.length`
@@ -182,18 +189,20 @@ export interface TranscriptDTO {
       text: string;
       startTime: number;
       endTime: number;
-      isHighlightSuggestion: boolean;      // 注意：Application DTO 使用 isHighlightSuggestion
+      isHighlightSuggestion: boolean; // 注意：Application DTO 使用 isHighlightSuggestion
     }[];
   }[];
 }
 ```
 
 **與 TranscriptPersistenceDTO 的差異**:
+
 - Application DTO 不包含 `savedAt` 和 `sessionId`（由 Infrastructure Layer 添加）
 - Application DTO 的 `isHighlightSuggestion` 對應 Persistence DTO 的 `isHighlightSuggestionSuggestion`
 - Application DTO 不包含 `id` 和 `videoId`（由 Use Case 生成/提供）
 
 **資料流向**:
+
 ```
 MockAIService.generate()
   → 返回 TranscriptDTO (Application)
@@ -210,6 +219,7 @@ MockAIService.generate()
 ### 1. Video Entity ↔ VideoPersistenceDTO
 
 **Entity → Persistence DTO**:
+
 ```typescript
 function videoEntityToPersistenceDto(video: Video, sessionId: string): VideoPersistenceDTO {
   return {
@@ -221,16 +231,17 @@ function videoEntityToPersistenceDto(video: Video, sessionId: string): VideoPers
       height: video.metadata.height,
       size: video.metadata.size,
       mimeType: video.metadata.mimeType,
-      name: video.metadata.name,
+      name: video.metadata.name
     },
     url: video.url, // blob URL（不儲存到 IndexedDB）
     savedAt: Date.now(),
-    sessionId: sessionId,
+    sessionId: sessionId
   };
 }
 ```
 
 **Persistence DTO → Entity**:
+
 ```typescript
 function videoPersistenceDtoToEntity(dto: VideoPersistenceDTO): Video {
   const metadata = new VideoMetadata(
@@ -246,6 +257,7 @@ function videoPersistenceDtoToEntity(dto: VideoPersistenceDTO): Video {
 ```
 
 **Special Handling**:
+
 - 大視頻（> 50MB）：`file` 儲存為 null，恢復時需重新上傳
 - `url` 不儲存，恢復時由 FileStorageService 重新生成
 
@@ -256,10 +268,11 @@ function videoPersistenceDtoToEntity(dto: VideoPersistenceDTO): Video {
 #### 路徑 A: Application DTO → Entity (MockAIService 返回)
 
 **TranscriptDTO (Application) → Transcript Entity**:
+
 ```typescript
 function applicationTranscriptDtoToEntity(dto: TranscriptDTO, videoId: string): Transcript {
-  const sections = dto.sections.map(sectionDto => {
-    const sentences = sectionDto.sentences.map(sentenceDto => {
+  const sections = dto.sections.map((sectionDto) => {
+    const sentences = sectionDto.sentences.map((sentenceDto) => {
       const timeRange = new TimeRange(
         new TimeStamp(sentenceDto.startTime),
         new TimeStamp(sentenceDto.endTime)
@@ -286,25 +299,29 @@ function applicationTranscriptDtoToEntity(dto: TranscriptDTO, videoId: string): 
 #### 路徑 B: Entity → Persistence DTO (儲存到 IndexedDB)
 
 **Transcript Entity → TranscriptPersistenceDTO**:
+
 ```typescript
-function transcriptEntityToPersistenceDto(transcript: Transcript, sessionId: string): TranscriptPersistenceDTO {
+function transcriptEntityToPersistenceDto(
+  transcript: Transcript,
+  sessionId: string
+): TranscriptPersistenceDTO {
   return {
     id: transcript.id,
     videoId: transcript.videoId,
     fullText: transcript.fullText,
-    sections: transcript.sections.map(section => ({
+    sections: transcript.sections.map((section) => ({
       id: section.id,
       title: section.title,
-      sentences: section.sentences.map(sentence => ({
+      sentences: section.sentences.map((sentence) => ({
         id: sentence.id,
         text: sentence.text,
         startTime: sentence.timeRange.start.seconds,
         endTime: sentence.timeRange.end.seconds,
-        isHighlightSuggestionSuggestion: sentence.isHighlightSuggestionSuggestion,
-      })),
+        isHighlightSuggestionSuggestion: sentence.isHighlightSuggestionSuggestion
+      }))
     })),
     savedAt: Date.now(),
-    sessionId: sessionId,
+    sessionId: sessionId
   };
 }
 ```
@@ -312,10 +329,11 @@ function transcriptEntityToPersistenceDto(transcript: Transcript, sessionId: str
 #### 路徑 C: Persistence DTO → Entity (從 IndexedDB 恢復)
 
 **TranscriptPersistenceDTO → Transcript Entity**:
+
 ```typescript
 function transcriptPersistenceDtoToEntity(dto: TranscriptPersistenceDTO): Transcript {
-  const sections = dto.sections.map(sectionDto => {
-    const sentences = sectionDto.sentences.map(sentenceDto => {
+  const sections = dto.sections.map((sectionDto) => {
+    const sentences = sectionDto.sentences.map((sentenceDto) => {
       const timeRange = new TimeRange(
         new TimeStamp(sentenceDto.startTime),
         new TimeStamp(sentenceDto.endTime)
@@ -339,8 +357,12 @@ function transcriptPersistenceDtoToEntity(dto: TranscriptPersistenceDTO): Transc
 ### 3. Highlight Entity ↔ HighlightPersistenceDTO
 
 **Highlight Entity → HighlightPersistenceDTO**:
+
 ```typescript
-function highlightEntityToPersistenceDto(highlight: Highlight, sessionId: string): HighlightPersistenceDTO {
+function highlightEntityToPersistenceDto(
+  highlight: Highlight,
+  sessionId: string
+): HighlightPersistenceDTO {
   return {
     id: highlight.id,
     videoId: highlight.videoId,
@@ -348,17 +370,18 @@ function highlightEntityToPersistenceDto(highlight: Highlight, sessionId: string
     selectedSentenceIds: Array.from(highlight.selectedSentenceIds), // Set → Array
     selectionOrder: highlight.selectionOrder,
     savedAt: Date.now(),
-    sessionId: sessionId,
+    sessionId: sessionId
   };
 }
 ```
 
 **HighlightPersistenceDTO → Highlight Entity**:
+
 ```typescript
 function highlightPersistenceDtoToEntity(dto: HighlightPersistenceDTO): Highlight {
   const highlight = new Highlight(dto.id, dto.videoId, dto.name);
   // 恢復選擇狀態
-  dto.selectedSentenceIds.forEach(sentenceId => {
+  dto.selectedSentenceIds.forEach((sentenceId) => {
     highlight.addSentence(sentenceId);
   });
   return highlight;
@@ -366,6 +389,7 @@ function highlightPersistenceDtoToEntity(dto: HighlightPersistenceDTO): Highligh
 ```
 
 **Special Handling**:
+
 - `selectedSentenceIds` 從 Set 轉換為 Array（IndexedDB 不支援 Set）
 - 恢復時需逐一調用 `addSentence()` 重建內部狀態
 
@@ -396,6 +420,7 @@ function highlightPersistenceDtoToEntity(dto: HighlightPersistenceDTO): Highligh
 **Purpose**: 儲存視頻檔案和元資料
 
 **Indexes**:
+
 - `sessionId`: 用於清理屬於已關閉 Tab 的資料
 - `savedAt`: 用於清理超過 24 小時的資料
 
@@ -418,6 +443,7 @@ function highlightPersistenceDtoToEntity(dto: HighlightPersistenceDTO): Highligh
 **Purpose**: 儲存轉錄資料
 
 **Indexes**:
+
 - `videoId`: 用於按視頻 ID 查詢轉錄
 - `sessionId`: 用於清理
 - `savedAt`: 用於清理
@@ -441,6 +467,7 @@ function highlightPersistenceDtoToEntity(dto: HighlightPersistenceDTO): Highligh
 **Purpose**: 儲存高光資料
 
 **Indexes**:
+
 - `videoId`: 用於查詢某視頻的所有高光版本
 - `sessionId`: 用於清理
 - `savedAt`: 用於清理
@@ -496,11 +523,13 @@ export class BrowserStorage {
 ### Error Handling
 
 所有 BrowserStorage 方法應捕獲 IndexedDB 錯誤並：
+
 1. 使用 `console.warn` 記錄錯誤（不阻斷主流程）
 2. 返回 null 或空陣列（優雅降級）
 3. 不拋出例外（避免影響 Repository 的 CRUD 操作）
 
 範例：
+
 ```typescript
 async saveVideo(video: VideoPersistenceDTO): Promise<void> {
   try {
@@ -533,10 +562,10 @@ async saveVideo(video: VideoPersistenceDTO): Promise<void> {
 
 ### Keys
 
-| Key | Value Type | Purpose |
-|-----|------------|---------|
-| `sessionId` | string | 當前會話 ID（格式：`session_${timestamp}_${random}`） |
-| `video_meta_${videoId}` | JSON string | 大視頻（> 50MB）的元資料 |
+| Key                     | Value Type  | Purpose                                               |
+| ----------------------- | ----------- | ----------------------------------------------------- |
+| `sessionId`             | string      | 當前會話 ID（格式：`session_${timestamp}_${random}`） |
+| `video_meta_${videoId}` | JSON string | 大視頻（> 50MB）的元資料                              |
 
 ### Example
 
@@ -545,11 +574,14 @@ async saveVideo(video: VideoPersistenceDTO): Promise<void> {
 sessionStorage.setItem('sessionId', 'session_1698765432000_a3f5e9');
 
 // 大視頻元資料
-sessionStorage.setItem('video_meta_abc123', JSON.stringify({
-  id: 'abc123',
-  name: 'large-video.mp4',
-  size: 80 * 1024 * 1024, // 80MB
-}));
+sessionStorage.setItem(
+  'video_meta_abc123',
+  JSON.stringify({
+    id: 'abc123',
+    name: 'large-video.mp4',
+    size: 80 * 1024 * 1024 // 80MB
+  })
+);
 ```
 
 ---
@@ -558,10 +590,10 @@ sessionStorage.setItem('video_meta_abc123', JSON.stringify({
 
 ### DTO 類型對比表
 
-| DTO 類型 | 檔案位置 | 主要欄位 | 額外欄位 | 使用場景 |
-|---------|---------|---------|---------|---------|
-| **TranscriptDTO** (Application) | `src/application/dto/` | fullText, sections[] | ❌ 無 | MockAI 返回、Use Case 輸入 |
-| **TranscriptPersistenceDTO** | `src/infrastructure/storage/dto/` | id, videoId, fullText, sections[] | ✅ savedAt, sessionId | IndexedDB 儲存、刷新恢復 |
+| DTO 類型                        | 檔案位置                          | 主要欄位                          | 額外欄位              | 使用場景                   |
+| ------------------------------- | --------------------------------- | --------------------------------- | --------------------- | -------------------------- |
+| **TranscriptDTO** (Application) | `src/application/dto/`            | fullText, sections[]              | ❌ 無                 | MockAI 返回、Use Case 輸入 |
+| **TranscriptPersistenceDTO**    | `src/infrastructure/storage/dto/` | id, videoId, fullText, sections[] | ✅ savedAt, sessionId | IndexedDB 儲存、刷新恢復   |
 
 ### 轉換路徑圖
 

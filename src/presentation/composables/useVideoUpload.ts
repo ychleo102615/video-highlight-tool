@@ -1,5 +1,5 @@
-import { computed, readonly } from 'vue'
-import { useVideoStore } from '@/presentation/stores/videoStore'
+import { computed, readonly } from 'vue';
+import { useVideoStore } from '@/presentation/stores/videoStore';
 
 /**
  * useVideoUpload Composable
@@ -10,14 +10,14 @@ import { useVideoStore } from '@/presentation/stores/videoStore'
  * - 提供響應式的上傳狀態供組件使用
  */
 export function useVideoUpload() {
-  const videoStore = useVideoStore()
+  const videoStore = useVideoStore();
 
   // ========================================
   // Reactive State (從 Store 取得)
   // ========================================
-  const isUploading = computed(() => videoStore.isUploading)
-  const uploadProgress = computed(() => videoStore.uploadProgress)
-  const error = computed(() => videoStore.error)
+  const isUploading = computed(() => videoStore.isUploading);
+  const uploadProgress = computed(() => videoStore.uploadProgress);
+  const error = computed(() => videoStore.error);
 
   // ========================================
   // Actions
@@ -29,7 +29,7 @@ export function useVideoUpload() {
    * @param transcriptFile 可選的轉錄 JSON 檔案
    */
   async function uploadVideo(videoFile: File, transcriptFile?: File): Promise<void> {
-    await videoStore.uploadVideo(videoFile, transcriptFile)
+    await videoStore.uploadVideo(videoFile, transcriptFile);
   }
 
   // ========================================
@@ -40,5 +40,5 @@ export function useVideoUpload() {
     uploadProgress: readonly(uploadProgress),
     error: readonly(error),
     uploadVideo
-  }
+  };
 }

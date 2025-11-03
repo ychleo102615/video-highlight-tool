@@ -5,7 +5,7 @@
 **Status**: Draft
 **Input**: User description: "建立 RestoreSessionUseCase 來處理應用啟動時的會話恢復：(1) 在 BrowserStorage 新增 restoreAllVideos() 等批量查詢方法；(2) 修改三個 Repository 的 findAll()/findByVideoId() 方法，在記憶體 Map 為空時自動從 BrowserStorage 恢復資料；(3) 建立 RestoreSessionUseCase，協調 Video/Transcript/Highlight 三個 Repository 查詢，判斷是否需要重新上傳（大視頻 file 為 null），返回 SessionStateDTO { video, transcript, highlights, needsReupload }；(4) 在 DI Container 註冊 Use Case；(5) 在 videoStore 新增 restoreSession() action 調用 Use Case，根據 needsReupload 決定顯示提示訊息或完整恢復狀態；(6) 在 App.vue onMounted 調用 videoStore.restoreSession()，實現刷新後自動恢復編輯狀態（小視頻完整恢復，大視頻提示重新上傳但保留編輯內容）。"
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - 小視頻完整恢復 (Priority: P1)
 
@@ -81,7 +81,7 @@
 - **同時打開多個分頁**: 如果使用者同時在多個瀏覽器分頁中開啟應用，每個分頁應該獨立運作，但共享 IndexedDB 資料。最後儲存的分頁會覆蓋其他分頁的資料（預設行為，不需特殊處理）。
 - **平台儲存限制差異**: 不同平台（桌面 vs 行動裝置）的 IndexedDB 儲存配額不同，系統應該根據平台動態決定儲存閾值，而非使用固定數值。
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -104,7 +104,7 @@
 - **Highlight**: 高光片段實體，包含 videoId、選中的句子 ID 清單（selectedSentenceIds）
 - **SessionState**: 會話狀態 DTO，整合 Video、Transcript、Highlight 和 needsReupload 旗標，用於傳遞恢復結果
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

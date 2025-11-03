@@ -26,5 +26,5 @@ export interface IMockDataProvider {
    * 4. 存儲到記憶體 Map
    * 5. 資料在 ITranscriptGenerator.generate() 使用後自動清除
    */
-  setMockData(videoId: string, jsonContent: string): void
+  setMockData(videoId: string, jsonContent: string): void;
 }

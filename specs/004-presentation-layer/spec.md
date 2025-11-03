@@ -15,7 +15,7 @@
 - Q: 圖示系統 - 應用中的圖示（上傳、播放/暫停、時間戳等）應使用哪個圖示庫？ → A: Heroicons - Tailwind 官方圖示庫，與 Tailwind 完美整合，有 Vue 3 套件（@heroicons/vue），現代簡潔
 - Q: 字體系統與字級階層 - 應用的字體系統（字級、行高、字重）應如何定義？ → A: Tailwind 預設字級 + 系統字體（font-sans）- 跨平台一致，無需額外載入，Tailwind 預設值經過優化
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - 視頻上傳與初始化 (Priority: P1)
 
@@ -149,7 +149,7 @@
 - **網絡中斷**: 當視頻上傳過程中網絡中斷，應顯示錯誤訊息並允許使用者重試
 - **瀏覽器返回/重新整理**: 當使用者在編輯過程中刷新頁面，應提示「您有未儲存的編輯，確定要離開嗎？」（如果未來支援儲存功能）
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -254,7 +254,7 @@
 - **useHighlight**: 封裝高光選擇和查詢邏輯
 - **useVideoPlayer**: 封裝視頻播放器控制邏輯（片段播放、同步）
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 
@@ -335,12 +335,14 @@
 - **中性色**: 使用 Tailwind 的 slate 色系作為文字和背景的基礎
 
 **編輯區句子視覺狀態**：
+
 - **未選中**: 無邊框，白色背景（bg-white）
 - **選中**: 左側藍色邊框（border-l-4 border-blue-500）+ 淺藍背景（bg-blue-50）
 - **播放中**: 左側藍色粗邊框（border-l-4 border-blue-600）+ 深藍背景（bg-blue-100）
 - **AI 預設高光**: AI 處理完成後，建議的高光句子自動設為「選中」狀態，視覺上與使用者手動選中相同
 
 **文字疊加樣式**：
+
 - **位置**: 視頻底部居中，距離底部約 5-10% 視頻高度
 - **背景**: 半透明黑色（bg-black/80）
 - **文字**: 白色（text-white），字級 text-lg（18px），行高適中（leading-relaxed）
@@ -350,6 +352,7 @@
 - **最大寬度**: 80% 視頻寬度，避免文字過長換行過多
 
 **圖示系統**：
+
 - **圖示庫**: Heroicons（@heroicons/vue）
 - **風格**: 優先使用 Outline 風格（輪廓），Solid 風格（實心）用於選中狀態或強調
 - **尺寸標準**:
@@ -364,6 +367,7 @@
   - 檢查/選中: CheckIcon
 
 **字體系統**：
+
 - **字體家族**: Tailwind 預設系統字體堆疊（font-sans）
   - 實際渲染: ui-sans-serif, system-ui, sans-serif
   - 跨平台自動適配：macOS 使用 San Francisco，Windows 使用 Segoe UI，Android 使用 Roboto

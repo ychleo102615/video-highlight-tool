@@ -23,11 +23,11 @@
 
 **Purpose**: 專案初始化與基礎設定
 
-- [X] T001 安裝新依賴套件（tailwindcss, @tailwindcss/vite, video.js, @types/video.js, naive-ui, @heroicons/vue）
-- [X] T002 [P] 設定 Tailwind CSS 在 vite.config.ts 中新增 tailwindcss() 插件
-- [X] T003 [P] 建立 src/assets/main.css 並加入 @import "tailwindcss"
-- [X] T004 [P] 更新 src/main.ts 引入 ./assets/main.css
-- [X] T005 建立 Presentation Layer 資料夾結構（components/layout, components/upload, components/editing, components/preview, composables, stores, types）
+- [x] T001 安裝新依賴套件（tailwindcss, @tailwindcss/vite, video.js, @types/video.js, naive-ui, @heroicons/vue）
+- [x] T002 [P] 設定 Tailwind CSS 在 vite.config.ts 中新增 tailwindcss() 插件
+- [x] T003 [P] 建立 src/assets/main.css 並加入 @import "tailwindcss"
+- [x] T004 [P] 更新 src/main.ts 引入 ./assets/main.css
+- [x] T005 建立 Presentation Layer 資料夾結構（components/layout, components/upload, components/editing, components/preview, composables, stores, types）
 
 ---
 
@@ -39,26 +39,26 @@
 
 ### Application Layer 更新
 
-- [X] T006 [P] 新增 IMockDataProvider Port 在 src/application/ports/IMockDataProvider.ts
-- [X] T007 [P] 更新 IFileStorage Port 在 src/application/ports/IFileStorage.ts 新增 onProgress 回調參數
-- [X] T008 更新 UploadVideoUseCase 在 src/application/use-cases/UploadVideoUseCase.ts 的 execute 方法新增 onProgress 參數
-- [X] T009 [P] 新增 UploadVideoWithMockTranscriptUseCase 在 src/application/use-cases/UploadVideoWithMockTranscriptUseCase.ts
+- [x] T006 [P] 新增 IMockDataProvider Port 在 src/application/ports/IMockDataProvider.ts
+- [x] T007 [P] 更新 IFileStorage Port 在 src/application/ports/IFileStorage.ts 新增 onProgress 回調參數
+- [x] T008 更新 UploadVideoUseCase 在 src/application/use-cases/UploadVideoUseCase.ts 的 execute 方法新增 onProgress 參數
+- [x] T009 [P] 新增 UploadVideoWithMockTranscriptUseCase 在 src/application/use-cases/UploadVideoWithMockTranscriptUseCase.ts
 
 ### Infrastructure Layer 更新
 
-- [X] T010 [P] 更新 MockAIService 在 src/infrastructure/api/MockAIService.ts 實作 IMockDataProvider 介面
-- [X] T011 [P] 更新 FileStorageService 在 src/infrastructure/storage/FileStorageService.ts 支援 onProgress 回調
-- [X] T011a [P] 建立 VideoProcessor 在 src/infrastructure/services/VideoProcessor.ts 實作 IVideoProcessor 介面
+- [x] T010 [P] 更新 MockAIService 在 src/infrastructure/api/MockAIService.ts 實作 IMockDataProvider 介面
+- [x] T011 [P] 更新 FileStorageService 在 src/infrastructure/storage/FileStorageService.ts 支援 onProgress 回調
+- [x] T011a [P] 建立 VideoProcessor 在 src/infrastructure/services/VideoProcessor.ts 實作 IVideoProcessor 介面
 
 ### DI Container 設定
 
-- [X] T012 更新 DI Container 在 src/di/container.ts 註冊 MockDataProvider, VideoProcessor, UploadVideoUseCase 和 UploadVideoWithMockTranscriptUseCase
+- [x] T012 更新 DI Container 在 src/di/container.ts 註冊 MockDataProvider, VideoProcessor, UploadVideoUseCase 和 UploadVideoWithMockTranscriptUseCase
 
 ### Type Definitions
 
-- [X] T013 [P] 建立 Store Contracts 在 src/presentation/types/store-contracts.ts（複製自 specs/004-presentation-layer/contracts/）
-- [X] T014 [P] 建立 Component Contracts 在 src/presentation/types/component-contracts.ts（複製自 specs/004-presentation-layer/contracts/）
-- [X] T015 建立型別統一匯出檔 src/presentation/types/index.ts
+- [x] T013 [P] 建立 Store Contracts 在 src/presentation/types/store-contracts.ts（複製自 specs/004-presentation-layer/contracts/）
+- [x] T014 [P] 建立 Component Contracts 在 src/presentation/types/component-contracts.ts（複製自 specs/004-presentation-layer/contracts/）
+- [x] T015 建立型別統一匯出檔 src/presentation/types/index.ts
 
 **Checkpoint**: 基礎設施就緒 - 現在可以開始平行實作 User Story
 
@@ -69,6 +69,7 @@
 **Goal**: 使用者能上傳視頻文件、看到上傳進度、並在完成後觸發 AI 處理以生成轉錄內容和預設高光
 
 **Independent Test**:
+
 1. 選擇有效視頻文件（MP4, MOV, WEBM）→ 顯示上傳進度 → 完成後自動處理轉錄 → 建立預設高光
 2. 選擇超過 100MB 的文件 → 顯示錯誤訊息「文件大小超過 100MB 限制」
 3. 選擇不支援格式（AVI）→ 顯示錯誤訊息「不支援的視頻格式」
@@ -76,14 +77,14 @@
 
 ### Implementation for User Story 1
 
-- [X] T016 [P] [US1] 建立 videoStore 在 src/presentation/stores/videoStore.ts（State: video, isUploading, uploadProgress, error）
-- [X] T017 [P] [US1] 建立 transcriptStore 在 src/presentation/stores/transcriptStore.ts（State: transcript, isProcessing, playingSentenceId, error）
-- [X] T018 [P] [US1] 建立 highlightStore 在 src/presentation/stores/highlightStore.ts（State: currentHighlight, isLoading, error）
-- [X] T019 [P] [US1] 建立 useVideoUpload composable 在 src/presentation/composables/useVideoUpload.ts
-- [X] T020 [P] [US1] 建立 useTranscript composable 在 src/presentation/composables/useTranscript.ts
-- [X] T021 [US1] 建立 VideoUpload 組件在 src/presentation/components/upload/VideoUpload.vue（支援視頻和可選轉錄 JSON 檔案上傳）
-- [X] T022 [US1] 整合 VideoUpload 到 App.vue 並測試上傳流程（包含錯誤處理和進度顯示）
-- [X] T023 [US1] 測試上傳完成後自動觸發轉錄處理和預設高光建立
+- [x] T016 [P] [US1] 建立 videoStore 在 src/presentation/stores/videoStore.ts（State: video, isUploading, uploadProgress, error）
+- [x] T017 [P] [US1] 建立 transcriptStore 在 src/presentation/stores/transcriptStore.ts（State: transcript, isProcessing, playingSentenceId, error）
+- [x] T018 [P] [US1] 建立 highlightStore 在 src/presentation/stores/highlightStore.ts（State: currentHighlight, isLoading, error）
+- [x] T019 [P] [US1] 建立 useVideoUpload composable 在 src/presentation/composables/useVideoUpload.ts
+- [x] T020 [P] [US1] 建立 useTranscript composable 在 src/presentation/composables/useTranscript.ts
+- [x] T021 [US1] 建立 VideoUpload 組件在 src/presentation/components/upload/VideoUpload.vue（支援視頻和可選轉錄 JSON 檔案上傳）
+- [x] T022 [US1] 整合 VideoUpload 到 App.vue 並測試上傳流程（包含錯誤處理和進度顯示）
+- [x] T023 [US1] 測試上傳完成後自動觸發轉錄處理和預設高光建立
 
 **Checkpoint**: 此時 User Story 1 應完全可用且可獨立測試（視頻上傳 → AI 處理 → 預設高光建立）
 
@@ -94,6 +95,7 @@
 **Goal**: 使用者能在編輯區查看結構化的轉錄內容（段落、句子、時間戳），並能點擊句子切換選中狀態
 
 **Independent Test**:
+
 1. 視頻處理完成 → 編輯區顯示段落和句子，AI 建議的句子已選中（藍色邊框 + 淺藍背景）
 2. 點擊未選中句子 → 變為選中（視覺標示出現）
 3. 點擊已選中句子 → 取消選中（視覺標示移除）
@@ -101,13 +103,13 @@
 
 ### Implementation for User Story 2
 
-- [X] T024 [P] [US2] 建立 useHighlight composable 在 src/presentation/composables/useHighlight.ts
-- [X] T025 [P] [US2] 建立 SentenceItem 組件在 src/presentation/components/editing/SentenceItem.vue（顯示句子、時間戳、選中狀態視覺化）
-- [X] T026 [P] [US2] 建立 SectionItem 組件在 src/presentation/components/editing/SectionItem.vue（顯示段落標題和句子列表）
-- [X] T027 [US2] 建立 SectionList 組件在 src/presentation/components/editing/SectionList.vue（渲染所有段落）
-- [X] T028 [US2] 建立 EditingArea 組件在 src/presentation/components/editing/EditingArea.vue（容器組件，處理滾動）
-- [X] T029 [US2] 整合 EditingArea 到 App.vue 並測試句子選擇功能
-- [X] T030 [US2] 驗證選中狀態的視覺反饋（未選中、選中、播放中三種狀態）
+- [x] T024 [P] [US2] 建立 useHighlight composable 在 src/presentation/composables/useHighlight.ts
+- [x] T025 [P] [US2] 建立 SentenceItem 組件在 src/presentation/components/editing/SentenceItem.vue（顯示句子、時間戳、選中狀態視覺化）
+- [x] T026 [P] [US2] 建立 SectionItem 組件在 src/presentation/components/editing/SectionItem.vue（顯示段落標題和句子列表）
+- [x] T027 [US2] 建立 SectionList 組件在 src/presentation/components/editing/SectionList.vue（渲染所有段落）
+- [x] T028 [US2] 建立 EditingArea 組件在 src/presentation/components/editing/EditingArea.vue（容器組件，處理滾動）
+- [x] T029 [US2] 整合 EditingArea 到 App.vue 並測試句子選擇功能
+- [x] T030 [US2] 驗證選中狀態的視覺反饋（未選中、選中、播放中三種狀態）
 
 **Checkpoint**: 此時 User Stories 1 和 2 都應該獨立運作（上傳視頻 → 顯示轉錄 → 選擇句子）
 
@@ -118,6 +120,7 @@
 **Goal**: 使用者能在預覽區播放選中的高光片段（跳過未選中部分），並能使用標準播放控制
 
 **Independent Test**:
+
 1. 選擇至少一個句子 → 點擊播放 → 只播放選中片段，跳過未選中部分
 2. 片段切換時過渡流暢（< 100ms 卡頓感）
 3. 點擊暫停 → 視頻暫停在當前位置
@@ -126,13 +129,13 @@
 
 ### Implementation for User Story 3
 
-- [X] T031 [P] [US3] 建立 useVideoPlayer composable 在 src/presentation/composables/useVideoPlayer.ts（封裝 video.js 和片段播放邏輯）
-- [X] T032 [US3] 建立 VideoPlayer 組件在 src/presentation/components/preview/VideoPlayer.vue（使用 video.js 播放器）
-- [X] T033 [US3] 實作片段播放機制在 useVideoPlayer.ts（基於 timeupdate 事件 + seekTo 方法）
-- [X] T034 [P] [US3] 建立 EmptyState 組件在 src/presentation/components/common/EmptyState.vue（顯示空狀態提示）
-- [X] T035 [US3] 建立 PreviewArea 組件在 src/presentation/components/preview/PreviewArea.vue（容器組件，整合 VideoPlayer）
-- [X] T036 [US3] 整合 PreviewArea 到 App.vue 並測試片段播放功能
-- [X] T037 [US3] 測試邊緣情況（無選中句子、拖動到非選中區域、片段切換流暢度）
+- [x] T031 [P] [US3] 建立 useVideoPlayer composable 在 src/presentation/composables/useVideoPlayer.ts（封裝 video.js 和片段播放邏輯）
+- [x] T032 [US3] 建立 VideoPlayer 組件在 src/presentation/components/preview/VideoPlayer.vue（使用 video.js 播放器）
+- [x] T033 [US3] 實作片段播放機制在 useVideoPlayer.ts（基於 timeupdate 事件 + seekTo 方法）
+- [x] T034 [P] [US3] 建立 EmptyState 組件在 src/presentation/components/common/EmptyState.vue（顯示空狀態提示）
+- [x] T035 [US3] 建立 PreviewArea 組件在 src/presentation/components/preview/PreviewArea.vue（容器組件，整合 VideoPlayer）
+- [x] T036 [US3] 整合 PreviewArea 到 App.vue 並測試片段播放功能
+- [x] T037 [US3] 測試邊緣情況（無選中句子、拖動到非選中區域、片段切換流暢度）
 
 **Checkpoint**: 此時 User Stories 1, 2, 3 都應該獨立運作（上傳 → 選擇 → 預覽片段）
 
@@ -143,6 +146,7 @@
 **Goal**: 預覽視頻時，選中的句子文字疊加在視頻上，且時間與音頻精確同步（< 100ms 誤差）
 
 **Independent Test**:
+
 1. 播放高光片段 → 當前句子文字疊加在視頻底部（半透明黑底白字）
 2. 播放時間超出句子結束時間 → 文字消失，進入下一句時顯示新文字
 3. 文字出現/消失時有淡入淡出效果（300ms 過渡）
@@ -150,10 +154,10 @@
 
 ### Implementation for User Story 4
 
-- [X] T038 [US4] 建立 TranscriptOverlay 組件在 src/presentation/components/preview/TranscriptOverlay.vue（文字疊加層，支援淡入淡出）
-- [X] T039 [US4] 整合 TranscriptOverlay 到 VideoPlayer.vue 並實作時間同步邏輯
-- [X] T040 [US4] 測試文字同步精確度（使用 useVideoPlayer 的 currentTime 更新 transcriptStore.playingSentenceId）
-- [X] T041 [US4] 驗證文字疊加樣式（位置、背景、過渡效果）
+- [x] T038 [US4] 建立 TranscriptOverlay 組件在 src/presentation/components/preview/TranscriptOverlay.vue（文字疊加層，支援淡入淡出）
+- [x] T039 [US4] 整合 TranscriptOverlay 到 VideoPlayer.vue 並實作時間同步邏輯
+- [x] T040 [US4] 測試文字同步精確度（使用 useVideoPlayer 的 currentTime 更新 transcriptStore.playingSentenceId）
+- [x] T041 [US4] 驗證文字疊加樣式（位置、背景、過渡效果）
 
 **Checkpoint**: 此時 User Stories 1-4 都應該獨立運作（上傳 → 選擇 → 預覽 + 文字疊加）
 
@@ -164,6 +168,7 @@
 **Goal**: 預覽區顯示時間軸，視覺化呈現選中片段的時間分布，支援點擊跳轉
 
 **Independent Test**:
+
 1. 選擇多個句子 → 時間軸顯示所有選中片段的時間範圍（藍色區塊）
 2. 點擊時間軸上的片段區塊 → 視頻跳轉到該片段起點
 3. 播放時進度指示器隨視頻移動
@@ -171,10 +176,10 @@
 
 ### Implementation for User Story 5
 
-- [X] T042 [US5] 建立 VideoTimeline 組件在 src/presentation/components/preview/VideoTimeline.vue（時間軸視覺化，支援點擊跳轉）
-- [X] T043 [US5] 整合 VideoTimeline 到 PreviewArea.vue 並實作片段區塊渲染
-- [X] T044 [US5] 實作播放進度指示器在 VideoTimeline.vue（監聽 currentTime 變化）
-- [X] T045 [US5] 測試時間軸點擊跳轉和即時更新功能（型別檢查和建置通過）
+- [x] T042 [US5] 建立 VideoTimeline 組件在 src/presentation/components/preview/VideoTimeline.vue（時間軸視覺化，支援點擊跳轉）
+- [x] T043 [US5] 整合 VideoTimeline 到 PreviewArea.vue 並實作片段區塊渲染
+- [x] T044 [US5] 實作播放進度指示器在 VideoTimeline.vue（監聽 currentTime 變化）
+- [x] T045 [US5] 測試時間軸點擊跳轉和即時更新功能（型別檢查和建置通過）
 
 **Checkpoint**: 此時 User Stories 1-5 都應該獨立運作（上傳 → 選擇 → 預覽 + 文字 + 時間軸）
 
@@ -185,6 +190,7 @@
 **Goal**: 編輯區和預覽區互動同步：點擊時間戳跳轉視頻、播放時編輯區高亮當前句子並自動滾動
 
 **Independent Test**:
+
 1. 點擊編輯區的時間戳 → 預覽區視頻跳轉到該時間（< 100ms 延遲）
 2. 預覽區播放時 → 編輯區當前句子高亮（深藍背景 + 粗邊框）
 3. 當前句子不在可見範圍 → 編輯區自動滾動使其可見（< 100ms）
@@ -192,11 +198,11 @@
 
 ### Implementation for User Story 6
 
-- [X] T046 [US6] 實作時間戳點擊跳轉在 SentenceItem.vue（emit seek 事件）
-- [X] T047 [US6] 實作預覽區 → 編輯區同步在 EditingArea.vue（監聽 playingSentenceId 變化並高亮 + 滾動）
-- [X] T048 [US6] 實作編輯區 → 預覽區同步在 PreviewArea.vue（監聽 seek 事件並更新 VideoPlayer）
-- [X] T049 [US6] 測試雙向同步的正確性和效能（延遲 < 100-200ms）
-- [X] T050 [US6] 測試自動滾動機制（scrollIntoView 實作）
+- [x] T046 [US6] 實作時間戳點擊跳轉在 SentenceItem.vue（emit seek 事件）
+- [x] T047 [US6] 實作預覽區 → 編輯區同步在 EditingArea.vue（監聽 playingSentenceId 變化並高亮 + 滾動）
+- [x] T048 [US6] 實作編輯區 → 預覽區同步在 PreviewArea.vue（監聽 seek 事件並更新 VideoPlayer）
+- [x] T049 [US6] 測試雙向同步的正確性和效能（延遲 < 100-200ms）
+- [x] T050 [US6] 測試自動滾動機制（scrollIntoView 實作）
 
 **Checkpoint**: 此時 User Stories 1-6 都應該獨立運作（完整的雙向同步體驗）
 
@@ -207,6 +213,7 @@
 **Goal**: 應用在不同設備（桌面、平板、手機）上佈局自動調整，確保良好的使用體驗
 
 **Independent Test**:
+
 1. 桌面瀏覽器（> 1024px）→ 左右分屏佈局（編輯區左、預覽區右）
 2. 平板/手機（≤ 768px）→ 上下堆疊佈局（編輯區上、預覽區下）
 3. iOS Safari 上所有功能正常運作（無兼容性問題）
@@ -214,12 +221,12 @@
 
 ### Implementation for User Story 7
 
-- [X] T051 [US7] 建立 SplitLayout 組件在 src/presentation/components/layout/SplitLayout.vue（響應式分屏容器）
-- [X] T052 [US7] 整合 EditingArea 和 PreviewArea 到 SplitLayout 中
-- [X] T053 [US7] 更新 App.vue 使用 SplitLayout 作為主佈局
-- [X] T054 [US7] 調整移動端樣式（觸控目標 ≥ 44x44px、字級適中）
-- [X] T055 [US7] 測試桌面和移動端佈局切換（使用瀏覽器開發者工具模擬不同螢幕尺寸）
-- [X] T056 [US7] 在實際 iOS 和 Android 裝置上測試功能（特別是視頻播放和自動播放限制）
+- [x] T051 [US7] 建立 SplitLayout 組件在 src/presentation/components/layout/SplitLayout.vue（響應式分屏容器）
+- [x] T052 [US7] 整合 EditingArea 和 PreviewArea 到 SplitLayout 中
+- [x] T053 [US7] 更新 App.vue 使用 SplitLayout 作為主佈局
+- [x] T054 [US7] 調整移動端樣式（觸控目標 ≥ 44x44px、字級適中）
+- [x] T055 [US7] 測試桌面和移動端佈局切換（使用瀏覽器開發者工具模擬不同螢幕尺寸）
+- [x] T056 [US7] 在實際 iOS 和 Android 裝置上測試功能（特別是視頻播放和自動播放限制）
 
 **Checkpoint**: 此時所有 User Stories 都應該在桌面和移動端正常運作
 
@@ -229,20 +236,20 @@
 
 **Purpose**: 改進和優化多個 User Story 的共通問題
 
-- [X] T057 [P] 新增錯誤邊界在關鍵組件（VideoPlayer, EditingArea）捕獲執行時錯誤
-- [X] T058 [P] 效能優化：為 timeupdate 事件添加 requestAnimationFrame 防抖
-- [X] T059 [P] 效能優化：長列表渲染優化（評估結果：50-100 句子不需要虛擬滾動，保持現有實作）
+- [x] T057 [P] 新增錯誤邊界在關鍵組件（VideoPlayer, EditingArea）捕獲執行時錯誤
+- [x] T058 [P] 效能優化：為 timeupdate 事件添加 requestAnimationFrame 防抖
+- [x] T059 [P] 效能優化：長列表渲染優化（評估結果：50-100 句子不需要虛擬滾動，保持現有實作）
 - [ ] T060 [P] 無障礙性改善：確保色彩對比度符合 WCAG AA 標準（4.5:1）- 跳過（非必要）
-- [X] T061 [P] 新增 Loading 狀態指示器（使用 Naive UI 的 NSpin 組件）- VideoPlayer 已實作
-- [X] T062 [P] 新增成功/錯誤通知（使用 Naive UI 的 NNotificationProvider）
-- [X] T062a [P] 邊緣情況處理：為句子選擇添加 Debounce (50ms) 防止快速連續點擊導致狀態錯誤
-- [X] T062b [P] 邊緣情況處理：測試並處理「預覽區播放時修改句子選擇」場景（暫停播放器並重新載入片段列表）
-- [X] T062c 邊緣情況處理：實作「瀏覽器返回/重新整理」提示功能（beforeunload 事件）
-- [X] T063 程式碼清理和重構（移除未使用的程式碼、統一命名風格）
-- [X] T064 執行 TypeScript 型別檢查（npm run type-check）確保無錯誤
-- [X] T065 執行 ESLint 檢查（npm run lint）- src 資料夾無錯誤，specs 資料夾錯誤可忽略
+- [x] T061 [P] 新增 Loading 狀態指示器（使用 Naive UI 的 NSpin 組件）- VideoPlayer 已實作
+- [x] T062 [P] 新增成功/錯誤通知（使用 Naive UI 的 NNotificationProvider）
+- [x] T062a [P] 邊緣情況處理：為句子選擇添加 Debounce (50ms) 防止快速連續點擊導致狀態錯誤
+- [x] T062b [P] 邊緣情況處理：測試並處理「預覽區播放時修改句子選擇」場景（暫停播放器並重新載入片段列表）
+- [x] T062c 邊緣情況處理：實作「瀏覽器返回/重新整理」提示功能（beforeunload 事件）
+- [x] T063 程式碼清理和重構（移除未使用的程式碼、統一命名風格）
+- [x] T064 執行 TypeScript 型別檢查（npm run type-check）確保無錯誤
+- [x] T065 執行 ESLint 檢查（npm run lint）- src 資料夾無錯誤，specs 資料夾錯誤可忽略
 - [ ] T066 執行 quickstart.md 驗證（確認所有設定步驟正確）
-- [X] T067 建置專案（npm run build）並驗證 Bundle 大小 < 500KB (gzip) - 實際: 274.30 KB
+- [x] T067 建置專案（npm run build）並驗證 Bundle 大小 < 500KB (gzip) - 實際: 274.30 KB
 - [ ] T068 本地預覽（npm run preview）並測試完整工作流程
 
 ---

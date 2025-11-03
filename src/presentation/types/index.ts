@@ -21,8 +21,8 @@ export type {
   // Highlight Store
   HighlightStoreState,
   HighlightStoreGetters,
-  HighlightStoreActions,
-} from './store-contracts'
+  HighlightStoreActions
+} from './store-contracts';
 
 // Component Contracts (匯出所有 Component 相關型別)
 export type {
@@ -47,5 +47,5 @@ export type {
   TimelineProps,
   TimelineEmits,
   // Common
-  EmptyStateProps,
-} from './component-contracts'
+  EmptyStateProps
+} from './component-contracts';

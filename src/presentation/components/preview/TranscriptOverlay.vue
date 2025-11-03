@@ -3,10 +3,7 @@
     class="transcript-overlay absolute bottom-0 left-0 right-0 z-20 pointer-events-none flex justify-center px-4"
   >
     <!-- 文字疊加層 -->
-    <Transition
-      name="fade"
-      mode="out-in"
-    >
+    <Transition name="fade" mode="out-in">
       <div
         v-if="visible && currentText"
         key="text-overlay"
@@ -21,10 +18,10 @@
 </template>
 
 <script setup lang="ts">
-import type { TranscriptOverlayProps } from '@/presentation/types/component-contracts'
+import type { TranscriptOverlayProps } from '@/presentation/types/component-contracts';
 
 // Props
-defineProps<TranscriptOverlayProps>()
+defineProps<TranscriptOverlayProps>();
 </script>
 
 <style scoped>

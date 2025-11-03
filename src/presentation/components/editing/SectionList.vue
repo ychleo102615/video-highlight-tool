@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import SectionItem from './SectionItem.vue'
-import type { SectionListProps, SectionListEmits } from '@/presentation/types/component-contracts'
+import SectionItem from './SectionItem.vue';
+import type { SectionListProps, SectionListEmits } from '@/presentation/types/component-contracts';
 
 /**
  * SectionList 組件
@@ -13,8 +13,8 @@ import type { SectionListProps, SectionListEmits } from '@/presentation/types/co
 // ========================================
 // Props & Emits
 // ========================================
-defineProps<SectionListProps>()
-const emit = defineEmits<SectionListEmits>()
+defineProps<SectionListProps>();
+const emit = defineEmits<SectionListEmits>();
 
 // ========================================
 // Event Handlers
@@ -25,7 +25,7 @@ const emit = defineEmits<SectionListEmits>()
  * @param sentenceId 句子 ID
  */
 function handleToggleSentence(sentenceId: string) {
-  emit('toggle-sentence', sentenceId)
+  emit('toggle-sentence', sentenceId);
 }
 
 /**
@@ -33,7 +33,7 @@ function handleToggleSentence(sentenceId: string) {
  * @param time 時間（秒數）
  */
 function handleSeekToTime(time: number) {
-  emit('seek-to-time', time)
+  emit('seek-to-time', time);
 }
 </script>
 

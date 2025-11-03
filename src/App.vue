@@ -1,34 +1,36 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue'
-import { NNotificationProvider } from 'naive-ui'
-import VideoUpload from '@/presentation/components/upload/VideoUpload.vue'
-import EditingArea from '@/presentation/components/editing/EditingArea.vue'
-import PreviewArea from '@/presentation/components/preview/PreviewArea.vue'
-import SplitLayout from '@/presentation/components/layout/SplitLayout.vue'
-import SessionRestorer from '@/presentation/components/SessionRestorer.vue'
-import { useVideoStore } from '@/presentation/stores/videoStore'
-import { useTranscriptStore } from '@/presentation/stores/transcriptStore'
-import { useHighlightStore } from '@/presentation/stores/highlightStore'
+import { computed, ref, onMounted, onUnmounted } from 'vue';
+import { NNotificationProvider } from 'naive-ui';
+import VideoUpload from '@/presentation/components/upload/VideoUpload.vue';
+import EditingArea from '@/presentation/components/editing/EditingArea.vue';
+import PreviewArea from '@/presentation/components/preview/PreviewArea.vue';
+import SplitLayout from '@/presentation/components/layout/SplitLayout.vue';
+import SessionRestorer from '@/presentation/components/SessionRestorer.vue';
+import { useVideoStore } from '@/presentation/stores/videoStore';
+import { useTranscriptStore } from '@/presentation/stores/transcriptStore';
+import { useHighlightStore } from '@/presentation/stores/highlightStore';
 
 // ========================================
 // Stores
 // ========================================
-const videoStore = useVideoStore()
-const transcriptStore = useTranscriptStore()
-const highlightStore = useHighlightStore()
+const videoStore = useVideoStore();
+const transcriptStore = useTranscriptStore();
+const highlightStore = useHighlightStore();
 
 // ========================================
 // Refs
 // ========================================
 /** 用於編輯區 → 預覽區同步的 seek 時間 */
-const seekTime = ref<number | null>(null)
+const seekTime = ref<number | null>(null);
 
 // ========================================
 // Computed
 // ========================================
-const showUpload = computed(() => !videoStore.hasVideo)
-const showProcessing = computed(() => transcriptStore.isProcessing)
-const showMainContent = computed(() => transcriptStore.hasTranscript && highlightStore.hasHighlight)
+const showUpload = computed(() => !videoStore.hasVideo);
+const showProcessing = computed(() => transcriptStore.isProcessing);
+const showMainContent = computed(
+  () => transcriptStore.hasTranscript && highlightStore.hasHighlight
+);
 
 // ========================================
 // Event Handlers
@@ -41,11 +43,11 @@ const showMainContent = computed(() => transcriptStore.hasTranscript && highligh
  */
 function handleSeekToTime(time: number) {
   // 更新 seekTime，觸發 PreviewArea 的 watch
-  seekTime.value = time
+  seekTime.value = time;
   // 重置為 null，以便下次相同時間也能觸發（例如連續點擊同一個時間戳）
   setTimeout(() => {
-    seekTime.value = null
-  }, 100)
+    seekTime.value = null;
+  }, 100);
 }
 
 /**
@@ -54,7 +56,7 @@ function handleSeekToTime(time: number) {
  */
 function handleBeforeUnload(e: BeforeUnloadEvent) {
   if (videoStore.hasVideo) {
-    e.preventDefault()
+    e.preventDefault();
     // 現代瀏覽器會忽略自訂訊息，顯示預設提示
     // e.returnValue = ''
   }
@@ -66,12 +68,12 @@ function handleBeforeUnload(e: BeforeUnloadEvent) {
 
 onMounted(() => {
   // 註冊瀏覽器關閉/重新整理提示
-  window.addEventListener('beforeunload', handleBeforeUnload)
-})
+  window.addEventListener('beforeunload', handleBeforeUnload);
+});
 
 onUnmounted(() => {
-  window.removeEventListener('beforeunload', handleBeforeUnload)
-})
+  window.removeEventListener('beforeunload', handleBeforeUnload);
+});
 </script>
 
 <template>
@@ -90,39 +92,34 @@ onUnmounted(() => {
 
       <!-- Main Content -->
       <main class="h-[calc(100vh-5rem)]">
-      <!-- 上傳區（未上傳視頻時顯示） -->
-      <div v-if="showUpload" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <VideoUpload />
-      </div>
-
-      <!-- 處理中狀態 -->
-      <div v-else-if="showProcessing" class="flex items-center justify-center h-full">
-        <div class="text-center">
-          <div
-            class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"
-          ></div>
-          <p class="mt-4 text-gray-600">正在處理轉錄內容...</p>
+        <!-- 上傳區（未上傳視頻時顯示） -->
+        <div v-if="showUpload" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <VideoUpload />
         </div>
-      </div>
 
-      <!-- 主內容區：編輯區 + 預覽區（使用 SplitLayout） -->
-      <SplitLayout v-if="showMainContent">
-        <!-- 左側/上方：編輯區 -->
-        <template #left>
-          <EditingArea @seek-to-time="handleSeekToTime" />
-        </template>
+        <!-- 處理中狀態 -->
+        <div v-else-if="showProcessing" class="flex items-center justify-center h-full">
+          <div class="text-center">
+            <div
+              class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"
+            ></div>
+            <p class="mt-4 text-gray-600">正在處理轉錄內容...</p>
+          </div>
+        </div>
 
-        <!-- 右側/下方：預覽區 -->
-        <template #right>
-          <PreviewArea :seek-time="seekTime" />
-        </template>
-      </SplitLayout>
+        <!-- 主內容區：編輯區 + 預覽區（使用 SplitLayout） -->
+        <SplitLayout v-if="showMainContent">
+          <!-- 左側/上方：編輯區 -->
+          <template #left>
+            <EditingArea @seek-to-time="handleSeekToTime" />
+          </template>
 
-      <!-- 其他狀態 -->
-      <div v-else class="flex items-center justify-center h-full">
-        <p class="text-gray-500">載入中...</p>
-      </div>
-    </main>
+          <!-- 右側/下方：預覽區 -->
+          <template #right>
+            <PreviewArea :seek-time="seekTime" />
+          </template>
+        </SplitLayout>
+      </main>
     </div>
   </n-notification-provider>
 </template>

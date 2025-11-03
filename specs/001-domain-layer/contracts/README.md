@@ -11,6 +11,7 @@ Domain Layer 不暴露 HTTP API，因為它是純粹的業務邏輯層。本資�
 定義所有實體、值物件和 Repository 介面的 TypeScript 型別契約。
 
 **包含內容**:
+
 - **Value Objects**: `ITimeStamp`, `ITimeRange`, `IVideoMetadata`
 - **Entities**: `IVideo`, `ISentence`, `ISection`, `ITranscript`, `IHighlight`
 - **Repository Interfaces**: `IVideoRepository`, `ITranscriptRepository`, `IHighlightRepository`
@@ -117,6 +118,7 @@ function processEntity(entity: unknown) {
 當前版本：**1.0.0**
 
 版本規則：
+
 - **MAJOR**: 移除或重新定義介面方法
 - **MINOR**: 新增介面方法（可選）
 - **PATCH**: 文檔更新、型別註釋修正

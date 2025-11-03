@@ -64,12 +64,7 @@ export class UploadVideoUseCase {
       const video = document.createElement('video');
       video.preload = 'metadata';
       video.onloadedmetadata = () => {
-        resolve(new VideoMetadata(
-          video.duration,
-          video.videoWidth,
-          video.videoHeight,
-          file.type
-        ));
+        resolve(new VideoMetadata(video.duration, video.videoWidth, video.videoHeight, file.type));
         URL.revokeObjectURL(video.src);
       };
       video.onerror = () => reject(new VideoMetadataExtractionError());
@@ -80,17 +75,20 @@ export class UploadVideoUseCase {
 ```
 
 **理由**:
+
 1. **建構函式注入**: 依賴在 Use Case 生命週期中不變，使用建構函式注入更清晰
 2. **單一公開方法 `execute`**: 清楚表達 Use Case 的唯一職責
 3. **輸入驗證在前**: 快速失敗（Fail Fast），減少無效處理
 4. **私有方法輔助**: 提取複雜邏輯到私有方法，保持 `execute` 可讀性
 
 **替代方案**:
+
 - **方法參數注入**: 使依賴可變，增加測試複雜度（rejected）
 - **多個公開方法**: 違反單一職責原則（rejected）
 - **驗證在 Domain Entity**: 驗證屬於應用層職責，Domain 只驗證不變量（rejected）
 
 **事務邊界處理**:
+
 - 本專案使用前端儲存（Map/IndexedDB），無分佈式事務需求
 - 每個 Use Case 操作單一 Aggregate，Repository save 即事務邊界
 - 若未來需要跨 Aggregate 事務，考慮使用 Unit of Work 模式
@@ -159,38 +157,22 @@ export class ProcessTranscriptUseCase {
   }
 
   private convertToEntity(dto: TranscriptDTO): Transcript {
-    const sections = dto.sections.map(sectionDTO =>
-      this.convertSectionToEntity(sectionDTO)
-    );
+    const sections = dto.sections.map((sectionDTO) => this.convertSectionToEntity(sectionDTO));
 
-    return new Transcript(
-      generateId(),
-      dto.videoId,
-      sections,
-      dto.fullText
-    );
+    return new Transcript(generateId(), dto.videoId, sections, dto.fullText);
   }
 
   private convertSectionToEntity(dto: SectionDTO): Section {
-    const sentences = dto.sentences.map(sentenceDTO =>
-      this.convertSentenceToEntity(sentenceDTO)
-    );
+    const sentences = dto.sentences.map((sentenceDTO) => this.convertSentenceToEntity(sentenceDTO));
 
-    return new Section(
-      dto.id,
-      dto.title,
-      sentences
-    );
+    return new Section(dto.id, dto.title, sentences);
   }
 
   private convertSentenceToEntity(dto: SentenceDTO): Sentence {
     return new Sentence(
       dto.id,
       dto.text,
-      new TimeRange(
-        new TimeStamp(dto.startTime),
-        new TimeStamp(dto.endTime)
-      ),
+      new TimeRange(new TimeStamp(dto.startTime), new TimeStamp(dto.endTime)),
       dto.isHighlightSuggestion
     );
   }
@@ -198,17 +180,20 @@ export class ProcessTranscriptUseCase {
 ```
 
 **理由**:
+
 1. **Use Case 負責協調**: 轉換是應用層職責，Use Case 是最適合的位置
 2. **私有方法處理複雜性**: 巢狀結構轉換邏輯清晰，易於測試
 3. **避免引入 Mapper 類別**: 本專案 DTO 結構簡單，無需額外抽象層
 4. **DTO 保持純數據**: 不包含轉換邏輯，符合 DTO 定義
 
 **替代方案**:
+
 - **獨立 Mapper 類別**: 適用於複雜轉換，本專案過度設計（rejected）
 - **Domain Entity 接受 DTO**: 違反依賴方向，Domain 不應知道 DTO（rejected）
 - **DTO 包含 `toEntity()` 方法**: DTO 應保持純數據，避免邏輯（rejected）
 
 **驗證邏輯位置**:
+
 - **DTO 驗證**: 在 Use Case 的 `validateInput` 中進行（格式、必填欄位）
 - **Domain 驗證**: 在 Entity 建構函式中進行（業務不變量，如時間範圍合法性）
 
@@ -229,7 +214,10 @@ export class ProcessTranscriptUseCase {
 ```typescript
 // application/errors/ApplicationErrors.ts
 export class ApplicationError extends Error {
-  constructor(message: string, public readonly code: string) {
+  constructor(
+    message: string,
+    public readonly code: string
+  ) {
     super(message);
     this.name = this.constructor.name;
   }
@@ -261,10 +249,7 @@ export class InvalidVideoFormatError extends ApplicationError {
 
 export class VideoFileTooLargeError extends ApplicationError {
   constructor(size: number, maxSize: number) {
-    super(
-      `Video file too large: ${size} bytes. Maximum: ${maxSize} bytes`,
-      'VIDEO_FILE_TOO_LARGE'
-    );
+    super(`Video file too large: ${size} bytes. Maximum: ${maxSize} bytes`, 'VIDEO_FILE_TOO_LARGE');
   }
 }
 
@@ -311,17 +296,20 @@ try {
 ```
 
 **理由**:
+
 1. **語義清晰**: 錯誤類別名稱直接表達錯誤含義
 2. **易於處理**: Presentation Layer 可根據錯誤類型提供友好訊息
 3. **錯誤碼支援**: `code` 屬性可用於日誌記錄和監控
 4. **TypeScript 友好**: 類型檢查幫助確保錯誤處理完整性
 
 **替代方案**:
+
 - **Result pattern (`Result<T, E>`)**: 適用於函數式風格，TypeScript 生態系統更習慣異常（rejected）
 - **錯誤碼字串**: 缺乏型別安全，易於拼寫錯誤（rejected）
 - **通用 Error**: 無法區分錯誤類型，處理邏輯混亂（rejected）
 
 **國際化考量**:
+
 - 錯誤訊息使用英文（開發友好）
 - 錯誤碼（`code`）用於查找本地化訊息
 - Presentation Layer 負責顯示本地化訊息
@@ -330,13 +318,13 @@ try {
 // 未來國際化範例
 const errorMessages: Record<string, Record<string, string>> = {
   'zh-TW': {
-    'VIDEO_NOT_FOUND': '找不到指定的視頻',
-    'INVALID_VIDEO_FORMAT': '視頻格式不支援，請選擇 MP4、MOV 或 WebM',
+    VIDEO_NOT_FOUND: '找不到指定的視頻',
+    INVALID_VIDEO_FORMAT: '視頻格式不支援，請選擇 MP4、MOV 或 WebM'
   },
   'en-US': {
-    'VIDEO_NOT_FOUND': 'Video not found',
-    'INVALID_VIDEO_FORMAT': 'Invalid video format. Please select MP4, MOV, or WebM',
-  },
+    VIDEO_NOT_FOUND: 'Video not found',
+    INVALID_VIDEO_FORMAT: 'Invalid video format. Please select MP4, MOV, or WebM'
+  }
 };
 
 function getLocalizedMessage(error: ApplicationError, locale: string): string {
@@ -402,19 +390,23 @@ export interface IVideoProcessor {
 ```
 
 **理由**:
+
 1. **粗粒度**: 每個方法代表一個完整的業務操作，減少介面數量
 2. **Promise**: TypeScript 生態系統標準，易於使用和測試
 3. **註釋完整**: JSDoc 提供清晰的契約定義
 4. **錯誤明確**: 明確標註可能拋出的錯誤類型
 
 **替代方案**:
+
 - **細粒度介面**: 如 `ITranscriptGenerator` 拆分為 `ITranscriptFetcher`, `ITranscriptParser`，過度設計（rejected）
 - **Observable**: 適用於流式數據，本專案無需（rejected）
 - **Callback**: 過時模式，Promise 更清晰（rejected）
 
 **介面版本管理**:
+
 - 目前無版本管理需求（單一實作）
 - 若未來需要多版本，採用以下策略：
+
   ```typescript
   // 方案 1: 介面繼承
   export interface ITranscriptGeneratorV2 extends ITranscriptGenerator {
@@ -428,21 +420,16 @@ export interface IVideoProcessor {
   ```
 
 **擴展性考量**:
+
 ```typescript
 // 未來可能需要進度回報
 export interface ITranscriptGenerator {
-  generate(
-    videoId: string,
-    onProgress?: (progress: number) => void
-  ): Promise<TranscriptDTO>;
+  generate(videoId: string, onProgress?: (progress: number) => void): Promise<TranscriptDTO>;
 }
 
 // 未來可能需要取消操作
 export interface ITranscriptGenerator {
-  generate(
-    videoId: string,
-    signal?: AbortSignal
-  ): Promise<TranscriptDTO>;
+  generate(videoId: string, signal?: AbortSignal): Promise<TranscriptDTO>;
 }
 ```
 
@@ -477,12 +464,12 @@ describe('UploadVideoUseCase', () => {
     // 建立 Mock
     mockVideoRepository = {
       save: vi.fn(),
-      findById: vi.fn(),
+      findById: vi.fn()
     };
 
     mockFileStorage = {
       save: vi.fn().mockResolvedValue('http://example.com/video.mp4'),
-      delete: vi.fn(),
+      delete: vi.fn()
     };
 
     // 注入 Mock
@@ -535,12 +522,14 @@ describe('UploadVideoUseCase', () => {
 ```
 
 **測試覆蓋場景**:
+
 1. **Happy Path**: 正常流程成功執行
 2. **輸入驗證**: 各種無效輸入（格式、大小）
 3. **依賴失敗**: Mock 依賴拋出錯誤
 4. **業務規則**: 特定業務邏輯（如重複性檢查）
 
 **理由**:
+
 1. **單元測試隔離**: Mock 所有依賴，確保測試獨立
 2. **快速執行**: 無真實 I/O，測試秒級完成
 3. **易於維護**: 測試結構清晰，易於理解和修改
@@ -569,9 +558,12 @@ import { IFileStorage } from '@/application/ports/IFileStorage';
 
 // Injection Keys
 export const VideoRepositoryKey: InjectionKey<IVideoRepository> = Symbol('VideoRepository');
-export const TranscriptRepositoryKey: InjectionKey<ITranscriptRepository> = Symbol('TranscriptRepository');
-export const HighlightRepositoryKey: InjectionKey<IHighlightRepository> = Symbol('HighlightRepository');
-export const TranscriptGeneratorKey: InjectionKey<ITranscriptGenerator> = Symbol('TranscriptGenerator');
+export const TranscriptRepositoryKey: InjectionKey<ITranscriptRepository> =
+  Symbol('TranscriptRepository');
+export const HighlightRepositoryKey: InjectionKey<IHighlightRepository> =
+  Symbol('HighlightRepository');
+export const TranscriptGeneratorKey: InjectionKey<ITranscriptGenerator> =
+  Symbol('TranscriptGenerator');
 export const FileStorageKey: InjectionKey<IFileStorage> = Symbol('FileStorage');
 
 // Setup function
@@ -612,6 +604,7 @@ export const useVideoStore = defineStore('video', () => {
 ```
 
 **理由**:
+
 1. **Vue 原生支援**: 無需額外 DI 庫
 2. **型別安全**: InjectionKey 提供型別檢查
 3. **易於測試**: 可在測試中 provide mock 實作
@@ -622,13 +615,13 @@ export const useVideoStore = defineStore('video', () => {
 
 所有研究主題均已完成決策，無遺留的 NEEDS CLARIFICATION 項目。主要決策如下：
 
-| 主題 | 決策 | 理由 |
-|------|------|------|
-| Use Case 模式 | 建構函式注入 + execute 方法 | 清晰、易測試、符合 DDD |
-| DTO 轉換 | Use Case 內轉換 + 私有輔助函數 | 避免過度抽象，結構簡單 |
-| 錯誤處理 | 自定義錯誤類別 + throw | 語義清晰、易於處理 |
-| Port 介面 | 粗粒度 + Promise | 業務導向、TypeScript 友好 |
-| 測試策略 | Vitest + Mock | 快速、獨立、易維護 |
-| 依賴注入 | Vue provide/inject | 原生支援、型別安全 |
+| 主題          | 決策                           | 理由                      |
+| ------------- | ------------------------------ | ------------------------- |
+| Use Case 模式 | 建構函式注入 + execute 方法    | 清晰、易測試、符合 DDD    |
+| DTO 轉換      | Use Case 內轉換 + 私有輔助函數 | 避免過度抽象，結構簡單    |
+| 錯誤處理      | 自定義錯誤類別 + throw         | 語義清晰、易於處理        |
+| Port 介面     | 粗粒度 + Promise               | 業務導向、TypeScript 友好 |
+| 測試策略      | Vitest + Mock                  | 快速、獨立、易維護        |
+| 依賴注入      | Vue provide/inject             | 原生支援、型別安全        |
 
 所有設計均符合 Clean Architecture 和 DDD 原則，可進入 Phase 1 設計階段。

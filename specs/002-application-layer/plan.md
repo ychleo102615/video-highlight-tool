@@ -18,17 +18,20 @@
 **Target Platform**: Web (Desktop & Mobile browsers)
 **Project Type**: Single project (Frontend application with Clean Architecture)
 **Performance Goals**:
+
 - Use Case 執行時間 < 100ms（不含外部 I/O）
 - DTO 轉換效能 < 10ms
 - 記憶體使用合理（每個 Use Case 實例 < 1MB）
 
 **Constraints**:
+
 - Application Layer 不得依賴 Infrastructure 或 Presentation Layer
 - 所有外部依賴必須透過 Port 介面定義
 - Use Cases 必須保持單一職責原則
 - DTO 僅用於數據傳輸，不包含業務邏輯
 
 **Scale/Scope**:
+
 - 5 個 Use Cases
 - 3 個 Port 介面 (ITranscriptGenerator, IFileStorage, IVideoProcessor)
 - 2 個 DTO 類別
@@ -36,35 +39,35 @@
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
 ### Core Principles Compliance
 
-| 原則 | 狀態 | 說明 |
-|------|------|------|
-| Clean Architecture 分層 | ✅ PASS | Application Layer 僅依賴 Domain Layer，通過 Port 介面與外層解耦 |
+| 原則                             | 狀態    | 說明                                                                             |
+| -------------------------------- | ------- | -------------------------------------------------------------------------------- |
+| Clean Architecture 分層          | ✅ PASS | Application Layer 僅依賴 Domain Layer，通過 Port 介面與外層解耦                  |
 | Infrastructure/Presentation 分離 | ✅ PASS | Application Layer 定義 Port，由 Infrastructure 實作，Presentation 呼叫 Use Cases |
-| DDD 模式 | ✅ PASS | 使用 Use Case 模式組織業務邏輯，每個 Use Case 代表完整用戶操作 |
-| TypeScript 型別安全 | ✅ PASS | 所有 Use Cases、Ports、DTOs 都有明確型別定義，無 `any` 使用 |
-| RWD 支援 | N/A | Application Layer 不涉及 UI，由 Presentation Layer 負責 |
-| Pinia 單向數據流 | ✅ PASS | Use Cases 不知道 Store 存在，Store 呼叫 Use Cases 執行邏輯 |
-| 依賴注入 | ✅ PASS | 所有 Use Cases 透過建構函式接收 Repository 和 Port 依賴 |
-| Mock 數據品質 | N/A | Application Layer 不包含 Mock 數據，由 Infrastructure Layer 實作 |
+| DDD 模式                         | ✅ PASS | 使用 Use Case 模式組織業務邏輯，每個 Use Case 代表完整用戶操作                   |
+| TypeScript 型別安全              | ✅ PASS | 所有 Use Cases、Ports、DTOs 都有明確型別定義，無 `any` 使用                      |
+| RWD 支援                         | N/A     | Application Layer 不涉及 UI，由 Presentation Layer 負責                          |
+| Pinia 單向數據流                 | ✅ PASS | Use Cases 不知道 Store 存在，Store 呼叫 Use Cases 執行邏輯                       |
+| 依賴注入                         | ✅ PASS | 所有 Use Cases 透過建構函式接收 Repository 和 Port 依賴                          |
+| Mock 數據品質                    | N/A     | Application Layer 不包含 Mock 數據，由 Infrastructure Layer 實作                 |
 
 ### Architecture Constraints Compliance
 
-| 約束 | 狀態 | 說明 |
-|------|------|------|
-| 資料夾結構 | ✅ PASS | `src/application/` 包含 `use-cases/`, `dto/`, `ports/` |
-| 命名規範 | ✅ PASS | Use Cases 使用 PascalCase + UseCase 後綴，Ports 使用 I 前綴 |
-| 依賴方向 | ✅ PASS | Application → Domain，無反向依賴 |
+| 約束       | 狀態    | 說明                                                        |
+| ---------- | ------- | ----------------------------------------------------------- |
+| 資料夾結構 | ✅ PASS | `src/application/` 包含 `use-cases/`, `dto/`, `ports/`      |
+| 命名規範   | ✅ PASS | Use Cases 使用 PascalCase + UseCase 後綴，Ports 使用 I 前綴 |
+| 依賴方向   | ✅ PASS | Application → Domain，無反向依賴                            |
 
 ### Performance Goals Compliance
 
-| 指標 | 目標 | 預期 | 狀態 |
-|------|------|------|------|
+| 指標              | 目標    | 預期             | 狀態    |
+| ----------------- | ------- | ---------------- | ------- |
 | Use Case 執行時間 | < 100ms | < 50ms（純邏輯） | ✅ PASS |
-| DTO 轉換效能 | < 10ms | < 5ms | ✅ PASS |
+| DTO 轉換效能      | < 10ms  | < 5ms            | ✅ PASS |
 
 ### Gate Result
 
@@ -180,6 +183,7 @@ tests/
 ### 預期產出
 
 `research.md` 將記錄所有研究結果，包含：
+
 - 每個主題的決策
 - 選擇理由
 - 替代方案分析
@@ -196,17 +200,20 @@ tests/
 定義所有 DTOs、Ports 和 Use Cases 的結構：
 
 **DTOs**:
+
 - `VideoDTO`: 視頻元數據（duration, width, height, format）
 - `TranscriptDTO`: 轉錄數據（fullText, sections[]）
   - `SectionDTO`: 段落數據（id, title, sentences[]）
   - `SentenceDTO`: 句子數據（id, text, startTime, endTime, isHighlightSuggestion）
 
 **Ports**:
+
 - `ITranscriptGenerator`: 轉錄生成服務
 - `IFileStorage`: 文件儲存服務
 - `IVideoProcessor`: 視頻處理服務（元數據提取）
 
 **Use Cases**:
+
 - `UploadVideoUseCase`: 輸入、輸出、依賴、流程
 - `ProcessTranscriptUseCase`: 輸入、輸出、依賴、流程
 - `CreateHighlightUseCase`: 輸入、輸出、依賴、流程
@@ -218,6 +225,7 @@ tests/
 TypeScript 介面定義：
 
 **contracts/ports.ts**:
+
 ```typescript
 export interface ITranscriptGenerator {
   generate(videoId: string): Promise<TranscriptDTO>;
@@ -230,6 +238,7 @@ export interface IFileStorage {
 ```
 
 **contracts/use-cases.ts**:
+
 ```typescript
 // 所有 Use Cases 的介面簽名
 export interface IUploadVideoUseCase {
@@ -241,6 +250,7 @@ export interface IUploadVideoUseCase {
 ### 3. quickstart.md
 
 快速入門指南：
+
 - 如何建立新的 Use Case
 - 如何注入依賴
 - 如何撰寫單元測試
@@ -256,28 +266,28 @@ export interface IUploadVideoUseCase {
 
 ## Post-Design Constitution Check
 
-*重新評估設計完成後的憲法合規性*
+_重新評估設計完成後的憲法合規性_
 
 ### Phase 1 設計審查
 
-| 原則 | 狀態 | 驗證結果 |
-|------|------|----------|
-| Clean Architecture 分層 | ✅ PASS | - `data-model.md` 明確定義 DTOs、Ports、Use Cases 結構<br>- Application Layer 僅依賴 Domain Layer 介面<br>- Ports 由 Infrastructure Layer 實作 |
-| Infrastructure/Presentation 分離 | ✅ PASS | - Ports（ITranscriptGenerator, IFileStorage, IVideoProcessor）明確定義<br>- Use Cases 不知道實作細節<br>- DI Container 管理依賴注入 |
-| DDD 模式 | ✅ PASS | - 每個 Use Case 代表完整用戶操作<br>- DTO 轉換邏輯清晰<br>- 聚合協調模式正確（GenerateHighlightUseCase） |
-| TypeScript 型別安全 | ✅ PASS | - 所有 contracts 定義完整型別<br>- 輸入/輸出型別明確<br>- 無 `any` 使用 |
-| 單一職責原則 | ✅ PASS | - 每個 Use Case 職責單一且清晰<br>- 平均程式碼行數預估 < 100 行<br>- 私有方法輔助邏輯提取 |
-| 錯誤處理 | ✅ PASS | - 9 個領域特定錯誤類別<br>- 錯誤碼支援國際化<br>- 錯誤傳播機制明確 |
+| 原則                             | 狀態    | 驗證結果                                                                                                                                       |
+| -------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Clean Architecture 分層          | ✅ PASS | - `data-model.md` 明確定義 DTOs、Ports、Use Cases 結構<br>- Application Layer 僅依賴 Domain Layer 介面<br>- Ports 由 Infrastructure Layer 實作 |
+| Infrastructure/Presentation 分離 | ✅ PASS | - Ports（ITranscriptGenerator, IFileStorage, IVideoProcessor）明確定義<br>- Use Cases 不知道實作細節<br>- DI Container 管理依賴注入            |
+| DDD 模式                         | ✅ PASS | - 每個 Use Case 代表完整用戶操作<br>- DTO 轉換邏輯清晰<br>- 聚合協調模式正確（GenerateHighlightUseCase）                                       |
+| TypeScript 型別安全              | ✅ PASS | - 所有 contracts 定義完整型別<br>- 輸入/輸出型別明確<br>- 無 `any` 使用                                                                        |
+| 單一職責原則                     | ✅ PASS | - 每個 Use Case 職責單一且清晰<br>- 平均程式碼行數預估 < 100 行<br>- 私有方法輔助邏輯提取                                                      |
+| 錯誤處理                         | ✅ PASS | - 9 個領域特定錯誤類別<br>- 錯誤碼支援國際化<br>- 錯誤傳播機制明確                                                                             |
 
 ### 設計文件完整性
 
-| 文件 | 狀態 | 內容檢查 |
-|------|------|----------|
-| `research.md` | ✅ 完成 | - 4 個研究主題全部完成<br>- 決策理由清晰<br>- 無 NEEDS CLARIFICATION |
-| `data-model.md` | ✅ 完成 | - 2 個 DTOs 定義完整<br>- 3 個 Ports 定義完整<br>- 5 個 Use Cases 流程清晰<br>- 9 個錯誤類別定義 |
-| `contracts/ports.ts` | ✅ 完成 | - TypeScript 介面定義<br>- JSDoc 註釋完整 |
-| `contracts/use-cases.ts` | ✅ 完成 | - 所有 Use Cases 介面定義<br>- 輸入/輸出型別定義 |
-| `quickstart.md` | ✅ 完成 | - 建立 Use Case 步驟<br>- 測試範例<br>- DI 配置範例<br>- 檢查清單 |
+| 文件                     | 狀態    | 內容檢查                                                                                         |
+| ------------------------ | ------- | ------------------------------------------------------------------------------------------------ |
+| `research.md`            | ✅ 完成 | - 4 個研究主題全部完成<br>- 決策理由清晰<br>- 無 NEEDS CLARIFICATION                             |
+| `data-model.md`          | ✅ 完成 | - 2 個 DTOs 定義完整<br>- 3 個 Ports 定義完整<br>- 5 個 Use Cases 流程清晰<br>- 9 個錯誤類別定義 |
+| `contracts/ports.ts`     | ✅ 完成 | - TypeScript 介面定義<br>- JSDoc 註釋完整                                                        |
+| `contracts/use-cases.ts` | ✅ 完成 | - 所有 Use Cases 介面定義<br>- 輸入/輸出型別定義                                                 |
+| `quickstart.md`          | ✅ 完成 | - 建立 Use Case 步驟<br>- 測試範例<br>- DI 配置範例<br>- 檢查清單                                |
 
 ### Gate Result
 
@@ -286,12 +296,14 @@ export interface IUploadVideoUseCase {
 ### 發現與改進
 
 **優點**:
+
 1. 架構清晰，依賴方向正確
 2. 錯誤處理完整，支援國際化
 3. 測試策略明確（單元測試 + Mock）
 4. 文檔完整，開發者友好
 
 **潛在改進**（未來考慮）:
+
 1. 若 Use Cases 數量增加，考慮引入 Use Case 分類（如 Video、Transcript、Highlight 分組）
 2. 若需要事務管理，考慮引入 Unit of Work 模式
 3. 若需要進度回報，Ports 可添加 `onProgress` 回調參數

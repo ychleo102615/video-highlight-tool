@@ -99,11 +99,11 @@ export class MockAIService implements ITranscriptGenerator, IMockDataProvider {
               text: sentence.text,
               startTime: sentence.startTime,
               endTime: sentence.endTime,
-              isHighlightSuggestion: sentence.isHighlightSuggestion ?? false,
+              isHighlightSuggestion: sentence.isHighlightSuggestion ?? false
             })
-          ),
+          )
         })
-      ),
+      )
     };
 
     // 7. 使用後自動清除（避免內存洩漏，確保一次性使用）
@@ -141,7 +141,7 @@ export class MockAIService implements ITranscriptGenerator, IMockDataProvider {
   private getDefaultMockData(): string {
     return JSON.stringify({
       fullText:
-        "大家好，歡迎來到今天的分享。今天我們要討論前端架構設計的經驗。我們會討論 Clean Architecture 在前端的應用。Clean Architecture 是由 Robert Martin 提出的軟體架構模式。核心理念是讓業務邏輯獨立於框架和外部依賴。這種架構分為四層：Domain、Application、Infrastructure、Presentation。Domain Layer 包含業務實體和規則，完全不依賴外部。Application Layer 定義應用邏輯和 Use Case。Infrastructure Layer 處理外部系統整合。Presentation Layer 負責使用者介面。",
+        '大家好，歡迎來到今天的分享。今天我們要討論前端架構設計的經驗。我們會討論 Clean Architecture 在前端的應用。Clean Architecture 是由 Robert Martin 提出的軟體架構模式。核心理念是讓業務邏輯獨立於框架和外部依賴。這種架構分為四層：Domain、Application、Infrastructure、Presentation。Domain Layer 包含業務實體和規則，完全不依賴外部。Application Layer 定義應用邏輯和 Use Case。Infrastructure Layer 處理外部系統整合。Presentation Layer 負責使用者介面。',
       sections: [
         {
           id: 'section_1',
@@ -152,23 +152,23 @@ export class MockAIService implements ITranscriptGenerator, IMockDataProvider {
               text: '大家好，歡迎來到今天的分享。',
               startTime: 0.0,
               endTime: 3.5,
-              isHighlightSuggestion: true,
+              isHighlightSuggestion: true
             },
             {
               id: 'sentence_2',
               text: '今天我們要討論前端架構設計的經驗。',
               startTime: 3.5,
               endTime: 7.2,
-              isHighlightSuggestion: true,
+              isHighlightSuggestion: true
             },
             {
               id: 'sentence_3',
               text: '我們會討論 Clean Architecture 在前端的應用。',
               startTime: 7.2,
               endTime: 11.5,
-              isHighlightSuggestion: false,
-            },
-          ],
+              isHighlightSuggestion: false
+            }
+          ]
         },
         {
           id: 'section_2',
@@ -179,23 +179,23 @@ export class MockAIService implements ITranscriptGenerator, IMockDataProvider {
               text: 'Clean Architecture 是由 Robert Martin 提出的軟體架構模式。',
               startTime: 11.5,
               endTime: 17.0,
-              isHighlightSuggestion: false,
+              isHighlightSuggestion: false
             },
             {
               id: 'sentence_5',
               text: '核心理念是讓業務邏輯獨立於框架和外部依賴。',
               startTime: 17.0,
               endTime: 21.5,
-              isHighlightSuggestion: true,
+              isHighlightSuggestion: true
             },
             {
               id: 'sentence_6',
               text: '這種架構分為四層：Domain、Application、Infrastructure、Presentation。',
               startTime: 21.5,
               endTime: 27.8,
-              isHighlightSuggestion: false,
-            },
-          ],
+              isHighlightSuggestion: false
+            }
+          ]
         },
         {
           id: 'section_3',
@@ -206,32 +206,32 @@ export class MockAIService implements ITranscriptGenerator, IMockDataProvider {
               text: 'Domain Layer 包含業務實體和規則，完全不依賴外部。',
               startTime: 27.8,
               endTime: 32.5,
-              isHighlightSuggestion: true,
+              isHighlightSuggestion: true
             },
             {
               id: 'sentence_8',
               text: 'Application Layer 定義應用邏輯和 Use Case。',
               startTime: 32.5,
               endTime: 36.8,
-              isHighlightSuggestion: false,
+              isHighlightSuggestion: false
             },
             {
               id: 'sentence_9',
               text: 'Infrastructure Layer 處理外部系統整合。',
               startTime: 36.8,
               endTime: 40.5,
-              isHighlightSuggestion: true,
+              isHighlightSuggestion: true
             },
             {
               id: 'sentence_10',
               text: 'Presentation Layer 負責使用者介面。',
               startTime: 40.5,
               endTime: 44.0,
-              isHighlightSuggestion: false,
-            },
-          ],
-        },
-      ],
+              isHighlightSuggestion: false
+            }
+          ]
+        }
+      ]
     });
   }
 }

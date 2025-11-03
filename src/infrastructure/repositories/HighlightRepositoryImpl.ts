@@ -66,7 +66,7 @@ export class HighlightRepositoryImpl implements IHighlightRepository {
       console.warn('HighlightRepository: 儲存高光時發生錯誤', {
         highlightId: highlight.id,
         videoId: highlight.videoId,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? error.message : String(error)
       });
       // 不拋出例外,優雅降級 (記憶體儲存已成功)
     }
@@ -113,7 +113,7 @@ export class HighlightRepositoryImpl implements IHighlightRepository {
     } catch (error) {
       console.warn('HighlightRepository: 查找高光時發生錯誤', {
         highlightId: id,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? error.message : String(error)
       });
       return null; // 優雅降級,返回 null
     }
@@ -164,7 +164,7 @@ export class HighlightRepositoryImpl implements IHighlightRepository {
           console.warn('HighlightRepository: 轉換 DTO 時發生錯誤,跳過此筆資料', {
             highlightId: dto.id,
             videoId: dto.videoId,
-            error: error instanceof Error ? error.message : String(error),
+            error: error instanceof Error ? error.message : String(error)
           });
           // 跳過該筆資料,繼續處理其他資料
         }
@@ -181,7 +181,7 @@ export class HighlightRepositoryImpl implements IHighlightRepository {
     } catch (error) {
       console.warn('HighlightRepository: 按視頻 ID 查找高光時發生錯誤', {
         videoId: videoId,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? error.message : String(error)
       });
       // 優雅降級,返回空陣列
       return [];

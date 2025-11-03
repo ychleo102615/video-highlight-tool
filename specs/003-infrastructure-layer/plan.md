@@ -10,6 +10,7 @@
 實作 Infrastructure Layer，包含 Mock AI Service、File Storage Service、以及三個 Repository 實作（Video、Transcript、Highlight）。Mock AI Service 透過記憶體快取讀取使用者上傳的 JSON 檔案並轉換為 TranscriptDTO。File Storage Service 使用瀏覽器原生 URL.createObjectURL() 管理視頻檔案。所有 Repository 使用記憶體 Map 進行運行時 CRUD，並整合 BrowserStorage 工具類別實現基本持久化（IndexedDB + SessionStorage），防止用戶誤刷新導致工作遺失。
 
 技術方案採用：
+
 - MockAIService 提供 setMockData(videoId, jsonContent) 暫存 JSON 到記憶體 Map，generate(videoId) 從 Map 讀取並解析
 - FileStorageService 封裝 URL.createObjectURL/revokeObjectURL
 - BrowserStorage 內部工具類別封裝 IndexedDB 和 SessionStorage 操作，由 Repository 透過建構函式注入使用
@@ -25,23 +26,24 @@
 **Target Platform**: 瀏覽器環境 (Desktop: Windows/Mac Chrome, Mobile: iOS/Android Chrome/Safari)
 **Project Type**: Web 前端 (單一專案)
 **Performance Goals**:
+
 - Repository CRUD 操作 < 10ms (記憶體操作)
 - Mock AI generate() 返回時間 ≈ 1.5 秒 (模擬延遲)
 - IndexedDB 讀寫 < 100ms (小視頻恢復)
 - FileStorageService save() < 50ms (blob URL 生成)
-**Constraints**:
+  **Constraints**:
 - IndexedDB 儲存限制 50MB 視頻檔案
 - SessionStorage 容量限制 < 5MB (僅儲存 sessionId 和大視頻元資料)
 - Mock AI 延遲固定 1.5 秒
 - 不支援跨 Tab 同步
-**Scale/Scope**:
+  **Scale/Scope**:
 - 支援單一視頻編輯會話
 - Mock 資料規模：5-10 個段落，15-80 個句子
 - 最多支援 5 個不同的 Highlight 版本
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
 - ✅ **Clean Architecture 分層架構**: Infrastructure Layer 僅實作 Domain/Application Layer 定義的介面（IVideoRepository、ITranscriptRepository、IHighlightRepository、ITranscriptGenerator、IFileStorage），不引入新的業務邏輯
 - ✅ **Infrastructure 和 Presentation 職責分離**: Infrastructure Layer 專注於技術基礎設施（Repository、API、Storage），不包含任何 Vue 組件或 UI 邏輯

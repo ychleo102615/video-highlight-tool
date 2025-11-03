@@ -91,7 +91,7 @@ export class RestoreSessionUseCase {
     return {
       video,
       transcript,
-      highlights,
+      highlights
     };
   }
 }

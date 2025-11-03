@@ -11,40 +11,40 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 具體規則如下：
 
 1. **嚴格依據來源**
+   - 僅使用使用者提供的內容、你內部明確記載的知識、或經明確查證的資料。
+   - 若資訊不足，請直接說明「沒有足夠資料」或「我無法確定」，不要臆測。
 
-    - 僅使用使用者提供的內容、你內部明確記載的知識、或經明確查證的資料。
-    - 若資訊不足，請直接說明「沒有足夠資料」或「我無法確定」，不要臆測。
 2. **顯示思考依據**
+   - 若你引用資料或推論，請說明你依據的段落或理由。
+   - 若是個人分析或估計，必須明確標註「這是推論」或「這是假設情境」。
 
-    - 若你引用資料或推論，請說明你依據的段落或理由。
-    - 若是個人分析或估計，必須明確標註「這是推論」或「這是假設情境」。
 3. **避免裝作知道**
+   - 不可為了讓答案完整而「補完」不存在的內容。
+   - 若遇到模糊或不完整的問題，請先回問確認或提出選項，而非自行決定。
 
-    - 不可為了讓答案完整而「補完」不存在的內容。
-    - 若遇到模糊或不完整的問題，請先回問確認或提出選項，而非自行決定。
 4. **保持語意一致**
+   - 不可改寫或擴大使用者原意。
+   - 若你需要重述，應明確標示為「重述版本」，並保持語義對等。
 
-    - 不可改寫或擴大使用者原意。
-    - 若你需要重述，應明確標示為「重述版本」，並保持語義對等。
 5. **回答格式**
+   - 若有明確資料：回答並附上依據。
+   - 若無明確資料：回答「無法確定」並說明原因。
+   - 不要在回答中使用「應該是」「可能是」「我猜」等模糊語氣，除非使用者要求。
 
-    - 若有明確資料：回答並附上依據。
-    - 若無明確資料：回答「無法確定」並說明原因。
-    - 不要在回答中使用「應該是」「可能是」「我猜」等模糊語氣，除非使用者要求。
 6. **思考深度**
-
-    - 在產出前，先檢查答案是否： a. 有清楚依據
-        b. 未超出題目範圍
-        c. 沒有出現任何未被明確提及的人名、數字、事件或假設
+   - 在產出前，先檢查答案是否： a. 有清楚依據
+     b. 未超出題目範圍
+     c. 沒有出現任何未被明確提及的人名、數字、事件或假設
 
 最終原則：**寧可空白，不可捏造。**
 
 # 架構
+
 採用 Clean Architecture、Domain Driven Development (DDD) 原則來組織程式碼。
 
-  - 四層架構（Domain, Application, Infrastracture, Presentation）
-  - Use Case 設計原則
-  - 依賴注入配置
+- 四層架構（Domain, Application, Infrastracture, Presentation）
+- Use Case 設計原則
+- 依賴注入配置
 
 # 專案 Memory 文件
 
@@ -53,23 +53,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 專案快速概覽
 
 ### 專案資訊
+
 - **專案名稱**: Video Highlight Tool
 - **專案類型**: Frontend Homework Assignment
 - **目標平台**: Web (Desktop & Mobile)
 
 ### 核心技術棧
+
 ```
 Vue 3 + TypeScript + Tailwind v4 + Vite + Pinia + Naive UI + video.js
 ```
 
 ### 專案目標
+
 建立一個視頻高光編輯工具的展示版本，允許用戶：
+
 1. 上傳視頻
 2. 透過 Mock AI 獲取轉錄和高光建議
 3. 選擇/編輯高光片段
 4. 預覽編輯後的高光視頻（含文字疊加）
 
 ### 架構原則
+
 - ✅ Clean Architecture（四層架構）
 - ✅ Domain-Driven Development (DDD)
 - ✅ 依賴注入
@@ -89,16 +94,19 @@ Vue 3 + TypeScript + Tailwind v4 + Vite + Pinia + Naive UI + video.js
 使用 video.js 作為視頻播放器解決方案
 
 **理由**:
+
 1. 跨瀏覽器兼容性好（iOS Safari 等）
 2. 提供豐富的 API 和插件系統
 3. 社群活躍，文檔完善
 4. 支援自定義 UI
 
 **替代方案**:
+
 - 原生 HTML5 Video: 功能受限，兼容性需自行處理
 - Plyr: 較輕量，但功能不如 video.js 豐富
 
 **後果**:
+
 - 正面: 減少開發時間，提高穩定性
 - 負面: 增加 bundle 大小（約 200KB）
 
@@ -116,15 +124,18 @@ Vue 3 + TypeScript + Tailwind v4 + Vite + Pinia + Naive UI + video.js
 使用 timeupdate 事件監聽 + seekTo 方法跳轉
 
 **理由**:
+
 1. 實現簡單，不需要複雜的視頻處理
 2. 適用於展示型專案
 3. 不需要後端支援
 
 **替代方案**:
+
 - Media Source Extensions (MSE): 過於複雜，開發成本高
 - 伺服器端視頻剪輯: 需要後端，超出專案範圍
 
 **後果**:
+
 - 正面: 快速實現，易於維護
 - 負面: 片段切換可能有輕微延遲（需優化）
 
@@ -142,25 +153,28 @@ Vue 3 + TypeScript + Tailwind v4 + Vite + Pinia + Naive UI + video.js
 建立 MockAIService 類別，返回預設的 JSON 數據
 
 **理由**:
+
 1. 符合作業要求
 2. 無需申請 AI API 金鑰
 3. 開發速度快，可專注於 UI 和交互
 4. 易於後續替換為真實 API
 
 **實作細節**:
+
 - 模擬 1.5 秒處理延遲
 - 準備 2-3 組不同主題的 Mock 數據
 - 數據格式與真實 API 保持一致
 
 **後續計劃**:
-- Phase 2 可考慮接入真實 AI API (如 OpenAI Whisper)
 
+- Phase 2 可考慮接入真實 AI API (如 OpenAI Whisper)
 
 ## 開發指南
 
 ### 開發流程
 
 1. **建立新功能**
+
    ```bash
    # 1. 從 Domain Layer 開始，定義 Entity 或 Value Object
    # 2. 建立對應的 Use Case (Application Layer)
@@ -173,7 +187,6 @@ Vue 3 + TypeScript + Tailwind v4 + Vite + Pinia + Naive UI + video.js
    - 確保內層不依賴外層
    - 使用介面解耦
    - 透過 DI Container 注入依賴
-
 
 ### 資料夾結構速查
 
@@ -189,36 +202,38 @@ src/
 
 ### 命名規範
 
-| 類型 | 規範 | 範例 |
-|------|------|------|
-| Entity | PascalCase, 名詞 | `Video`, `Transcript` |
-| Value Object | PascalCase, 名詞 | `TimeStamp`, `TimeRange` |
-| Use Case | PascalCase + UseCase 後綴 | `UploadVideoUseCase` |
-| Repository | PascalCase + Repository 後綴 | `VideoRepository` |
-| Store | camelCase + Store 後綴 | `videoStore`, `transcriptStore` |
-| Component | PascalCase | `VideoPlayer.vue` |
-| Composable | camelCase, use 前綴 | `useVideoPlayer`, `useHighlight` |
+| 類型         | 規範                         | 範例                             |
+| ------------ | ---------------------------- | -------------------------------- |
+| Entity       | PascalCase, 名詞             | `Video`, `Transcript`            |
+| Value Object | PascalCase, 名詞             | `TimeStamp`, `TimeRange`         |
+| Use Case     | PascalCase + UseCase 後綴    | `UploadVideoUseCase`             |
+| Repository   | PascalCase + Repository 後綴 | `VideoRepository`                |
+| Store        | camelCase + Store 後綴       | `videoStore`, `transcriptStore`  |
+| Component    | PascalCase                   | `VideoPlayer.vue`                |
+| Composable   | camelCase, use 前綴          | `useVideoPlayer`, `useHighlight` |
 
 ### 型別定義位置
 
-| 型別 | 定義位置 |
-|------|----------|
-| Domain 型別 | `domain/entities/`, `domain/value-objects/` |
-| DTO | `application/dto/` |
-| Interface | `domain/repositories/`, `application/ports/` |
-| API Response | `adapter/api/types.ts` |
-| Component Props | 組件內部使用 `defineProps<T>()` |
+| 型別            | 定義位置                                     |
+| --------------- | -------------------------------------------- |
+| Domain 型別     | `domain/entities/`, `domain/value-objects/`  |
+| DTO             | `application/dto/`                           |
+| Interface       | `domain/repositories/`, `application/ports/` |
+| API Response    | `adapter/api/types.ts`                       |
+| Component Props | 組件內部使用 `defineProps<T>()`              |
 
 ## 關鍵概念速查
 
 ### 1. Entity vs Value Object
 
 **Entity (實體)**:
+
 - 有唯一識別 (ID)
 - 可變 (mutable)
 - 例如: `Video`, `Transcript`, `Sentence`
 
 **Value Object (值物件)**:
+
 - 無唯一識別
 - 不可變 (immutable)
 - 透過值比較相等性
@@ -288,6 +303,7 @@ export function useFeature() {
 ### Q1: 為什麼要使用 Clean Architecture？
 
 **A**:
+
 1. **關注點分離**: 業務邏輯與 UI 框架解耦
 2. **可測試性**: 核心邏輯不依賴外部，易於單元測試
 3. **可維護性**: 清晰的層次結構，易於理解和修改
@@ -296,6 +312,7 @@ export function useFeature() {
 ### Q2: Domain Layer 可以使用外部套件嗎？
 
 **A**:
+
 - ❌ 不可使用 UI 框架 (Vue, React)
 - ❌ 不可使用狀態管理 (Pinia, Vuex)
 - ❌ 不可使用 HTTP 客戶端 (axios)
@@ -305,6 +322,7 @@ export function useFeature() {
 ### Q3: 何時該建立新的 Use Case？
 
 **A**: 當有以下情況之一時：
+
 1. 用戶的一個完整操作流程（如「上傳視頻」）
 2. 需要協調多個 Entity 的操作
 3. 包含業務規則驗證
@@ -313,6 +331,7 @@ export function useFeature() {
 ### Q4: Store 和 Use Case 的關係？
 
 **A**:
+
 - **Store**: 管理狀態，呼叫 Use Case
 - **Use Case**: 執行業務邏輯，不知道 Store 的存在
 - **流程**: Component → Store → Use Case → Repository
@@ -332,6 +351,7 @@ export const useVideoStore = defineStore('video', () => {
 ### Q5: 如何處理視頻片段切換的卡頓？
 
 **A**:
+
 1. 添加短暫的淡入淡出過渡
 2. 預加載下一個片段
 3. 使用 `requestAnimationFrame` 優化 seek 時機
@@ -340,6 +360,7 @@ export const useVideoStore = defineStore('video', () => {
 ### Q6: Mobile 上自動播放被阻擋怎麼辦？
 
 **A**:
+
 1. 不要自動播放，等待用戶點擊
 2. 顯示明確的播放按鈕
 3. 在用戶交互後再初始化播放器
@@ -357,15 +378,19 @@ watch(currentTime, (time) => {
 });
 
 // 編輯區監聽
-watch(() => transcriptStore.currentSentenceId, (id) => {
-  scrollToSentence(id);
-  highlightSentence(id);
-});
+watch(
+  () => transcriptStore.currentSentenceId,
+  (id) => {
+    scrollToSentence(id);
+    highlightSentence(id);
+  }
+);
 ```
 
 ### Q8: Mock 數據應該多詳細？
 
 **A**:
+
 - 視頻時長: 2-5 分鐘
 - 段落數: 5-10 個
 - 每段句子數: 3-8 個
@@ -374,6 +399,7 @@ watch(() => transcriptStore.currentSentenceId, (id) => {
 - 時間戳: 符合自然說話節奏
 
 範例:
+
 ```json
 {
   "id": "sent_1",
@@ -384,16 +410,15 @@ watch(() => transcriptStore.currentSentenceId, (id) => {
 }
 ```
 
-
 ## 關鍵檔案速查
 
 ### 必讀檔案
 
-| 檔案 | 內容 | 何時查閱 |
-|------|------|----------|
-| `REQUIREMENTS.md` | 完整需求拆解 | 不確定功能範圍時 |
-| `TECHNICAL_DESIGN.md` | 技術架構和實作細節 | 開發前和開發中 |
-| `CLAUDE.md` | AI 協作規則 | 使用 Claude Code 時 |
+| 檔案                  | 內容               | 何時查閱            |
+| --------------------- | ------------------ | ------------------- |
+| `REQUIREMENTS.md`     | 完整需求拆解       | 不確定功能範圍時    |
+| `TECHNICAL_DESIGN.md` | 技術架構和實作細節 | 開發前和開發中      |
+| `CLAUDE.md`           | AI 協作規則        | 使用 Claude Code 時 |
 
 ### 待建立的關鍵檔案
 
@@ -490,14 +515,14 @@ src/
 
 ## 效能基準目標
 
-| 指標 | 目標值 | 測量方式 |
-|------|--------|----------|
-| 首次內容繪製 (FCP) | < 1.5s | Lighthouse |
-| 最大內容繪製 (LCP) | < 2.5s | Lighthouse |
-| 視頻上傳回應 | < 100ms | 手動測試 |
-| 句子選擇回應 | < 50ms | 手動測試 |
-| 預覽更新延遲 | < 200ms | 手動測試 |
-| Bundle 大小 | < 500KB (gzip) | `npm run build` |
+| 指標               | 目標值         | 測量方式        |
+| ------------------ | -------------- | --------------- |
+| 首次內容繪製 (FCP) | < 1.5s         | Lighthouse      |
+| 最大內容繪製 (LCP) | < 2.5s         | Lighthouse      |
+| 視頻上傳回應       | < 100ms        | 手動測試        |
+| 句子選擇回應       | < 50ms         | 手動測試        |
+| 預覽更新延遲       | < 200ms        | 手動測試        |
+| Bundle 大小        | < 500KB (gzip) | `npm run build` |
 
 ### 3. 視頻播放問題
 
@@ -535,7 +560,6 @@ watch([currentTime, currentSentenceTime], ([video, sentence]) => {
 - [ ] Build 成功 (`npm run build`)
 - [ ] 本地預覽正常 (`npm run preview`)
 
-
 ### 功能檢查
 
 - [ ] 視頻上傳成功
@@ -557,8 +581,8 @@ watch([currentTime, currentSentenceTime], ([video, sentence]) => {
 - [ ] 控制台無錯誤
 - [ ] 效能符合目標
 
-
 ## Active Technologies
+
 - TypeScript ^5.0.0 + 無（Domain Layer 不依賴任何外部框架，僅使用 TypeScript 標準庫） (001-domain-layer)
 - N/A（儲存由 Infrastructure Layer 負責，此層僅定義 Repository 介面） (001-domain-layer)
 - TypeScript ^5.0.0 + 僅依賴 Domain Layer（無外部框架依賴） (002-application-layer)
@@ -571,5 +595,6 @@ watch([currentTime, currentSentenceTime], ([video, sentence]) => {
 - IndexedDB (視頻檔案 + 所有 Entity) + SessionStorage (sessionId) (005-session-restore)
 
 ## Recent Changes
+
 - 005-session-restore: Completed session restore feature implementation - RestoreSessionUseCase, SessionRestorer component, error handling, and validation
 - 001-domain-layer: Added TypeScript ^5.0.0 + 無（Domain Layer 不依賴任何外部框架，僅使用 TypeScript 標準庫）

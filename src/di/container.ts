@@ -8,7 +8,7 @@ type Factory<T = unknown> = () => T;
 
 enum Lifecycle {
   Transient = 'transient', // 每次 resolve 都建立新實例
-  Singleton = 'singleton', // 僅建立一次,後續返回同一個實例
+  Singleton = 'singleton' // 僅建立一次,後續返回同一個實例
 }
 
 interface Registration<T = unknown> {
@@ -34,7 +34,7 @@ export class Container {
   register<T>(key: string, factory: Factory<T>): void {
     this.registrations.set(key, {
       factory,
-      lifecycle: Lifecycle.Transient,
+      lifecycle: Lifecycle.Transient
     });
   }
 
@@ -47,7 +47,7 @@ export class Container {
   registerSingleton<T>(key: string, factory: Factory<T>): void {
     this.registrations.set(key, {
       factory,
-      lifecycle: Lifecycle.Singleton,
+      lifecycle: Lifecycle.Singleton
     });
   }
 
@@ -116,9 +116,7 @@ export async function registerInfrastructureDependencies(): Promise<void> {
   const { BrowserStorage } = await import('@/infrastructure/storage/BrowserStorage');
   const { MockAIService } = await import('@/infrastructure/api/MockAIService');
   const { FileStorageService } = await import('@/infrastructure/storage/FileStorageService');
-  const { VideoRepositoryImpl } = await import(
-    '@/infrastructure/repositories/VideoRepositoryImpl'
-  );
+  const { VideoRepositoryImpl } = await import('@/infrastructure/repositories/VideoRepositoryImpl');
   const { TranscriptRepositoryImpl } = await import(
     '@/infrastructure/repositories/TranscriptRepositoryImpl'
   );
@@ -177,9 +175,7 @@ export async function registerInfrastructureDependencies(): Promise<void> {
   container.registerSingleton('IVideoProcessor', () => new VideoProcessor());
 
   // UploadVideoUseCase: 上傳視頻
-  const { UploadVideoUseCase } = await import(
-    '@/application/use-cases/UploadVideoUseCase'
-  );
+  const { UploadVideoUseCase } = await import('@/application/use-cases/UploadVideoUseCase');
   container.register(
     'UploadVideoUseCase',
     () =>
@@ -218,9 +214,7 @@ export async function registerInfrastructureDependencies(): Promise<void> {
   );
 
   // CreateHighlightUseCase: 建立高光
-  const { CreateHighlightUseCase } = await import(
-    '@/application/use-cases/CreateHighlightUseCase'
-  );
+  const { CreateHighlightUseCase } = await import('@/application/use-cases/CreateHighlightUseCase');
   container.register(
     'CreateHighlightUseCase',
     () =>
@@ -236,14 +230,11 @@ export async function registerInfrastructureDependencies(): Promise<void> {
   );
   container.register(
     'ToggleSentenceInHighlightUseCase',
-    () =>
-      new ToggleSentenceInHighlightUseCase(container.resolve('IHighlightRepository'))
+    () => new ToggleSentenceInHighlightUseCase(container.resolve('IHighlightRepository'))
   );
 
   // RestoreSessionUseCase: 恢復會話
-  const { RestoreSessionUseCase } = await import(
-    '@/application/use-cases/RestoreSessionUseCase'
-  );
+  const { RestoreSessionUseCase } = await import('@/application/use-cases/RestoreSessionUseCase');
   container.register(
     'RestoreSessionUseCase',
     () =>

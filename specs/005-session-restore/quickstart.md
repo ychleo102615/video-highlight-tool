@@ -45,6 +45,7 @@ src/
 建議按以下順序實作（由內到外）：
 
 #### Step 1: Infrastructure Layer - BrowserStorage
+
 ```typescript
 // @src/infrastructure/storage/BrowserStorage.ts
 
@@ -64,30 +65,32 @@ async restoreAllHighlights(): Promise<HighlightPersistenceDTO[]> {
 ```
 
 #### Step 2: Domain Layer - Repository 介面擴充
+
 ```typescript
 // @src/domain/repositories/IVideoRepository.ts
 export interface IVideoRepository {
   save(video: Video): Promise<void>;
   findById(id: string): Promise<Video | null>;
-  findAll(): Promise<Video[]>;  // [NEW]
+  findAll(): Promise<Video[]>; // [NEW]
 }
 
 // @src/domain/repositories/ITranscriptRepository.ts
 export interface ITranscriptRepository {
   save(transcript: Transcript): Promise<void>;
   findById(id: string): Promise<Transcript | null>;
-  findByVideoId(videoId: string): Promise<Transcript | null>;  // [NEW]
+  findByVideoId(videoId: string): Promise<Transcript | null>; // [NEW]
 }
 
 // @src/domain/repositories/IHighlightRepository.ts
 export interface IHighlightRepository {
   save(highlight: Highlight): Promise<void>;
   findById(id: string): Promise<Highlight | null>;
-  findByVideoId(videoId: string): Promise<Highlight[]>;  // [NEW]
+  findByVideoId(videoId: string): Promise<Highlight[]>; // [NEW]
 }
 ```
 
 #### Step 3: Infrastructure Layer - Repository 實作
+
 ```typescript
 // @src/infrastructure/repositories/VideoRepositoryImpl.ts
 async findAll(): Promise<Video[]> {
@@ -105,6 +108,7 @@ async findAll(): Promise<Video[]> {
 ```
 
 #### Step 4: Application Layer - RestoreSessionUseCase
+
 ```typescript
 // @src/application/use-cases/RestoreSessionUseCase.ts
 export class RestoreSessionUseCase {
@@ -141,6 +145,7 @@ export class RestoreSessionUseCase {
 ```
 
 #### Step 5: DI Container - 註冊 Use Case
+
 ```typescript
 // @src/di/container.ts
 container.register('RestoreSessionUseCase', () => {
@@ -153,6 +158,7 @@ container.register('RestoreSessionUseCase', () => {
 ```
 
 #### Step 6: Presentation Layer - videoStore
+
 ```typescript
 // @src/presentation/stores/videoStore.ts
 export const useVideoStore = defineStore('video', () => {
@@ -179,11 +185,12 @@ export const useVideoStore = defineStore('video', () => {
     }
   }
 
-  return { restoreSession, /* ... */ };
+  return { restoreSession /* ... */ };
 });
 ```
 
 #### Step 7: App 整合
+
 ```typescript
 // App.vue
 <script setup lang="ts">
@@ -201,6 +208,7 @@ onMounted(async () => {
 ### 3. 驗證實作
 
 #### 本地開發測試
+
 ```bash
 # 1. 啟動開發伺服器
 npm run dev
@@ -232,12 +240,14 @@ npm run lint
 ```
 
 #### 單元測試
+
 ```bash
 # 執行 RestoreSessionUseCase 測試
 npm run test:unit src/application/use-cases/RestoreSessionUseCase.spec.ts
 ```
 
 #### E2E 測試
+
 ```bash
 # 執行會話恢復 E2E 測試
 npm run test:e2e tests/e2e/session-restore.spec.ts
@@ -246,6 +256,7 @@ npm run test:e2e tests/e2e/session-restore.spec.ts
 ## 關鍵代碼示例
 
 ### 使用 DTOMapper 轉換
+
 ```typescript
 // Infrastructure Layer
 const persistenceDto = await this.browserStorage.restoreVideo(id);
@@ -253,12 +264,14 @@ const video = DTOMapper.videoPersistenceDtoToEntity(persistenceDto);
 ```
 
 ### 判斷是否需要重新上傳
+
 ```typescript
 // Use Case Layer
 const needsReupload = video.file === null;
 ```
 
 ### 顯示通知
+
 ```typescript
 // Presentation Layer
 import { useNotification } from '@/presentation/composables/useNotification';
@@ -278,29 +291,37 @@ showError('恢復會話失敗，請重新上傳視頻');
 ## 常見問題
 
 ### Q1: 為什麼不建立 SessionStateDTO？
+
 **A**: 專案慣例是 Presentation Layer (Store) 直接使用 Domain Entity，避免過度設計。Use Case 直接返回包含 Entity 的匿名物件即可。
 
 ### Q2: Repository 的 findAll() 什麼時候會從 BrowserStorage 恢復？
+
 **A**: 僅在記憶體 Map 為空時（應用首次啟動）。恢復後填充記憶體 Map，後續調用直接返回記憶體資料。
 
 ### Q3: 大視頻恢復後，video.file 是 null，這會影響播放嗎？
+
 **A**: 會的。大視頻恢復後無法直接播放，需要使用者重新上傳相同的視頻檔案。轉錄和高光選擇會被保留。
 
 ### Q4: 如果資料不完整（有 video 但無 transcript），會發生什麼？
+
 **A**: RestoreSessionUseCase 會拋出錯誤，videoStore.restoreSession() 捕獲後顯示「恢復會話失敗，請重新上傳視頻」。
 
 ### Q5: 會話過期時間可以調整嗎？
+
 **A**: 可以。在 BrowserStorage.ts 中修改 `MAX_AGE_MS` 常數（預設 24 小時）。
 
 ### Q6: 如何測試會話過期清除？
+
 **A**: 手動修改 IndexedDB 中資料的 `savedAt` 時間戳，或修改 `MAX_AGE_MS` 為較小值（如 5 秒）進行測試。
 
 ### Q7: 是否支援多視頻專案？
+
 **A**: 目前不支援。RestoreSessionUseCase 僅恢復第一個視頻。若未來需要支援，可依 `savedAt` 排序，恢復最後編輯的視頻。
 
 ## 除錯技巧
 
 ### 檢查 IndexedDB 資料
+
 ```javascript
 // 在瀏覽器 Console 執行
 // 1. 開啟 IndexedDB 資料庫
@@ -312,12 +333,15 @@ const videos = await tx.objectStore('videos').getAll();
 console.log('Videos:', videos);
 
 // 3. 查詢所有轉錄
-const transcripts = await db.transaction('transcripts', 'readonly')
-  .objectStore('transcripts').getAll();
+const transcripts = await db
+  .transaction('transcripts', 'readonly')
+  .objectStore('transcripts')
+  .getAll();
 console.log('Transcripts:', transcripts);
 ```
 
 ### 檢查 SessionStorage
+
 ```javascript
 // 在瀏覽器 Console 執行
 // 1. 查看 sessionId
@@ -325,13 +349,14 @@ console.log('SessionId:', sessionStorage.getItem('sessionId'));
 
 // 2. 查看大視頻元資料
 Object.keys(sessionStorage)
-  .filter(k => k.startsWith('video_meta_'))
-  .forEach(key => {
+  .filter((k) => k.startsWith('video_meta_'))
+  .forEach((key) => {
     console.log(key, JSON.parse(sessionStorage.getItem(key)));
   });
 ```
 
 ### 清除所有會話資料
+
 ```javascript
 // 在瀏覽器 Console 執行
 // 1. 清除 IndexedDB
@@ -356,6 +381,7 @@ location.reload();
 完成實作後：
 
 1. **執行測試**
+
    ```bash
    npm run type-check
    npm run lint

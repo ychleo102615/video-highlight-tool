@@ -69,7 +69,7 @@ export class VideoRepositoryImpl implements IVideoRepository {
       // BrowserStorage 錯誤已在內部捕獲並發出 console.warn
       console.warn('VideoRepository: 儲存視頻時發生錯誤', {
         videoId: video.id,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? error.message : String(error)
       });
       // 不拋出例外,優雅降級 (記憶體儲存已成功)
     }
@@ -118,7 +118,7 @@ export class VideoRepositoryImpl implements IVideoRepository {
       } catch (error) {
         console.warn('VideoRepository: 無法重新創建 blob URL', {
           videoId: id,
-          error: error instanceof Error ? error.message : String(error),
+          error: error instanceof Error ? error.message : String(error)
         });
         // 即使 blob URL 創建失敗，仍返回視頻實例（url 為 undefined）
       }
@@ -130,7 +130,7 @@ export class VideoRepositoryImpl implements IVideoRepository {
     } catch (error) {
       console.warn('VideoRepository: 查找視頻時發生錯誤', {
         videoId: id,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? error.message : String(error)
       });
       return null; // 優雅降級,返回 null
     }
@@ -204,7 +204,7 @@ export class VideoRepositoryImpl implements IVideoRepository {
         } catch (error) {
           console.warn('VideoRepository: 無法重新創建 blob URL', {
             videoId: video.id,
-            error: error instanceof Error ? error.message : String(error),
+            error: error instanceof Error ? error.message : String(error)
           });
           // 即使 blob URL 創建失敗，仍保留視頻實例
         }
@@ -217,7 +217,7 @@ export class VideoRepositoryImpl implements IVideoRepository {
       return videos;
     } catch (error) {
       console.warn('VideoRepository: 查找所有視頻時發生錯誤', {
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? error.message : String(error)
       });
       return []; // 優雅降級,返回空陣列
     }

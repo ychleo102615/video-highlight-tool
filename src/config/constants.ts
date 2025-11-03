@@ -29,11 +29,7 @@ export const MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24小時
 /**
  * 允許上傳的視頻格式
  */
-export const ALLOWED_VIDEO_FORMATS = [
-  'video/mp4',
-  'video/quicktime',
-  'video/webm',
-] as const;
+export const ALLOWED_VIDEO_FORMATS = ['video/mp4', 'video/quicktime', 'video/webm'] as const;
 
 /**
  * 最大上傳檔案大小 (MB)

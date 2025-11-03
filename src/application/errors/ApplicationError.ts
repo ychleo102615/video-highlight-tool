@@ -16,7 +16,10 @@ export class ApplicationError extends Error {
    * @param message - 錯誤訊息
    * @param code - 錯誤碼（用於國際化和日誌）
    */
-  constructor(message: string, public readonly code: string) {
+  constructor(
+    message: string,
+    public readonly code: string
+  ) {
     super(message);
     this.name = this.constructor.name;
 

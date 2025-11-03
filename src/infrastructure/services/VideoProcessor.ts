@@ -6,9 +6,9 @@
  * - 實作 Application Layer 的 IVideoProcessor 介面
  */
 
-import type { IVideoProcessor } from '@/application/ports/IVideoProcessor'
-import { VideoMetadata } from '@/domain/value-objects'
-import { VideoMetadataExtractionError } from '@/application/errors'
+import type { IVideoProcessor } from '@/application/ports/IVideoProcessor';
+import { VideoMetadata } from '@/domain/value-objects';
+import { VideoMetadataExtractionError } from '@/application/errors';
 
 /**
  * VideoProcessor 實作
@@ -34,14 +34,14 @@ export class VideoProcessor implements IVideoProcessor {
     return new Promise((resolve, reject) => {
       try {
         // 建立臨時 video element
-        const video = document.createElement('video')
-        video.preload = 'metadata'
+        const video = document.createElement('video');
+        video.preload = 'metadata';
 
         // 錯誤處理
         video.onerror = () => {
-          URL.revokeObjectURL(video.src)
-          reject(new VideoMetadataExtractionError())
-        }
+          URL.revokeObjectURL(video.src);
+          reject(new VideoMetadataExtractionError());
+        };
 
         // 元數據載入完成
         video.onloadedmetadata = () => {
@@ -52,24 +52,24 @@ export class VideoProcessor implements IVideoProcessor {
               video.videoWidth,
               video.videoHeight,
               file.type
-            )
+            );
 
             // 清理資源
-            URL.revokeObjectURL(video.src)
+            URL.revokeObjectURL(video.src);
 
             // 返回結果
-            resolve(metadata)
+            resolve(metadata);
           } catch {
-            URL.revokeObjectURL(video.src)
-            reject(new VideoMetadataExtractionError())
+            URL.revokeObjectURL(video.src);
+            reject(new VideoMetadataExtractionError());
           }
-        }
+        };
 
         // 載入視頻
-        video.src = URL.createObjectURL(file)
+        video.src = URL.createObjectURL(file);
       } catch {
-        reject(new VideoMetadataExtractionError())
+        reject(new VideoMetadataExtractionError());
       }
-    })
+    });
   }
 }

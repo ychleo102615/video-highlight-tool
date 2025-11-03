@@ -8,6 +8,7 @@
 ## Summary
 
 開發 Presentation Layer，實作視頻高光編輯工具的完整 UI 層，包含：
+
 - **視頻上傳模組**: 使用 Vue 3 Composition API 建立上傳介面，整合 UploadVideoUseCase 和 ProcessTranscriptUseCase。視頻處理完成後，AI 建議的高光句子自動設為選中狀態（建立預設高光）
 - **編輯區模組**: 顯示轉錄內容（段落、句子、時間戳），支援句子選擇切換和雙向同步
 - **預覽區模組**: 使用 video.js 實作片段播放器、文字疊加層、時間軸視覺化
@@ -26,28 +27,29 @@
 **Target Platform**: Web（Desktop: Windows/Mac Chrome, Mobile: iOS Chrome/Safari, Android Chrome）
 **Project Type**: Web Application（單一專案，Vite 建置）
 **Performance Goals**:
-  - 句子選擇響應 < 50ms
-  - 預覽更新延遲 < 200ms
-  - 片段切換卡頓 < 100ms
-  - 文字同步誤差 < 100ms
-  - 編輯區滾動 < 100ms
-  - FCP < 1.5s, LCP < 2.5s
-**Constraints**:
-  - 視頻大小限制 100MB
-  - Bundle 大小 < 500KB (gzip)
-  - 瀏覽器兼容：支援 ES2020+ 和現代 Web API
-  - 移動端觸控目標 ≥ 44x44px
-  - 色彩對比度符合 WCAG AA 標準（4.5:1）
-**Scale/Scope**:
-  - 組件數量：約 15-20 個 Vue 組件
-  - Stores：3 個（videoStore, transcriptStore, highlightStore）
-  - Composables：4 個（useVideoUpload, useTranscript, useHighlight, useVideoPlayer）
-  - 預期轉錄內容：5-10 段落，每段 3-8 句子（總計 50-100 句子）
-  - 單一使用者、單一視頻、單一高光版本（此階段）
+
+- 句子選擇響應 < 50ms
+- 預覽更新延遲 < 200ms
+- 片段切換卡頓 < 100ms
+- 文字同步誤差 < 100ms
+- 編輯區滾動 < 100ms
+- FCP < 1.5s, LCP < 2.5s
+  **Constraints**:
+- 視頻大小限制 100MB
+- Bundle 大小 < 500KB (gzip)
+- 瀏覽器兼容：支援 ES2020+ 和現代 Web API
+- 移動端觸控目標 ≥ 44x44px
+- 色彩對比度符合 WCAG AA 標準（4.5:1）
+  **Scale/Scope**:
+- 組件數量：約 15-20 個 Vue 組件
+- Stores：3 個（videoStore, transcriptStore, highlightStore）
+- Composables：4 個（useVideoUpload, useTranscript, useHighlight, useVideoPlayer）
+- 預期轉錄內容：5-10 段落，每段 3-8 句子（總計 50-100 句子）
+- 單一使用者、單一視頻、單一高光版本（此階段）
 
 ## Constitution Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
 ### Pre-Phase 0 檢查（設計前）
 
@@ -137,6 +139,7 @@ tests/                        # 測試檔案
 ```
 
 **Structure Decision**:
+
 - 採用 Clean Architecture 單一專案結構（Option 1）
 - Presentation Layer 新增於 `src/presentation/`，包含 `components/`, `composables/`, `stores/` 三個子資料夾
 - 組件按功能模組分類：layout（佈局）、upload（上傳）、editing（編輯區）、preview（預覽區）

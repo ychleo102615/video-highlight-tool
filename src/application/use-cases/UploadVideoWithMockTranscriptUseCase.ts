@@ -4,9 +4,9 @@
  * 處理使用者同時上傳視頻和轉錄 JSON 檔案的情況
  */
 
-import type { Video } from '../../domain/aggregates/Video'
-import type { IMockDataProvider } from '../ports/IMockDataProvider'
-import type { UploadVideoUseCase } from './UploadVideoUseCase'
+import type { Video } from '../../domain/aggregates/Video';
+import type { IMockDataProvider } from '../ports/IMockDataProvider';
+import type { UploadVideoUseCase } from './UploadVideoUseCase';
 
 /**
  * UploadVideoWithMockTranscriptUseCase
@@ -51,15 +51,15 @@ export class UploadVideoWithMockTranscriptUseCase {
     onProgress?: (progress: number) => void
   ): Promise<Video> {
     // 1. 上傳視頻（重用現有 Use Case）
-    const video = await this.uploadVideoUseCase.execute(videoFile, onProgress)
+    const video = await this.uploadVideoUseCase.execute(videoFile, onProgress);
 
     // 2. 讀取轉錄 JSON 檔案內容
-    const jsonContent = await transcriptFile.text()
+    const jsonContent = await transcriptFile.text();
 
     // 3. 設定 Mock 資料（setMockData 會進行驗證、補完非必要欄位、檢查時間戳）
-    this.mockDataProvider.setMockData(video.id, jsonContent)
+    this.mockDataProvider.setMockData(video.id, jsonContent);
 
     // 4. 返回視頻
-    return video
+    return video;
   }
 }

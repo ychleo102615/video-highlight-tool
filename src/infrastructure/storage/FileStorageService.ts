@@ -71,7 +71,7 @@ export class FileStorageService implements IFileStorage {
       console.warn('FileStorageService: 無法生成 Blob URL', {
         fileName: file?.name,
         fileSize: file?.size,
-        error: message,
+        error: message
       });
       throw new FileStorageError(`Failed to create blob URL: ${message}`);
     }
@@ -99,7 +99,7 @@ export class FileStorageService implements IFileStorage {
     } catch (error) {
       console.warn('FileStorageService: 無法釋放 Blob URL', {
         url,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? error.message : String(error)
       });
       // 不拋出例外,優雅降級
     }

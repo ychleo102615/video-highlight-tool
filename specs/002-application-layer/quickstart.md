@@ -24,7 +24,7 @@ import { VideoMetadata } from '@/domain/value-objects/VideoMetadata';
 import {
   InvalidVideoFormatError,
   VideoFileTooLargeError,
-  VideoMetadataExtractionError,
+  VideoMetadataExtractionError
 } from '@/application/errors/ApplicationErrors';
 
 export class UploadVideoUseCase {
@@ -44,12 +44,7 @@ export class UploadVideoUseCase {
     const metadata = await this.extractMetadata(file);
 
     // 4. 建立 Entity
-    const video = new Video(
-      this.generateId(),
-      file,
-      metadata,
-      url
-    );
+    const video = new Video(this.generateId(), file, metadata, url);
 
     // 5. 持久化
     await this.videoRepository.save(video);
@@ -75,12 +70,7 @@ export class UploadVideoUseCase {
       const video = document.createElement('video');
       video.preload = 'metadata';
       video.onloadedmetadata = () => {
-        resolve(new VideoMetadata(
-          video.duration,
-          video.videoWidth,
-          video.videoHeight,
-          file.type
-        ));
+        resolve(new VideoMetadata(video.duration, video.videoWidth, video.videoHeight, file.type));
         URL.revokeObjectURL(video.src);
       };
       video.onerror = () => reject(new VideoMetadataExtractionError());
@@ -171,7 +161,7 @@ import { IVideoRepository } from '@/domain/repositories/IVideoRepository';
 import { IFileStorage } from '@/application/ports/IFileStorage';
 import {
   InvalidVideoFormatError,
-  VideoFileTooLargeError,
+  VideoFileTooLargeError
 } from '@/application/errors/ApplicationErrors';
 
 describe('UploadVideoUseCase', () => {
@@ -183,12 +173,12 @@ describe('UploadVideoUseCase', () => {
     // 建立 Mock 依賴
     mockVideoRepository = {
       save: vi.fn().mockResolvedValue(undefined),
-      findById: vi.fn().mockResolvedValue(null),
+      findById: vi.fn().mockResolvedValue(null)
     };
 
     mockFileStorage = {
       save: vi.fn().mockResolvedValue('http://example.com/video.mp4'),
-      delete: vi.fn().mockResolvedValue(undefined),
+      delete: vi.fn().mockResolvedValue(undefined)
     };
 
     // 注入 Mock 依賴
@@ -347,7 +337,7 @@ export const useVideoStore = defineStore('video', () => {
   return {
     video,
     isUploading,
-    uploadVideo,
+    uploadVideo
   };
 });
 ```
@@ -361,7 +351,10 @@ export const useVideoStore = defineStore('video', () => {
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useVideoStore } from '@/presentation/state/videoStore';
-import { InvalidVideoFormatError, VideoFileTooLargeError } from '@/application/errors/ApplicationErrors';
+import {
+  InvalidVideoFormatError,
+  VideoFileTooLargeError
+} from '@/application/errors/ApplicationErrors';
 
 const videoStore = useVideoStore();
 const errorMessage = ref<string>('');

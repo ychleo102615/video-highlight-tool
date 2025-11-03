@@ -15,12 +15,7 @@ import { openDB, type IDBPDatabase } from 'idb';
 import type { VideoPersistenceDTO } from './dto/VideoPersistenceDTO';
 import type { TranscriptPersistenceDTO } from './dto/TranscriptPersistenceDTO';
 import type { HighlightPersistenceDTO } from './dto/HighlightPersistenceDTO';
-import {
-  DB_NAME,
-  DB_VERSION,
-  MAX_AGE_MS,
-  SESSION_ID_KEY,
-} from '../../config/constants';
+import { DB_NAME, DB_VERSION, MAX_AGE_MS, SESSION_ID_KEY } from '../../config/constants';
 import { generateSessionId } from '../../config/id-generator';
 
 export class BrowserStorage {
@@ -60,7 +55,7 @@ export class BrowserStorage {
             highlightStore.createIndex('sessionId', 'sessionId', { unique: false });
             highlightStore.createIndex('savedAt', 'savedAt', { unique: false });
           }
-        },
+        }
       });
 
       // 3. 清理過期資料
@@ -129,7 +124,7 @@ export class BrowserStorage {
     try {
       const allVideos = await this.db.getAll('videos');
       // 過濾：只返回當前 sessionId 的資料
-      return allVideos.filter(video => video.sessionId === this.sessionId);
+      return allVideos.filter((video) => video.sessionId === this.sessionId);
     } catch (error) {
       console.warn('Failed to restore all videos:', error);
       return [];
@@ -172,7 +167,7 @@ export class BrowserStorage {
       const index = tx.store.index('videoId');
       const transcripts = await index.getAll(videoId);
       // 過濾：只返回當前 sessionId 的資料
-      const currentSessionTranscripts = transcripts.filter(t => t.sessionId === this.sessionId);
+      const currentSessionTranscripts = transcripts.filter((t) => t.sessionId === this.sessionId);
       return currentSessionTranscripts.length > 0 ? currentSessionTranscripts[0]! : null;
     } catch (error) {
       console.warn('Failed to restore transcript by videoId:', error);
@@ -228,7 +223,7 @@ export class BrowserStorage {
       const index = tx.store.index('videoId');
       const highlights = await index.getAll(videoId);
       // 過濾：只返回當前 sessionId 的資料
-      return highlights.filter(h => h.sessionId === this.sessionId);
+      return highlights.filter((h) => h.sessionId === this.sessionId);
     } catch (error) {
       console.warn('Failed to restore highlights by videoId:', error);
       return [];

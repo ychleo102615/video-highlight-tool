@@ -91,9 +91,7 @@ export class ProcessTranscriptUseCase {
    * @returns Transcript Entity
    */
   private convertToEntity(dto: TranscriptDTO): Transcript {
-    const sections = dto.sections.map((sectionDTO) =>
-      this.convertSectionToEntity(sectionDTO)
-    );
+    const sections = dto.sections.map((sectionDTO) => this.convertSectionToEntity(sectionDTO));
 
     const transcriptId = generateTranscriptId();
     return new Transcript(transcriptId, dto.videoId, sections, dto.fullText);
@@ -106,9 +104,7 @@ export class ProcessTranscriptUseCase {
    * @returns Section Entity
    */
   private convertSectionToEntity(dto: SectionDTO): Section {
-    const sentences = dto.sentences.map((sentenceDTO) =>
-      this.convertSentenceToEntity(sentenceDTO)
-    );
+    const sentences = dto.sentences.map((sentenceDTO) => this.convertSentenceToEntity(sentenceDTO));
 
     return new Section(dto.id, dto.title, sentences);
   }
@@ -127,5 +123,4 @@ export class ProcessTranscriptUseCase {
 
     return new Sentence(dto.id, dto.text, timeRange, dto.isHighlightSuggestion);
   }
-
 }

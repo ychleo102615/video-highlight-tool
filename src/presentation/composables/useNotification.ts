@@ -5,7 +5,7 @@
  * 封裝 Naive UI 的 useNotification API
  */
 
-import { useNotification as useNaiveNotification } from 'naive-ui'
+import { useNotification as useNaiveNotification } from 'naive-ui';
 
 export interface UseNotificationReturn {
   /**
@@ -14,7 +14,7 @@ export interface UseNotificationReturn {
    * @param content 內容（可選）
    * @param duration 持續時間（毫秒，預設 3000）
    */
-  success: (title: string, content?: string, duration?: number) => void
+  success: (title: string, content?: string, duration?: number) => void;
 
   /**
    * 顯示錯誤通知
@@ -22,7 +22,7 @@ export interface UseNotificationReturn {
    * @param content 內容（可選）
    * @param duration 持續時間（毫秒，預設 4500）
    */
-  error: (title: string, content?: string, duration?: number) => void
+  error: (title: string, content?: string, duration?: number) => void;
 
   /**
    * 顯示警告通知
@@ -30,7 +30,7 @@ export interface UseNotificationReturn {
    * @param content 內容（可選）
    * @param duration 持續時間（毫秒，預設 3000）
    */
-  warning: (title: string, content?: string, duration?: number) => void
+  warning: (title: string, content?: string, duration?: number) => void;
 
   /**
    * 顯示資訊通知
@@ -38,11 +38,11 @@ export interface UseNotificationReturn {
    * @param content 內容（可選）
    * @param duration 持續時間（毫秒，預設 3000）
    */
-  info: (title: string, content?: string, duration?: number) => void
+  info: (title: string, content?: string, duration?: number) => void;
 }
 
 export function useNotification(): UseNotificationReturn {
-  const notification = useNaiveNotification()
+  const notification = useNaiveNotification();
 
   function success(title: string, content?: string, duration = 3000) {
     notification.success({
@@ -50,7 +50,7 @@ export function useNotification(): UseNotificationReturn {
       content,
       duration,
       keepAliveOnHover: true
-    })
+    });
   }
 
   function error(title: string, content?: string, duration = 4500) {
@@ -59,7 +59,7 @@ export function useNotification(): UseNotificationReturn {
       content,
       duration,
       keepAliveOnHover: true
-    })
+    });
   }
 
   function warning(title: string, content?: string, duration = 3000) {
@@ -68,7 +68,7 @@ export function useNotification(): UseNotificationReturn {
       content,
       duration,
       keepAliveOnHover: true
-    })
+    });
   }
 
   function info(title: string, content?: string, duration = 3000) {
@@ -77,7 +77,7 @@ export function useNotification(): UseNotificationReturn {
       content,
       duration,
       keepAliveOnHover: true
-    })
+    });
   }
 
   return {
@@ -85,5 +85,5 @@ export function useNotification(): UseNotificationReturn {
     error,
     warning,
     info
-  }
+  };
 }

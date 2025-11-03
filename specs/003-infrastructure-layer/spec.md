@@ -5,7 +5,7 @@
 **Status**: Draft
 **Input**: User description: "@README.md @TECHNICAL_DESIGN.md 參考 @REQUIREMENTS.md ## 開發任務清單 Phase 4: Infrastructure Layer 接下來我們要開發的是基礎建設層，是實際操作影片檔案系統、與 API 交互的地方。目前影片不會真的上傳，也不會真的呼叫 API 來獲取資料。API 的結果可以是透過讀取其他地方已經存在的假檔案，並將結果回傳。"
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Mock AI Transcript Generation from Cached JSON (Priority: P1)
 
@@ -121,7 +121,7 @@
 - **視頻檔案剛好 50MB 邊界值**: 統一處理為「小視頻」，儲存到 IndexedDB
 - **用戶在多個 Tab 同時編輯**: 不支援跨 Tab 同步，每個 Tab 維護獨立的編輯狀態
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -189,7 +189,7 @@
 - **PersistenceDTO**: 用於 IndexedDB 儲存的 Plain Objects，包含 VideoDTO、TranscriptDTO、HighlightDTO，對應 Domain Entities 的可序列化表示（無方法，僅資料屬性）
 - **DI Container**: 專案級依賴注入容器（位於 `src/di/container.ts`），集中管理所有跨層依賴關係。負責註冊和解析 Repository、Service、BrowserStorage 等實例。Infrastructure Layer 和 Presentation Layer 共用此容器
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useVideoUpload } from '@/presentation/composables/useVideoUpload'
-import { useNotification } from '@/presentation/composables/useNotification'
-import { CloudArrowUpIcon } from '@heroicons/vue/24/solid'
-import { NButton, NProgress } from 'naive-ui'
-import { ALLOWED_VIDEO_FORMATS, MAX_FILE_SIZE, MAX_FILE_SIZE_MB } from '@/config'
+import { ref } from 'vue';
+import { useVideoUpload } from '@/presentation/composables/useVideoUpload';
+import { useNotification } from '@/presentation/composables/useNotification';
+import { CloudArrowUpIcon } from '@heroicons/vue/24/solid';
+import { NButton, NProgress } from 'naive-ui';
+import { ALLOWED_VIDEO_FORMATS, MAX_FILE_SIZE, MAX_FILE_SIZE_MB } from '@/config';
 
 // ========================================
 // Composable
 // ========================================
-const { isUploading, uploadProgress, error, uploadVideo } = useVideoUpload()
-const notification = useNotification()
+const { isUploading, uploadProgress, error, uploadVideo } = useVideoUpload();
+const notification = useNotification();
 
 // ========================================
 // Local State
 // ========================================
-const videoFileInput = ref<HTMLInputElement | null>(null)
-const transcriptFileInput = ref<HTMLInputElement | null>(null)
-const selectedVideoFile = ref<File | null>(null)
-const selectedTranscriptFile = ref<File | null>(null)
+const videoFileInput = ref<HTMLInputElement | null>(null);
+const transcriptFileInput = ref<HTMLInputElement | null>(null);
+const selectedVideoFile = ref<File | null>(null);
+const selectedTranscriptFile = ref<File | null>(null);
 
 // ========================================
 // Methods
@@ -28,56 +28,56 @@ const selectedTranscriptFile = ref<File | null>(null)
  * 觸發視頻文件選擇
  */
 function triggerVideoFileSelect() {
-  videoFileInput.value?.click()
+  videoFileInput.value?.click();
 }
 
 /**
  * 觸發轉錄文件選擇
  */
 function triggerTranscriptFileSelect() {
-  transcriptFileInput.value?.click()
+  transcriptFileInput.value?.click();
 }
 
 /**
  * 處理視頻文件選擇
  */
 function handleVideoFileChange(event: Event) {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
 
-  if (!file) return
+  if (!file) return;
 
   // 驗證文件格式
   if (!ALLOWED_VIDEO_FORMATS.includes(file.type as any)) {
-    notification.error('不支援的視頻格式', '請選擇 MP4、MOV 或 WEBM 格式')
-    return
+    notification.error('不支援的視頻格式', '請選擇 MP4、MOV 或 WEBM 格式');
+    return;
   }
 
   // 驗證文件大小
   if (file.size > MAX_FILE_SIZE) {
-    notification.error('文件大小超過限制', `文件大小不可超過 ${MAX_FILE_SIZE_MB}MB`)
-    return
+    notification.error('文件大小超過限制', `文件大小不可超過 ${MAX_FILE_SIZE_MB}MB`);
+    return;
   }
 
-  selectedVideoFile.value = file
+  selectedVideoFile.value = file;
 }
 
 /**
  * 處理轉錄文件選擇
  */
 function handleTranscriptFileChange(event: Event) {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
 
-  if (!file) return
+  if (!file) return;
 
   // 驗證文件格式
   if (!file.name.endsWith('.json')) {
-    notification.error('格式錯誤', '請選擇 JSON 格式的轉錄檔案')
-    return
+    notification.error('格式錯誤', '請選擇 JSON 格式的轉錄檔案');
+    return;
   }
 
-  selectedTranscriptFile.value = file
+  selectedTranscriptFile.value = file;
 }
 
 /**
@@ -85,27 +85,27 @@ function handleTranscriptFileChange(event: Event) {
  */
 async function handleUpload() {
   if (!selectedVideoFile.value) {
-    notification.warning('缺少視頻檔案', '請選擇視頻檔案')
-    return
+    notification.warning('缺少視頻檔案', '請選擇視頻檔案');
+    return;
   }
 
   if (!selectedTranscriptFile.value) {
-    notification.warning('缺少轉錄檔案', '請選擇轉錄檔案')
-    return
+    notification.warning('缺少轉錄檔案', '請選擇轉錄檔案');
+    return;
   }
 
   try {
-    await uploadVideo(selectedVideoFile.value, selectedTranscriptFile.value)
-    notification.success('上傳成功', '視頻已成功上傳並開始處理')
+    await uploadVideo(selectedVideoFile.value, selectedTranscriptFile.value);
+    notification.success('上傳成功', '視頻已成功上傳並開始處理');
 
     // 上傳成功，清除選擇
-    selectedVideoFile.value = null
-    selectedTranscriptFile.value = null
+    selectedVideoFile.value = null;
+    selectedTranscriptFile.value = null;
 
-    if (videoFileInput.value) videoFileInput.value.value = ''
-    if (transcriptFileInput.value) transcriptFileInput.value.value = ''
+    if (videoFileInput.value) videoFileInput.value.value = '';
+    if (transcriptFileInput.value) transcriptFileInput.value.value = '';
   } catch (err) {
-    notification.error('上傳失敗', (err as Error).message || '視頻上傳過程中發生錯誤')
+    notification.error('上傳失敗', (err as Error).message || '視頻上傳過程中發生錯誤');
   }
 }
 
@@ -113,8 +113,8 @@ async function handleUpload() {
  * 清除選擇的轉錄文件
  */
 function clearTranscriptFile() {
-  selectedTranscriptFile.value = null
-  if (transcriptFileInput.value) transcriptFileInput.value.value = ''
+  selectedTranscriptFile.value = null;
+  if (transcriptFileInput.value) transcriptFileInput.value.value = '';
 }
 </script>
 
@@ -148,7 +148,9 @@ function clearTranscriptFile() {
           {{ selectedVideoFile.name }} ({{ (selectedVideoFile.size / 1024 / 1024).toFixed(2) }} MB)
         </span>
       </div>
-      <p class="mt-1 text-xs text-gray-500">支援格式：MP4, MOV, WEBM（最大 {{MAX_FILE_SIZE_MB}}MB）</p>
+      <p class="mt-1 text-xs text-gray-500">
+        支援格式：MP4, MOV, WEBM（最大 {{ MAX_FILE_SIZE_MB }}MB）
+      </p>
     </div>
 
     <!-- 轉錄文件選擇 -->
@@ -162,9 +164,7 @@ function clearTranscriptFile() {
         @change="handleTranscriptFileChange"
       />
       <div class="flex items-center gap-3">
-        <NButton @click="triggerTranscriptFileSelect" :disabled="isUploading">
-          選擇 JSON
-        </NButton>
+        <NButton @click="triggerTranscriptFileSelect" :disabled="isUploading"> 選擇 JSON </NButton>
         <span v-if="selectedTranscriptFile" class="text-sm text-gray-600 flex items-center gap-2">
           {{ selectedTranscriptFile.name }}
           <button

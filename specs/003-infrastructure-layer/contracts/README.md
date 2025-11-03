@@ -88,6 +88,7 @@
 ```
 
 **補完結果**:
+
 - `fullText` 自動生成為 `"大家好，歡迎來到今天的分享。"`
 - `isHighlightSuggestion` 自動補完為 `false`
 
@@ -148,6 +149,7 @@ export class MockAIService implements ITranscriptGenerator {
 ### 未來擴展
 
 若未來需要支援真實 AI API（如 OpenAI Whisper），可以新增：
+
 - `transcript-api-response.schema.json` - 真實 AI API 回應格式
 - `transcript-api-request.schema.json` - 真實 AI API 請求格式
 

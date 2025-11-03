@@ -7,12 +7,20 @@
     >
       <div class="text-red-600 text-center">
         <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
         </svg>
         <p class="text-lg font-semibold mb-2">視頻播放器錯誤</p>
         <p class="text-sm text-gray-600">{{ errorMessage }}</p>
         <button
-          @click="hasError = false; errorMessage = ''"
+          @click="
+            hasError = false;
+            errorMessage = '';
+          "
           class="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
         >
           重試
@@ -21,11 +29,7 @@
     </div>
 
     <!-- Video.js 播放器 -->
-    <video
-      v-show="!hasError"
-      ref="videoElement"
-      class="video-js vjs-big-play-centered"
-    ></video>
+    <video v-show="!hasError" ref="videoElement" class="video-js vjs-big-play-centered"></video>
 
     <!-- 文字疊加層 -->
     <TranscriptOverlay
@@ -45,37 +49,37 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onUnmounted, onErrorCaptured, computed } from 'vue'
-import { NSpin } from 'naive-ui'
-import { useVideoPlayer } from '@/presentation/composables/useVideoPlayer'
-import { useTranscriptStore } from '@/presentation/stores/transcriptStore'
-import TranscriptOverlay from './TranscriptOverlay.vue'
-import type { VideoPlayerProps, VideoPlayerEmits } from '@/presentation/types/component-contracts'
+import { ref, watch, onMounted, onUnmounted, onErrorCaptured, computed } from 'vue';
+import { NSpin } from 'naive-ui';
+import { useVideoPlayer } from '@/presentation/composables/useVideoPlayer';
+import { useTranscriptStore } from '@/presentation/stores/transcriptStore';
+import TranscriptOverlay from './TranscriptOverlay.vue';
+import type { VideoPlayerProps, VideoPlayerEmits } from '@/presentation/types/component-contracts';
 
 // Props
-const props = defineProps<VideoPlayerProps>()
+const props = defineProps<VideoPlayerProps>();
 
 // Emits
-const emit = defineEmits<VideoPlayerEmits>()
+const emit = defineEmits<VideoPlayerEmits>();
 
 // 錯誤狀態
-const hasError = ref(false)
-const errorMessage = ref('')
+const hasError = ref(false);
+const errorMessage = ref('');
 
 /**
  * 錯誤邊界：捕獲子組件錯誤
  * 防止整個應用崩潰
  */
 onErrorCaptured((err: Error) => {
-  console.error('[VideoPlayer] Captured error from child component:', err)
-  hasError.value = true
-  errorMessage.value = err.message || '視頻播放器發生錯誤'
+  console.error('[VideoPlayer] Captured error from child component:', err);
+  hasError.value = true;
+  errorMessage.value = err.message || '視頻播放器發生錯誤';
   // 返回 false 阻止錯誤繼續向上傳播
-  return false
-})
+  return false;
+});
 
 // Stores
-const transcriptStore = useTranscriptStore()
+const transcriptStore = useTranscriptStore();
 
 // 使用 useVideoPlayer composable
 const {
@@ -90,34 +94,34 @@ const {
   initializePlayer,
   updateSegments,
   disposePlayer
-} = useVideoPlayer()
+} = useVideoPlayer();
 
 // 載入狀態
-const isLoading = ref(true)
+const isLoading = ref(true);
 
 // 計算當前播放句子的文字（用於文字疊加）
 const currentTranscriptText = computed(() => {
-  return transcriptStore.playingSentence?.text ?? ''
-})
+  return transcriptStore.playingSentence?.text ?? '';
+});
 
 // 控制文字疊加是否顯示（暫停時也顯示）
 const showTranscript = computed(() => {
-  return currentTranscriptText.value !== ''
-})
+  return currentTranscriptText.value !== '';
+});
 
 /**
  * 事件處理函數：視頻載入完成
  */
 function handleLoadedData() {
-  isLoading.value = false
+  isLoading.value = false;
 }
 
 /**
  * 事件處理函數：視頻載入錯誤
  */
 function handleError(e: Event) {
-  console.error('VideoPlayer: video loading error', e)
-  isLoading.value = false
+  console.error('VideoPlayer: video loading error', e);
+  isLoading.value = false;
 }
 
 /**
@@ -125,25 +129,25 @@ function handleError(e: Event) {
  */
 function setupPlayer() {
   if (!props.videoUrl || props.segments.length === 0) {
-    console.warn('VideoPlayer: videoUrl or segments is empty')
-    isLoading.value = false
-    return
+    console.warn('VideoPlayer: videoUrl or segments is empty');
+    isLoading.value = false;
+    return;
   }
 
-  isLoading.value = true
+  isLoading.value = true;
 
   // 初始化播放器和片段播放
-  initializePlayer(props.videoUrl, props.segments)
+  initializePlayer(props.videoUrl, props.segments);
 
   // 監聽 loadeddata 事件（只在初始化時添加一次）
   if (videoElement.value) {
     // 移除舊的監聽器，避免重複添加
-    videoElement.value.removeEventListener('loadeddata', handleLoadedData)
-    videoElement.value.removeEventListener('error', handleError)
+    videoElement.value.removeEventListener('loadeddata', handleLoadedData);
+    videoElement.value.removeEventListener('error', handleError);
 
     // 添加新的監聽器
-    videoElement.value.addEventListener('loadeddata', handleLoadedData)
-    videoElement.value.addEventListener('error', handleError)
+    videoElement.value.addEventListener('loadeddata', handleLoadedData);
+    videoElement.value.addEventListener('error', handleError);
   }
 }
 
@@ -152,10 +156,10 @@ watch(
   () => props.videoUrl,
   (newUrl, oldUrl) => {
     if (newUrl !== oldUrl) {
-      setupPlayer()
+      setupPlayer();
     }
   }
-)
+);
 
 // 監聽 segments 變化，只更新片段列表
 watch(
@@ -163,40 +167,40 @@ watch(
   (newSegments) => {
     if (newSegments.length === 0) {
       // segments 變為空，清理播放器
-      disposePlayer()
-      isLoading.value = false
+      disposePlayer();
+      isLoading.value = false;
     } else {
       // segments 有內容，只更新片段列表（不重新初始化播放器）
-      updateSegments(newSegments)
+      updateSegments(newSegments);
     }
   }
-)
+);
 
 // 監聽播放時間變化，發送 timeupdate 事件
 watch(currentTime, (time) => {
-  emit('timeupdate', time)
-})
+  emit('timeupdate', time);
+});
 
 // 監聽播放狀態變化，發送 play-state-change 事件
 watch(isPlaying, (playing) => {
-  emit('play-state-change', playing)
-})
+  emit('play-state-change', playing);
+});
 
 // 組件掛載時設定播放器
 onMounted(() => {
-  setupPlayer()
-})
+  setupPlayer();
+});
 
 // 組件卸載時清理播放器
 onUnmounted(() => {
   // 移除事件監聽器
   if (videoElement.value) {
-    videoElement.value.removeEventListener('loadeddata', handleLoadedData)
-    videoElement.value.removeEventListener('error', handleError)
+    videoElement.value.removeEventListener('loadeddata', handleLoadedData);
+    videoElement.value.removeEventListener('error', handleError);
   }
 
-  disposePlayer()
-})
+  disposePlayer();
+});
 
 // 暴露給父組件的方法
 defineExpose({
@@ -207,7 +211,7 @@ defineExpose({
   currentTime,
   isPlaying,
   duration
-})
+});
 </script>
 
 <style>
