@@ -155,7 +155,7 @@ function clearTranscriptFile() {
 
     <!-- 轉錄文件選擇 -->
     <div class="mb-6">
-      <label class="block text-sm font-medium text-gray-700 mb-2">轉錄檔案 *</label>
+      <label class="block text-sm font-medium text-gray-700 mb-2">轉錄檔案（模擬 API 回覆） *</label>
       <input
         ref="transcriptFileInput"
         type="file"
