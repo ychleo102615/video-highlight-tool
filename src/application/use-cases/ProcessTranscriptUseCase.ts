@@ -14,6 +14,7 @@ import type { IVideoRepository } from '../../domain/repositories/IVideoRepositor
 import type { ITranscriptGenerator } from '../ports/ITranscriptGenerator';
 import type { TranscriptDTO, SectionDTO, SentenceDTO } from '../dto';
 import { VideoNotFoundError, TranscriptGenerationError } from '../errors';
+import { generateTranscriptId } from '../../config/id-generator';
 
 /**
  * ProcessTranscriptUseCase
@@ -94,7 +95,7 @@ export class ProcessTranscriptUseCase {
       this.convertSectionToEntity(sectionDTO)
     );
 
-    const transcriptId = this.generateId();
+    const transcriptId = generateTranscriptId();
     return new Transcript(transcriptId, dto.videoId, sections, dto.fullText);
   }
 
@@ -127,12 +128,4 @@ export class ProcessTranscriptUseCase {
     return new Sentence(dto.id, dto.text, timeRange, dto.isHighlightSuggestion);
   }
 
-  /**
-   * 生成唯一 ID（簡化版 UUID）
-   *
-   * @returns 唯一識別碼
-   */
-  private generateId(): string {
-    return `transcript_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-  }
 }

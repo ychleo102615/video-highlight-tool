@@ -16,11 +16,15 @@ import { openDB, type IDBPDatabase } from 'idb';
 import type { VideoPersistenceDTO } from './dto/VideoPersistenceDTO';
 import type { TranscriptPersistenceDTO } from './dto/TranscriptPersistenceDTO';
 import type { HighlightPersistenceDTO } from './dto/HighlightPersistenceDTO';
-
-const DB_NAME = 'video-highlight-tool-db';
-const DB_VERSION = 1;
-const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
-const MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 小時
+import {
+  DB_NAME,
+  DB_VERSION,
+  MAX_VIDEO_SIZE,
+  MAX_AGE_MS,
+  SESSION_ID_KEY,
+  VIDEO_META_KEY_PREFIX,
+} from '../../config/constants';
+import { generateSessionId } from '../../config/id-generator';
 
 export class BrowserStorage {
   private db!: IDBPDatabase;
@@ -74,13 +78,13 @@ export class BrowserStorage {
    * 獲取或生成 sessionId
    */
   private initSessionId(): string {
-    const existing = sessionStorage.getItem('sessionId');
+    const existing = sessionStorage.getItem(SESSION_ID_KEY);
     if (existing) {
       return existing;
     }
 
-    const newId = `session_${Date.now()}_${Math.random().toString(36).substring(2)}`;
-    sessionStorage.setItem('sessionId', newId);
+    const newId = generateSessionId();
+    sessionStorage.setItem(SESSION_ID_KEY, newId);
     return newId;
   }
 
@@ -111,7 +115,7 @@ export class BrowserStorage {
           height: video.metadata.height,
           mimeType: video.metadata.mimeType,
         };
-        sessionStorage.setItem(`video_meta_${video.id}`, JSON.stringify(meta));
+        sessionStorage.setItem(`${VIDEO_META_KEY_PREFIX}${video.id}`, JSON.stringify(meta));
         return;
       }
 
@@ -133,7 +137,7 @@ export class BrowserStorage {
       if (video) return video;
 
       // 2. 查 SessionStorage (大視頻元資料)
-      const metaJson = sessionStorage.getItem(`video_meta_${id}`);
+      const metaJson = sessionStorage.getItem(`${VIDEO_META_KEY_PREFIX}${id}`);
       if (metaJson) {
         const meta = JSON.parse(metaJson);
         // 返回僅含元資料的 DTO,file 為 null
@@ -171,7 +175,9 @@ export class BrowserStorage {
       const indexedDbVideos = await this.db.getAll('videos');
 
       // 2. 從 SessionStorage 查詢大視頻元資料
-      const sessionKeys = Object.keys(sessionStorage).filter((k) => k.startsWith('video_meta_'));
+      const sessionKeys = Object.keys(sessionStorage).filter((k) =>
+        k.startsWith(VIDEO_META_KEY_PREFIX)
+      );
 
       const sessionVideos = sessionKeys.map((key) => {
         const meta = JSON.parse(sessionStorage.getItem(key)!);

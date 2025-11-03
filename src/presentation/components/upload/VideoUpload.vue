@@ -4,6 +4,7 @@ import { useVideoUpload } from '@/presentation/composables/useVideoUpload'
 import { useNotification } from '@/presentation/composables/useNotification'
 import { CloudArrowUpIcon } from '@heroicons/vue/24/solid'
 import { NButton, NProgress } from 'naive-ui'
+import { ALLOWED_VIDEO_FORMATS, MAX_FILE_SIZE, MAX_FILE_SIZE_MB } from '@/config'
 
 // ========================================
 // Composable
@@ -18,12 +19,6 @@ const videoFileInput = ref<HTMLInputElement | null>(null)
 const transcriptFileInput = ref<HTMLInputElement | null>(null)
 const selectedVideoFile = ref<File | null>(null)
 const selectedTranscriptFile = ref<File | null>(null)
-
-// ========================================
-// Constants
-// ========================================
-const SUPPORTED_VIDEO_FORMATS = ['video/mp4', 'video/quicktime', 'video/webm']
-const MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB
 
 // ========================================
 // Methods
@@ -53,14 +48,14 @@ function handleVideoFileChange(event: Event) {
   if (!file) return
 
   // 驗證文件格式
-  if (!SUPPORTED_VIDEO_FORMATS.includes(file.type)) {
+  if (!ALLOWED_VIDEO_FORMATS.includes(file.type as any)) {
     notification.error('不支援的視頻格式', '請選擇 MP4、MOV 或 WEBM 格式')
     return
   }
 
   // 驗證文件大小
   if (file.size > MAX_FILE_SIZE) {
-    notification.error('文件大小超過限制', '文件大小不可超過 100MB')
+    notification.error('文件大小超過限制', `文件大小不可超過 ${MAX_FILE_SIZE_MB}MB`)
     return
   }
 
@@ -138,7 +133,7 @@ function clearTranscriptFile() {
       <input
         ref="videoFileInput"
         type="file"
-        :accept="SUPPORTED_VIDEO_FORMATS.join(',')"
+        :accept="ALLOWED_VIDEO_FORMATS.join(',')"
         class="hidden"
         @change="handleVideoFileChange"
       />
@@ -153,7 +148,7 @@ function clearTranscriptFile() {
           {{ selectedVideoFile.name }} ({{ (selectedVideoFile.size / 1024 / 1024).toFixed(2) }} MB)
         </span>
       </div>
-      <p class="mt-1 text-xs text-gray-500">支援格式：MP4, MOV, WEBM（最大 100MB）</p>
+      <p class="mt-1 text-xs text-gray-500">支援格式：MP4, MOV, WEBM（最大 {{MAX_FILE_SIZE_MB}}MB）</p>
     </div>
 
     <!-- 轉錄文件選擇 -->

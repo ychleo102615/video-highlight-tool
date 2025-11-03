@@ -9,6 +9,8 @@ import type { IVideoRepository } from '../../domain/repositories/IVideoRepositor
 import type { IFileStorage } from '../ports/IFileStorage';
 import type { IVideoProcessor } from '../ports/IVideoProcessor';
 import { InvalidVideoFormatError, VideoFileTooLargeError } from '../errors';
+import { ALLOWED_VIDEO_FORMATS, MAX_FILE_SIZE } from '../../config/constants';
+import { generateVideoId } from '../../config/id-generator';
 
 /**
  * UploadVideoUseCase
@@ -29,9 +31,6 @@ import { InvalidVideoFormatError, VideoFileTooLargeError } from '../errors';
  * ```
  */
 export class UploadVideoUseCase {
-  private readonly ALLOWED_FORMATS = ['video/mp4', 'video/quicktime', 'video/webm'];
-  private readonly MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
-
   /**
    * 建立 UploadVideoUseCase 實例
    *
@@ -67,7 +66,7 @@ export class UploadVideoUseCase {
     const metadata = await this.videoProcessor.extractMetadata(file);
 
     // 4. 建立 Video Entity
-    const videoId = this.generateId();
+    const videoId = generateVideoId();
     const video = new Video(videoId, file, metadata, url);
 
     // 5. 持久化
@@ -86,22 +85,14 @@ export class UploadVideoUseCase {
    */
   private validateInput(file: File): void {
     // 驗證格式
-    if (!this.ALLOWED_FORMATS.includes(file.type)) {
+    if (!ALLOWED_VIDEO_FORMATS.includes(file.type as any)) {
       throw new InvalidVideoFormatError(file.type);
     }
 
     // 驗證大小
-    if (file.size > this.MAX_FILE_SIZE) {
-      throw new VideoFileTooLargeError(file.size, this.MAX_FILE_SIZE);
+    if (file.size > MAX_FILE_SIZE) {
+      throw new VideoFileTooLargeError(file.size, MAX_FILE_SIZE);
     }
   }
 
-  /**
-   * 生成唯一 ID（簡化版 UUID）
-   *
-   * @returns 唯一識別碼
-   */
-  private generateId(): string {
-    return `video_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-  }
 }

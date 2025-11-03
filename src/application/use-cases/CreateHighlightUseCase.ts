@@ -8,6 +8,7 @@ import { Highlight } from '../../domain/aggregates/Highlight';
 import type { IHighlightRepository } from '../../domain/repositories/IHighlightRepository';
 import type { IVideoRepository } from '../../domain/repositories/IVideoRepository';
 import { VideoNotFoundError, InvalidHighlightNameError } from '../errors';
+import { generateHighlightId } from '../../config/id-generator';
 
 /**
  * CreateHighlightUseCase 輸入
@@ -70,7 +71,7 @@ export class CreateHighlightUseCase {
     }
 
     // 3. 建立 Highlight Entity（初始無選中句子）
-    const highlightId = this.generateId();
+    const highlightId = generateHighlightId();
     const highlight = new Highlight(highlightId, input.videoId, input.name);
 
     // 4. 持久化
@@ -92,12 +93,4 @@ export class CreateHighlightUseCase {
     }
   }
 
-  /**
-   * 生成唯一 ID（簡化版 UUID）
-   *
-   * @returns 唯一識別碼
-   */
-  private generateId(): string {
-    return `highlight_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-  }
 }
