@@ -9,7 +9,7 @@ import type { IVideoRepository } from '../../domain/repositories/IVideoRepositor
 import type { IFileStorage } from '../ports/IFileStorage';
 import type { IVideoProcessor } from '../ports/IVideoProcessor';
 import { InvalidVideoFormatError, VideoFileTooLargeError } from '../errors';
-import { ALLOWED_VIDEO_FORMATS, MAX_FILE_SIZE } from '../../config/constants';
+import { ALLOWED_VIDEO_FORMATS, MAX_FILE_SIZE, type AllowedVideoFormat } from '../../config/constants';
 import { generateVideoId } from '../../config/id-generator';
 
 /**
@@ -85,7 +85,7 @@ export class UploadVideoUseCase {
    */
   private validateInput(file: File): void {
     // 驗證格式
-    if (!ALLOWED_VIDEO_FORMATS.includes(file.type as any)) {
+    if (!ALLOWED_VIDEO_FORMATS.includes(file.type as AllowedVideoFormat)) {
       throw new InvalidVideoFormatError(file.type);
     }
 

@@ -4,7 +4,7 @@ import { useVideoUpload } from '@/presentation/composables/useVideoUpload';
 import { useNotification } from '@/presentation/composables/useNotification';
 import { CloudArrowUpIcon } from '@heroicons/vue/24/solid';
 import { NButton, NProgress } from 'naive-ui';
-import { ALLOWED_VIDEO_FORMATS, MAX_FILE_SIZE, MAX_FILE_SIZE_MB } from '@/config';
+import { ALLOWED_VIDEO_FORMATS, MAX_FILE_SIZE, MAX_FILE_SIZE_MB, type AllowedVideoFormat } from '@/config';
 
 // ========================================
 // Composable
@@ -48,7 +48,7 @@ function handleVideoFileChange(event: Event) {
   if (!file) return;
 
   // 驗證文件格式
-  if (!ALLOWED_VIDEO_FORMATS.includes(file.type as any)) {
+  if (!ALLOWED_VIDEO_FORMATS.includes(file.type as AllowedVideoFormat)) {
     notification.error('不支援的視頻格式', '請選擇 MP4、MOV 或 WEBM 格式');
     return;
   }
