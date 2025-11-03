@@ -123,10 +123,13 @@ export class BrowserStorage {
   /**
    * 恢復所有視頻 (批量查詢)
    * - 從 IndexedDB 查詢所有視頻
+   * - 只返回當前 sessionId 的視頻（避免新分頁看到舊資料）
    */
   async restoreAllVideos(): Promise<VideoPersistenceDTO[]> {
     try {
-      return await this.db.getAll('videos');
+      const allVideos = await this.db.getAll('videos');
+      // 過濾：只返回當前 sessionId 的資料
+      return allVideos.filter(video => video.sessionId === this.sessionId);
     } catch (error) {
       console.warn('Failed to restore all videos:', error);
       return [];
@@ -161,13 +164,16 @@ export class BrowserStorage {
 
   /**
    * 按 videoId 恢復轉錄
+   * - 只返回當前 sessionId 的轉錄（避免新分頁看到舊資料）
    */
   async restoreTranscriptByVideoId(videoId: string): Promise<TranscriptPersistenceDTO | null> {
     try {
       const tx = this.db.transaction('transcripts', 'readonly');
       const index = tx.store.index('videoId');
       const transcripts = await index.getAll(videoId);
-      return transcripts.length > 0 ? transcripts[0]! : null;
+      // 過濾：只返回當前 sessionId 的資料
+      const currentSessionTranscripts = transcripts.filter(t => t.sessionId === this.sessionId);
+      return currentSessionTranscripts.length > 0 ? currentSessionTranscripts[0]! : null;
     } catch (error) {
       console.warn('Failed to restore transcript by videoId:', error);
       return null;
@@ -214,13 +220,15 @@ export class BrowserStorage {
 
   /**
    * 按 videoId 恢復所有高光
+   * - 只返回當前 sessionId 的高光（避免新分頁看到舊資料）
    */
   async restoreHighlightsByVideoId(videoId: string): Promise<HighlightPersistenceDTO[]> {
     try {
       const tx = this.db.transaction('highlights', 'readonly');
       const index = tx.store.index('videoId');
       const highlights = await index.getAll(videoId);
-      return highlights;
+      // 過濾：只返回當前 sessionId 的資料
+      return highlights.filter(h => h.sessionId === this.sessionId);
     } catch (error) {
       console.warn('Failed to restore highlights by videoId:', error);
       return [];
@@ -243,10 +251,8 @@ export class BrowserStorage {
 
   /**
    * 清理過期資料
-   * - 刪除 savedAt 超過 24 小時的資料
-   *
-   * 注意：不再檢查 sessionId，因為在單視頻專案中，頁面刷新應該恢復所有資料
-   * sessionId 機制會導致刷新後 sessionId 變化時誤刪資料
+   * - 只刪除 savedAt 超過 24 小時的資料
+   * - 不刪除其他 Tab 的資料（避免多分頁互相干擾）
    */
   async cleanupStaleData(): Promise<void> {
     try {
@@ -267,7 +273,7 @@ export class BrowserStorage {
 
   /**
    * 清理指定 store 的過期資料
-   * 只檢查時間，不檢查 sessionId（避免頁面刷新後誤刪資料）
+   * 只刪除超過 24 小時的資料
    */
   private async cleanupStore(
     storeName: 'videos' | 'transcripts' | 'highlights',
@@ -279,8 +285,7 @@ export class BrowserStorage {
       const items = await store.getAll();
 
       for (const item of items) {
-        const ageMs = now - item.savedAt;
-        const isExpired = ageMs > MAX_AGE_MS;
+        const isExpired = now - item.savedAt > MAX_AGE_MS;
 
         // 刪除條件: 超過 24 小時
         if (isExpired) {
