@@ -70,17 +70,15 @@
 ### Functional Requirements
 
 - **FR-001**: 系統 MUST 在使用者關閉瀏覽器分頁時攔截關閉事件（beforeunload 事件）
-- **FR-002**: 系統 MUST 在攔截到關閉事件時顯示瀏覽器原生確認對話框，內容為「關閉分頁將刪除此會話的所有資料，確定要繼續嗎？」
-- **FR-003**: 系統 MUST 區分「分頁關閉」和「分頁重整」兩種情境，僅在關閉時觸發清除邏輯
-- **FR-004**: 系統 MUST 在使用者確認關閉後，刪除該會話在 IndexedDB 中的所有資料（視頻檔案、Entity DTO）
-- **FR-005**: 系統 MUST 在使用者確認關閉後，刪除該會話在 SessionStorage 中的 sessionId
-- **FR-006**: 系統 MUST 在編輯畫面提供「刪除此會話（示意）」按鈕
-- **FR-007**: 系統 MUST 在使用者點擊刪除按鈕時顯示確認對話框（使用 Naive UI 的 Dialog），內容為「刪除後無法復原，確定要刪除此會話嗎？」
-- **FR-008**: 系統 MUST 在使用者確認手動刪除後，清除該會話的所有資料（IndexedDB + SessionStorage）
-- **FR-009**: 系統 MUST 在手動刪除完成後，導航至初始上傳畫面（路由：`/`）
-- **FR-010**: 系統 MUST 在分頁重整（F5, Cmd+R, 刷新按鈕）時不顯示確認提示，不觸發清除邏輯
-- **FR-011**: 系統 MUST 在清除資料時確保刪除完整性（不留下殘留資料）
-- **FR-012**: 系統 MUST 在手動刪除後阻止使用者透過「上一頁」導航回已刪除的會話
+- **FR-002**: 系統 MUST 在攔截到關閉事件時顯示瀏覽器原生確認對話框，內容為「關閉分頁將刪除此會話 (Session) 的所有資料，確定要繼續嗎？」
+- **FR-003**: 系統 MUST 區分「分頁關閉」和「分頁重整」兩種情境，僅在關閉時觸發清除邏輯（技術實作：使用 `isClosing` flag + `load` event，`beforeunload` 設定 flag，`load` 清除 flag；若應用程式啟動時 flag 仍存在，則判定為分頁關閉並執行延遲清除）
+- **FR-004**: 系統 MUST 在使用者確認關閉後，完整刪除該會話 (Session) 在 IndexedDB 中的所有資料（視頻檔案、Transcript Entity、Highlight Entity 等），並刪除 SessionStorage 中的 sessionId，確保無殘留資料（使用 IndexedDB Transaction 確保原子性）
+- **FR-005**: 系統 MUST 在編輯畫面提供「刪除此會話 (Session)（示意）」按鈕
+- **FR-006**: 系統 MUST 在使用者點擊刪除按鈕時顯示確認對話框（使用 Naive UI 的 Dialog），內容為「刪除後無法復原，確定要刪除此會話 (Session) 嗎？」
+- **FR-007**: 系統 MUST 在使用者確認手動刪除後，完整清除該會話 (Session) 的所有資料（IndexedDB + SessionStorage），確保無殘留資料（使用 IndexedDB Transaction 確保原子性）
+- **FR-008**: 系統 MUST 在手動刪除完成後，導航至初始上傳畫面（路由：`/`）
+- **FR-009**: 系統 MUST 在分頁重整（F5, Cmd+R, 刷新按鈕）時不顯示確認提示，不觸發清除邏輯
+- **FR-010**: 系統 MUST 在手動刪除後阻止使用者透過「上一頁」導航回已刪除的會話 (Session)
 
 ### Key Entities
 
@@ -110,8 +108,9 @@
 2. **確認對話框樣式**：beforeunload 的確認對話框由瀏覽器控制，無法自定義樣式或完整內容（根據瀏覽器規範）
 3. **SessionStorage 生命週期**：SessionStorage 會在分頁關閉時自動清除，但為確保一致性，仍在清除邏輯中明確刪除
 4. **路由系統**：假設應用程式使用 Vue Router，手動刪除後可透過 `router.replace('/')` 導航並阻止「上一頁」
-5. **清除操作的原子性**：IndexedDB 的刪除操作是非同步的，但假設在使用者關閉分頁的短暫時間內能完成（透過 `beforeunload` 事件的同步機制）
-6. **沒有伺服器端會話**：所有會話資料僅存於客戶端，清除操作不需要通知後端
+5. **延遲清除策略**：由於 `beforeunload` 事件無法完全區分「關閉」與「重整」，系統採用延遲清除策略：在 `beforeunload` 時設定 `pendingCleanup` flag，應用程式啟動時檢查此 flag，若存在則執行清除（這確保重整時不會誤刪資料，因為 `load` event 會在重整時清除 flag）
+6. **清除操作的原子性**：IndexedDB 的刪除操作使用 Transaction 確保原子性，所有 Entity（Video, Transcript, Highlight）在同一個 Transaction 中刪除
+7. **沒有伺服器端會話 (Session)**：所有會話 (Session) 資料僅存於客戶端，清除操作不需要通知後端
 
 ## Dependencies
 
@@ -127,7 +126,7 @@
 ## Out of Scope
 
 - 提供「撤銷刪除」功能（資料刪除後無法恢復）
-- 清除其他分頁的會話資料（每個分頁僅負責自己的會話）
-- 伺服器端的會話管理或同步
-- 定期自動清理「孤兒會話」（瀏覽器崩潰後留下的殘留資料）—— 可作為未來增強功能
+- 清除其他分頁的會話資料（每個分頁僅負責自己的會話 (Session)）
+- 伺服器端的會話 (Session) 管理或同步
+- **定期自動清理「孤兒會話 (Orphaned Session)」**：瀏覽器崩潰或異常關閉後留下的殘留資料，目前不提供自動檢測與清理機制。這是 Edge Case 中提及的情境，但因技術複雜度（需判斷會話 (Session) 是否為有效活躍會話），標註為未來增強功能。
 - 自定義 beforeunload 確認對話框的樣式或內容（受瀏覽器限制）

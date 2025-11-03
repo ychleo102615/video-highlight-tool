@@ -41,7 +41,7 @@ description: 'Task list for 會話清除功能 (Session Cleanup)'
 - [ ] T002 [P] Create ISessionRepository interface in src/domain/repositories/ISessionRepository.ts
 - [ ] T003 [P] Create SessionCleanupError class in src/application/errors/SessionCleanupError.ts
 - [ ] T004 Create CleanupSessionUseCase in src/application/use-cases/CleanupSessionUseCase.ts (depends on T002, T003)
-- [ ] T005 Implement SessionRepositoryImpl in src/infrastructure/repositories/SessionRepositoryImpl.ts (depends on T002)
+- [ ] T005 Implement SessionRepositoryImpl in src/infrastructure/repositories/SessionRepositoryImpl.ts (depends on T002) - MUST delete all session Entities (Video, Transcript, Highlight) using IndexedDB Transaction to ensure atomicity
 - [ ] T006 Register SessionRepositoryImpl and CleanupSessionUseCase in DI container at src/di/container.ts (depends on T004, T005)
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
@@ -100,10 +100,10 @@ description: 'Task list for 會話清除功能 (Session Cleanup)'
 - [ ] T020 [US2] Create SessionCleanupButton.vue component in src/presentation/components/editing/SessionCleanupButton.vue for header integration
 - [ ] T021 [US2] Implement handleManualDelete() method in useSessionCleanup.ts with confirmation dialog using Naive UI
 - [ ] T022 [US2] Add Store state clearing logic in handleManualDelete() after Use Case execution
-- [ ] T023 [US2] Implement router.replace('/') navigation after cleanup to prevent back navigation
+- [ ] T023 [US2] Implement router.replace('/') navigation after cleanup to prevent back navigation - verify history.back() does not return to deleted session
 - [ ] T024 [US2] Add error notification handling for manual delete failures
 - [ ] T025 [US2] Integrate SessionCleanupButton into header component
-- [ ] T026 [US2] Add data existence check in editing view onMounted to redirect if session was deleted
+- [ ] T026 [US2] Add data existence check in editing view onMounted to redirect if session was deleted - prevent access to non-existent session via direct URL or history manipulation
 
 **Checkpoint**: 手動刪除按鈕完整可用，刪除後無法透過「上一頁」返回編輯畫面
 
@@ -114,9 +114,10 @@ description: 'Task list for 會話清除功能 (Session Cleanup)'
 **Purpose**: Comprehensive E2E testing to ensure all scenarios work correctly
 
 - [ ] T027 [P] Create E2E test file at tests/e2e/session-cleanup.spec.ts
-- [ ] T028 [P] E2E test: Manual delete clears session and prevents back navigation
-- [ ] T029 [P] E2E test: Page refresh preserves session data (no cleanup triggered)
+- [ ] T028 [P] E2E test: Manual delete clears session and prevents back navigation (verify router.replace blocks history.back())
+- [ ] T029 [P] E2E test: Page refresh preserves session data (no cleanup triggered) - verify pendingCleanup flag is NOT set after refresh
 - [ ] T030 [P] E2E test: Tab close triggers delayed cleanup on next app launch
+- [ ] T030a [P] E2E test: Verify beforeunload confirmation dialog displays when closing tab with active session (browser native dialog)
 - [ ] T031 Unit test for CleanupSessionUseCase in tests/unit/application/CleanupSessionUseCase.spec.ts
 - [ ] T032 Integration test for SessionRepositoryImpl in tests/integration/repositories/SessionRepositoryImpl.spec.ts
 
@@ -130,7 +131,7 @@ description: 'Task list for 會話清除功能 (Session Cleanup)'
 - [ ] T034 [P] Run type-check and ensure TypeScript coverage > 90%
 - [ ] T035 [P] Run ESLint and fix any style violations
 - [ ] T036 Verify Clean Architecture dependency rules are followed
-- [ ] T037 Performance test: Ensure IndexedDB cleanup completes < 1s with large dataset
+- [ ] T037 Performance test: Ensure IndexedDB cleanup completes < 1s with large dataset AND verify no residual data remains using IndexedDB inspection tools
 - [ ] T038 Verify RWD support for SessionCleanupButton on mobile devices
 - [ ] T039 Run quickstart.md validation scenarios
 
@@ -283,10 +284,10 @@ With multiple developers:
 - **User Story 3**: 5 tasks (MUST complete first)
 - **User Story 1**: 8 tasks
 - **User Story 2**: 7 tasks
-- **Testing**: 6 tasks
+- **Testing**: 7 tasks (added T030a for beforeunload dialog verification)
 - **Polish**: 7 tasks
 
-**Total**: 39 tasks
+**Total**: 40 tasks
 
 ---
 
@@ -307,10 +308,10 @@ With multiple developers:
 
 1. **Foundational Phase**: 2 parallel opportunities (T002 + T003)
 2. **User Story 1**: 3 parallel opportunities (T015, T016, T017)
-3. **Testing Phase**: 5 parallel opportunities (all E2E and unit tests)
+3. **Testing Phase**: 6 parallel opportunities (all E2E and unit tests)
 4. **Polish Phase**: 4 parallel opportunities (documentation, linting, type-check, RWD)
 
-**Total Parallelizable Tasks**: 14 tasks (36% of total)
+**Total Parallelizable Tasks**: 15 tasks (37.5% of total)
 
 ---
 

@@ -9,7 +9,7 @@
 
 本功能提供兩種會話資料清除機制：(1) 瀏覽器分頁關閉時自動清除 IndexedDB 中的所有會話資料（需使用者確認），(2) 編輯畫面提供手動刪除按鈕立即清除資料。關鍵技術挑戰在於區分「分頁關閉」與「分頁重整」兩種情境，確保重整時不觸發清除邏輯（與 005-session-restore 功能協調），同時保證刪除操作的完整性（無殘留資料）。
 
-技術方案：使用瀏覽器 `beforeunload` 事件攔截關閉行為，透過 Navigation Timing API 區分關閉與重整，手動刪除則在 Presentation Layer 提供 UI 按鈕並使用 Naive UI Dialog 確認。刪除邏輯封裝為新的 Use Case（CleanupSessionUseCase），協調三個 Repository（Video、Transcript、Highlight）的刪除操作，確保原子性。
+技術方案：使用瀏覽器 `beforeunload` 事件攔截關閉行為，透過 `isClosing` flag + `load` event 區分關閉與重整（`beforeunload` 設定 flag，`load` 清除 flag，若 flag 仍存在則為關閉），手動刪除則在 Presentation Layer 提供 UI 按鈕並使用 Naive UI Dialog 確認。刪除邏輯封裝為新的 Use Case（CleanupSessionUseCase），協調 SessionRepository 刪除所有 Entity（Video、Transcript、Highlight），確保原子性（使用 IndexedDB Transaction）。
 
 ## Technical Context
 
@@ -20,9 +20,9 @@
 **Target Platform**: Web (Desktop: Windows/Mac Chrome, Mobile: iOS/Android Chrome/Safari)
 **Project Type**: Single-page web application (SPA) with Clean Architecture
 **Performance Goals**:
-  - 關閉分頁時確認提示顯示時間 < 100ms
+  - beforeunload 事件處理邏輯執行時間 < 100ms
   - 手動刪除後導航至初始畫面 < 500ms
-  - IndexedDB 完整清除時間 < 1s
+  - IndexedDB 完整清除時間 < 1s（使用 Transaction 確保原子性）
 **Constraints**:
   - 必須區分 beforeunload 的觸發原因（關閉 vs 重整）
   - 必須與 005-session-restore 功能協調（重整時不觸發清除）
@@ -94,11 +94,11 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 - N/A **Mock 數據品質**: 本功能不涉及 Mock 數據
 
 **設計變更摘要**:
-1. 新增 ISessionRepository（Domain Layer）- 專責會話生命週期管理
+1. 新增 ISessionRepository（Domain Layer）- 專責會話 (Session) 生命週期管理，協調刪除所有 Entity（Video, Transcript, Highlight）
 2. 新增 CleanupSessionUseCase（Application Layer）- 協調清除邏輯
-3. 新增 SessionRepositoryImpl（Infrastructure Layer）- 實作 IDB Transaction 清除
-4. 新增 useSessionCleanup（Presentation Layer）- 封裝 UI 事件處理
-5. 未修改現有 Repository 介面（IVideoRepository 等）- 避免破壞現有功能
+3. 新增 SessionRepositoryImpl（Infrastructure Layer）- 實作 IDB Transaction 清除，確保原子性
+4. 新增 useSessionCleanup（Presentation Layer）- 封裝 UI 事件處理（beforeunload, load, pagehide）
+5. **未修改現有 Repository 介面**（IVideoRepository, ITranscriptRepository, IHighlightRepository）- 避免破壞現有功能，保持向後兼容
 
 **結論**: ✅ 通過 Post-Phase 1 檢查，設計完全符合憲法要求，可進入 Phase 2（任務生成）。
 
@@ -128,15 +128,17 @@ src/
 │
 ├── domain/
 │   └── repositories/
-│       ├── IVideoRepository.ts                # [MODIFY] 新增 deleteAll()
-│       ├── ITranscriptRepository.ts           # [MODIFY] 新增 deleteByVideoId()
-│       └── IHighlightRepository.ts            # [MODIFY] 新增 deleteByVideoId()
+│       ├── ISessionRepository.ts              # [NEW] 會話生命週期管理介面
+│       ├── IVideoRepository.ts                # [NO CHANGE]
+│       ├── ITranscriptRepository.ts           # [NO CHANGE]
+│       └── IHighlightRepository.ts            # [NO CHANGE]
 │
 ├── infrastructure/
 │   └── repositories/
-│       ├── VideoRepositoryImpl.ts             # [MODIFY] 實作 deleteAll()
-│       ├── TranscriptRepositoryImpl.ts        # [MODIFY] 實作 deleteByVideoId()
-│       └── HighlightRepositoryImpl.ts         # [MODIFY] 實作 deleteByVideoId()
+│       ├── SessionRepositoryImpl.ts           # [NEW] 實作 ISessionRepository
+│       ├── VideoRepositoryImpl.ts             # [NO CHANGE]
+│       ├── TranscriptRepositoryImpl.ts        # [NO CHANGE]
+│       └── HighlightRepositoryImpl.ts         # [NO CHANGE]
 │
 ├── presentation/
 │   ├── components/
@@ -160,7 +162,7 @@ tests/
     └── session-cleanup.spec.ts                # [NEW] E2E 測試（關閉/刷新/手動刪除）
 ```
 
-**Structure Decision**: 採用現有的 Clean Architecture 分層結構（Domain → Application → Infrastructure/Presentation）。本功能主要影響 Application Layer（新增 Use Case）和 Infrastructure Layer（Repository 實作刪除方法），以及 Presentation Layer（UI 組件和事件處理）。所有新增檔案都遵循現有的命名規範和資料夾結構。
+**Structure Decision**: 採用現有的 Clean Architecture 分層結構（Domain → Application → Infrastructure/Presentation）。本功能主要影響 Application Layer（新增 Use Case）和 Infrastructure Layer（新增 SessionRepository 實作刪除方法），以及 Presentation Layer（UI 組件和事件處理）。所有新增檔案都遵循現有的命名規範和資料夾結構。**重要**: 不修改現有 Repository 介面（IVideoRepository 等），而是新增專責會話生命週期管理的 ISessionRepository。
 
 ## Complexity Tracking
 
