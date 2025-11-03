@@ -146,9 +146,14 @@ export async function registerInfrastructureDependencies(): Promise<void> {
 
   // ==================== 3. Repositories ====================
   // VideoRepositoryImpl: 實作 IVideoRepository 介面
+  // 注入 BrowserStorage 和 IFileStorage（用於恢復時重新創建 blob URL）
   container.registerSingleton(
     'IVideoRepository',
-    () => new VideoRepositoryImpl(container.resolve('BrowserStorage'))
+    () =>
+      new VideoRepositoryImpl(
+        container.resolve('BrowserStorage'),
+        container.resolve('IFileStorage')
+      )
   );
 
   // TranscriptRepositoryImpl: 實作 ITranscriptRepository 介面

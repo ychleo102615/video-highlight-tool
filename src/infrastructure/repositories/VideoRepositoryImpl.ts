@@ -10,6 +10,7 @@
  */
 
 import type { IVideoRepository } from '@/domain/repositories/IVideoRepository';
+import type { IFileStorage } from '@/application/ports/IFileStorage';
 import { Video } from '@/domain/aggregates/Video';
 import { BrowserStorage } from '../storage/BrowserStorage';
 import { DTOMapper } from '../utils/dto-mapper';
@@ -29,10 +30,14 @@ export class VideoRepositoryImpl implements IVideoRepository {
   private videos: Map<string, Video> = new Map();
 
   /**
-   * 建構函式 - 注入 BrowserStorage 依賴
+   * 建構函式 - 注入依賴
    * @param browserStorage - BrowserStorage 實例 (由 DI Container 注入)
+   * @param fileStorage - FileStorage 實例 (用於恢復時重新創建 blob URL)
    */
-  constructor(private browserStorage: BrowserStorage) {}
+  constructor(
+    private browserStorage: BrowserStorage,
+    private fileStorage: IFileStorage
+  ) {}
 
   /**
    * 儲存視頻 (實作 IVideoRepository 介面)
@@ -82,7 +87,8 @@ export class VideoRepositoryImpl implements IVideoRepository {
    * 2. 若找到,直接返回
    * 3. 若未找到,調用 BrowserStorage.restoreVideo() 從 IndexedDB 恢復
    * 4. 轉換 PersistenceDTO → Entity
-   * 5. 存入記憶體 Map (下次直接命中)
+   * 5. 重新創建 blob URL（如果 file 存在且不是空檔案）
+   * 6. 存入記憶體 Map (下次直接命中)
    *
    * 錯誤處理:
    * - BrowserStorage 錯誤不影響主流程,返回 null
@@ -102,10 +108,25 @@ export class VideoRepositoryImpl implements IVideoRepository {
         return null; // IndexedDB 中也不存在
       }
 
-      // 3. 轉換 PersistenceDTO → Entity
-      const video = DTOMapper.videoPersistenceDtoToEntity(persistenceDto);
+      // 3. 轉換 PersistenceDTO → Entity (url 為 undefined)
+      let video = DTOMapper.videoPersistenceDtoToEntity(persistenceDto);
 
-      // 4. 存入記憶體 Map (下次直接命中)
+      // 4. 重新創建 blob URL（如果 file 存在且不是空檔案）
+      if (video.file && video.file.size > 0) {
+        try {
+          const newBlobUrl = await this.fileStorage.save(video.file);
+          // 創建新的 Video 實例，帶有新的 blob URL
+          video = new Video(video.id, video.file, video.metadata, newBlobUrl);
+        } catch (error) {
+          console.warn('VideoRepository: 無法重新創建 blob URL', {
+            videoId: id,
+            error: error instanceof Error ? error.message : String(error),
+          });
+          // 即使 blob URL 創建失敗，仍返回視頻實例（url 為 undefined）
+        }
+      }
+
+      // 5. 存入記憶體 Map (下次直接命中)
       this.videos.set(id, video);
 
       return video;
@@ -156,8 +177,9 @@ export class VideoRepositoryImpl implements IVideoRepository {
    * 1. 若記憶體 Map 不為空,直接返回
    * 2. 若記憶體 Map 為空,從 BrowserStorage 恢復所有視頻
    * 3. 轉換 PersistenceDTO[] → Entity[]
-   * 4. 填充記憶體 Map
-   * 5. 返回 Entity 陣列
+   * 4. 重新創建 blob URL（如果 file 存在）
+   * 5. 填充記憶體 Map
+   * 6. 返回 Entity 陣列
    *
    * 錯誤處理:
    * - BrowserStorage 錯誤不影響主流程,返回空陣列
@@ -173,12 +195,29 @@ export class VideoRepositoryImpl implements IVideoRepository {
       // 2. 從 BrowserStorage 恢復所有視頻
       const persistenceDtos = await this.browserStorage.restoreAllVideos();
 
-      // 3. 轉換並填充記憶體
-      const videos = persistenceDtos.map((dto) => {
-        const video = DTOMapper.videoPersistenceDtoToEntity(dto);
+      // 3. 轉換並重新創建 blob URL
+      const videos: Video[] = [];
+      for (const dto of persistenceDtos) {
+        let video = DTOMapper.videoPersistenceDtoToEntity(dto);
+
+        // 4. 重新創建 blob URL（如果 file 存在且不是空檔案）
+        if (video.file && video.file.size > 0) {
+          try {
+            const newBlobUrl = await this.fileStorage.save(video.file);
+            video = new Video(video.id, video.file, video.metadata, newBlobUrl);
+          } catch (error) {
+            console.warn('VideoRepository: 無法重新創建 blob URL', {
+              videoId: video.id,
+              error: error instanceof Error ? error.message : String(error),
+            });
+            // 即使 blob URL 創建失敗，仍保留視頻實例
+          }
+        }
+
+        // 5. 填充記憶體 Map
         this.videos.set(video.id, video);
-        return video;
-      });
+        videos.push(video);
+      }
 
       return videos;
     } catch (error) {

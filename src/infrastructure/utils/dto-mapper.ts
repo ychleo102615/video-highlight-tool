@@ -41,7 +41,8 @@ export class DTOMapper {
         mimeType: video.metadata.format,
         name: video.file.name,
       },
-      url: video.url,
+      // blob URL 不持久化,因為刷新後會失效
+      url: undefined,
       savedAt: Date.now(),
       sessionId: sessionId,
     };
@@ -65,7 +66,9 @@ export class DTOMapper {
       dto.metadata.mimeType
     );
 
-    return new Video(dto.id, file, metadata, dto.url);
+    // 不使用 dto.url,因為刷新後 blob URL 已失效
+    // Repository 層會負責重新創建新的 blob URL
+    return new Video(dto.id, file, metadata, undefined);
   }
 
   // ==================== Transcript Mapping ====================
