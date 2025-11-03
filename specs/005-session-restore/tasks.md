@@ -155,7 +155,7 @@
 
 - [X] T036 [P] Test and handle corrupted video file in IndexedDB (playback error detection)
 - [X] T037 [P] Test and handle storage quota exceeded error (treat as large video)
-- [X] T038 [P] Verify sessionId filtering works correctly in BrowserStorage.cleanupStaleData()
+- [X] T038 [P] Verify sessionId filtering works correctly in BrowserStorage.cleanupStaleData() (修改：移除 sessionId 檢查，只保留時間檢查以避免誤刪)
 
 ### Performance Optimization
 

@@ -75,7 +75,9 @@ export class BrowserStorage {
    */
   private initSessionId(): string {
     const existing = sessionStorage.getItem('sessionId');
-    if (existing) return existing;
+    if (existing) {
+      return existing;
+    }
 
     const newId = `session_${Date.now()}_${Math.random().toString(36).substring(2)}`;
     sessionStorage.setItem('sessionId', newId);
@@ -306,22 +308,23 @@ export class BrowserStorage {
 
   /**
    * 清理過期資料
-   * - 刪除 sessionId 不匹配的資料 (屬於已關閉 Tab)
    * - 刪除 savedAt 超過 24 小時的資料
+   *
+   * 注意：不再檢查 sessionId，因為在單視頻專案中，頁面刷新應該恢復所有資料
+   * sessionId 機制會導致刷新後 sessionId 變化時誤刪資料
    */
   async cleanupStaleData(): Promise<void> {
     try {
-      const currentSessionId = this.sessionId;
       const now = Date.now();
 
       // 清理 videos
-      await this.cleanupStore('videos', currentSessionId, now);
+      await this.cleanupStore('videos', now);
 
       // 清理 transcripts
-      await this.cleanupStore('transcripts', currentSessionId, now);
+      await this.cleanupStore('transcripts', now);
 
       // 清理 highlights
-      await this.cleanupStore('highlights', currentSessionId, now);
+      await this.cleanupStore('highlights', now);
     } catch (error) {
       console.warn('Failed to cleanup stale data:', error);
     }
@@ -329,10 +332,10 @@ export class BrowserStorage {
 
   /**
    * 清理指定 store 的過期資料
+   * 只檢查時間，不檢查 sessionId（避免頁面刷新後誤刪資料）
    */
   private async cleanupStore(
     storeName: 'videos' | 'transcripts' | 'highlights',
-    currentSessionId: string,
     now: number
   ): Promise<void> {
     try {
@@ -341,8 +344,11 @@ export class BrowserStorage {
       const items = await store.getAll();
 
       for (const item of items) {
-        // 刪除條件:sessionId 不匹配 或 超過 24 小時
-        if (item.sessionId !== currentSessionId || now - item.savedAt > MAX_AGE_MS) {
+        const ageMs = now - item.savedAt;
+        const isExpired = ageMs > MAX_AGE_MS;
+
+        // 刪除條件: 超過 24 小時
+        if (isExpired) {
           await store.delete(item.id);
         }
       }
