@@ -571,4 +571,5 @@ watch([currentTime, currentSentenceTime], ([video, sentence]) => {
 - IndexedDB (小視頻檔案 + 所有 Entity) + SessionStorage (sessionId + 大視頻元資料) (005-session-restore)
 
 ## Recent Changes
+- 005-session-restore: Completed session restore feature implementation - RestoreSessionUseCase, SessionRestorer component, error handling, and validation
 - 001-domain-layer: Added TypeScript ^5.0.0 + 無（Domain Layer 不依賴任何外部框架，僅使用 TypeScript 標準庫）

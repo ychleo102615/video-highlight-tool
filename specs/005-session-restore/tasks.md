@@ -146,33 +146,33 @@
 
 ### Error Handling
 
-- [ ] T032 [P] Add comprehensive error handling for incomplete data (missing transcript) in RestoreSessionUseCase in src/application/use-cases/RestoreSessionUseCase.ts
-- [ ] T033 [P] Add comprehensive error handling for incomplete data (missing highlights) in RestoreSessionUseCase in src/application/use-cases/RestoreSessionUseCase.ts
-- [ ] T034 Add error notification display ("恢復會話失敗,請重新上傳視頻") in videoStore.restoreSession() catch block in src/presentation/stores/videoStore.ts
-- [ ] T035 [P] Add console error logging for RestoreSession failures in videoStore.restoreSession() in src/presentation/stores/videoStore.ts
+- [X] T032 [P] Add comprehensive error handling for incomplete data (missing transcript) in RestoreSessionUseCase in src/application/use-cases/RestoreSessionUseCase.ts
+- [X] T033 [P] Add comprehensive error handling for incomplete data (missing highlights) in RestoreSessionUseCase in src/application/use-cases/RestoreSessionUseCase.ts
+- [X] T034 Add error notification display ("恢復會話失敗,請重新上傳視頻") in videoStore.restoreSession() catch block in src/presentation/stores/videoStore.ts
+- [X] T035 [P] Add console error logging for RestoreSession failures in videoStore.restoreSession() in src/presentation/stores/videoStore.ts
 
 ### Edge Cases Handling
 
-- [ ] T036 [P] Test and handle corrupted video file in IndexedDB (playback error detection)
-- [ ] T037 [P] Test and handle storage quota exceeded error (treat as large video)
-- [ ] T038 [P] Verify sessionId filtering works correctly in BrowserStorage.cleanupStaleData()
+- [X] T036 [P] Test and handle corrupted video file in IndexedDB (playback error detection)
+- [X] T037 [P] Test and handle storage quota exceeded error (treat as large video)
+- [X] T038 [P] Verify sessionId filtering works correctly in BrowserStorage.cleanupStaleData()
 
 ### Performance Optimization
 
-- [ ] T039 [P] Verify batch query performance (IndexedDB getAll) meets < 150ms target for session restore
-- [ ] T040 [P] Verify overall app startup delay stays under 500ms with session restore enabled
-- [ ] T041 [P] Verify notification display response time < 100ms
+- [X] T039 [P] Verify batch query performance (IndexedDB getAll) meets < 150ms target for session restore
+- [X] T040 [P] Verify overall app startup delay stays under 500ms with session restore enabled
+- [X] T041 [P] Verify notification display response time < 100ms
 
 ### Documentation
 
-- [ ] T042 [P] Update CLAUDE.md if new coding conventions emerged during implementation
-- [ ] T043 [P] Update Active Technologies section in CLAUDE.md with session restore feature info
-- [ ] T044 Update quickstart.md with manual test scenarios for session restore in specs/005-session-restore/quickstart.md
+- [X] T042 [P] Update CLAUDE.md if new coding conventions emerged during implementation
+- [X] T043 [P] Update Active Technologies section in CLAUDE.md with session restore feature info
+- [X] T044 Update quickstart.md with manual test scenarios for session restore in specs/005-session-restore/quickstart.md
 
 ### Validation
 
-- [ ] T045 Run type-check: npm run type-check
-- [ ] T046 Run lint: npm run lint
+- [X] T045 Run type-check: npm run type-check
+- [X] T046 Run lint: npm run lint
 - [ ] T047 Manual test on desktop platform (Chrome/Mac or Chrome/Windows)
 - [ ] T048 Manual test on mobile platform (iOS Safari or Android Chrome)
 - [ ] T049 Run quickstart.md validation scenarios
