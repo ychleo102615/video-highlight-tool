@@ -100,9 +100,9 @@
 
 ### Implementation for User Story 2
 
-- [ ] T023 [US2] Add large video reupload notification logic to restoreSession() action (needsReupload: "偵測到先前的編輯內容,請重新上傳視頻以繼續編輯") in src/presentation/stores/videoStore.ts
-- [ ] T024 [US2] Verify video.file === null detection logic in RestoreSessionUseCase returns needsReupload flag correctly in src/application/use-cases/RestoreSessionUseCase.ts
-- [ ] T025 [US2] Test large video reupload workflow: verify state updates after user re-uploads video via VideoUpload component
+- [X] T023 [US2] Add large video reupload notification logic to restoreSession() action (needsReupload: "偵測到先前的編輯內容,請重新上傳視頻以繼續編輯") in src/presentation/components/SessionRestorer.vue
+- [X] T024 [US2] Verify video.file === null detection logic in RestoreSessionUseCase returns needsReupload flag correctly in src/application/use-cases/RestoreSessionUseCase.ts
+- [X] T025 [US2] Test large video reupload workflow: verify state updates after user re-uploads video via VideoUpload component
 
 **Checkpoint**: 大視頻恢復功能已完成。使用者刷新頁面後，看到提示訊息並重新上傳視頻後，編輯內容應該恢復。
 
@@ -116,9 +116,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T026 [US3] Verify RestoreSessionUseCase.execute() returns null when no session data exists in src/application/use-cases/RestoreSessionUseCase.ts
-- [ ] T027 [US3] Verify videoStore.restoreSession() handles null result silently (no notification) in src/presentation/stores/videoStore.ts
-- [ ] T028 [US3] Test first-time visit scenario: clear IndexedDB and SessionStorage, verify normal upload interface displays
+- [X] T026 [US3] Verify RestoreSessionUseCase.execute() returns null when no session data exists in src/application/use-cases/RestoreSessionUseCase.ts
+- [X] T027 [US3] Verify videoStore.restoreSession() handles null result silently (no notification) in src/presentation/stores/videoStore.ts
+- [X] T028 [US3] Test first-time visit scenario: clear IndexedDB and SessionStorage, verify normal upload interface displays
 
 **Checkpoint**: 首次訪問功能已完成。使用者首次訪問或清除資料後，應該看到正常的上傳介面，無任何提示訊息。
 
@@ -132,9 +132,9 @@
 
 ### Implementation for User Story 4
 
-- [ ] T029 [US4] Verify BrowserStorage.cleanupStaleData() correctly deletes data older than 24 hours in src/infrastructure/storage/BrowserStorage.ts
-- [ ] T030 [US4] Verify BrowserStorage.init() calls cleanupStaleData() on initialization in src/infrastructure/storage/BrowserStorage.ts
-- [ ] T031 [US4] Test session expiration scenario: manually modify savedAt timestamp in IndexedDB, verify stale data is cleared on next visit
+- [X] T029 [US4] Verify BrowserStorage.cleanupStaleData() correctly deletes data older than 24 hours in src/infrastructure/storage/BrowserStorage.ts
+- [X] T030 [US4] Verify BrowserStorage.init() calls cleanupStaleData() on initialization in src/infrastructure/storage/BrowserStorage.ts
+- [X] T031 [US4] Test session expiration scenario: manually modify savedAt timestamp in IndexedDB, verify stale data is cleared on next visit
 
 **Checkpoint**: 會話過期處理功能已完成。超過 24 小時的資料應該自動清除，使用者看到全新介面。
 
