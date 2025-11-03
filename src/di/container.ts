@@ -234,4 +234,18 @@ export async function registerInfrastructureDependencies(): Promise<void> {
     () =>
       new ToggleSentenceInHighlightUseCase(container.resolve('IHighlightRepository'))
   );
+
+  // RestoreSessionUseCase: 恢復會話
+  const { RestoreSessionUseCase } = await import(
+    '@/application/use-cases/RestoreSessionUseCase'
+  );
+  container.register(
+    'RestoreSessionUseCase',
+    () =>
+      new RestoreSessionUseCase(
+        container.resolve('IVideoRepository'),
+        container.resolve('ITranscriptRepository'),
+        container.resolve('IHighlightRepository')
+      )
+  );
 }

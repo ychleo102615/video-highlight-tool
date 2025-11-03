@@ -155,6 +155,44 @@ export class BrowserStorage {
     }
   }
 
+  /**
+   * 恢復所有視頻 (批量查詢)
+   * - 從 IndexedDB 查詢所有小視頻
+   * - 從 SessionStorage 查詢所有大視頻元資料
+   */
+  async restoreAllVideos(): Promise<VideoPersistenceDTO[]> {
+    try {
+      // 1. 從 IndexedDB 查詢所有視頻（小視頻）
+      const indexedDbVideos = await this.db.getAll('videos');
+
+      // 2. 從 SessionStorage 查詢大視頻元資料
+      const sessionKeys = Object.keys(sessionStorage).filter((k) => k.startsWith('video_meta_'));
+
+      const sessionVideos = sessionKeys.map((key) => {
+        const meta = JSON.parse(sessionStorage.getItem(key)!);
+        return {
+          id: meta.id,
+          file: null, // 大視頻無檔案
+          metadata: {
+            name: meta.name,
+            size: meta.size,
+            duration: meta.duration,
+            width: 0,
+            height: 0,
+            mimeType: 'video/mp4',
+          },
+          savedAt: 0,
+          sessionId: this.sessionId,
+        };
+      });
+
+      return [...indexedDbVideos, ...sessionVideos];
+    } catch (error) {
+      console.warn('Failed to restore all videos:', error);
+      return [];
+    }
+  }
+
   // ==================== Transcript CRUD ====================
 
   /**
@@ -196,6 +234,18 @@ export class BrowserStorage {
     }
   }
 
+  /**
+   * 恢復所有轉錄 (批量查詢)
+   */
+  async restoreAllTranscripts(): Promise<TranscriptPersistenceDTO[]> {
+    try {
+      return await this.db.getAll('transcripts');
+    } catch (error) {
+      console.warn('Failed to restore all transcripts:', error);
+      return [];
+    }
+  }
+
   // ==================== Highlight CRUD ====================
 
   /**
@@ -233,6 +283,18 @@ export class BrowserStorage {
       return highlights;
     } catch (error) {
       console.warn('Failed to restore highlights by videoId:', error);
+      return [];
+    }
+  }
+
+  /**
+   * 恢復所有高光 (批量查詢)
+   */
+  async restoreAllHighlights(): Promise<HighlightPersistenceDTO[]> {
+    try {
+      return await this.db.getAll('highlights');
+    } catch (error) {
+      console.warn('Failed to restore all highlights:', error);
       return [];
     }
   }

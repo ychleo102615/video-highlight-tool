@@ -22,4 +22,10 @@ export interface IVideoRepository {
    * @returns 找到的視頻,如果不存在則返回 null
    */
   findById(id: string): Promise<Video | null>;
+
+  /**
+   * 查找所有視頻
+   * @returns 所有視頻的陣列
+   */
+  findAll(): Promise<Video[]>;
 }

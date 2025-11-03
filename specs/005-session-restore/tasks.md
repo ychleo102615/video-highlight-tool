@@ -29,10 +29,10 @@
 
 **Purpose**: Project structure verification and prerequisites check
 
-- [ ] T001 Verify Clean Architecture structure is in place per plan.md
-- [ ] T002 Verify existing entities (Video, Transcript, Highlight) in src/domain/aggregates/
-- [ ] T003 [P] Verify existing repositories (VideoRepositoryImpl, TranscriptRepositoryImpl, HighlightRepositoryImpl) in src/infrastructure/repositories/
-- [ ] T004 [P] Verify BrowserStorage service exists in src/infrastructure/storage/BrowserStorage.ts
+- [X] T001 Verify Clean Architecture structure is in place per plan.md
+- [X] T002 Verify existing entities (Video, Transcript, Highlight) in src/domain/aggregates/
+- [X] T003 [P] Verify existing repositories (VideoRepositoryImpl, TranscriptRepositoryImpl, HighlightRepositoryImpl) in src/infrastructure/repositories/
+- [X] T004 [P] Verify BrowserStorage service exists in src/infrastructure/storage/BrowserStorage.ts
 
 ---
 
@@ -44,29 +44,29 @@
 
 ### Repository Interface Extensions
 
-- [ ] T005 [P] Extend IVideoRepository interface with findAll() method in src/domain/repositories/IVideoRepository.ts
-- [ ] T006 [P] Extend ITranscriptRepository interface with findByVideoId(videoId: string) method in src/domain/repositories/ITranscriptRepository.ts
-- [ ] T007 [P] Extend IHighlightRepository interface with findByVideoId(videoId: string) method in src/domain/repositories/IHighlightRepository.ts
+- [X] T005 [P] Extend IVideoRepository interface with findAll() method in src/domain/repositories/IVideoRepository.ts
+- [X] T006 [P] Extend ITranscriptRepository interface with findByVideoId(videoId: string) method in src/domain/repositories/ITranscriptRepository.ts (已存在)
+- [X] T007 [P] Extend IHighlightRepository interface with findByVideoId(videoId: string) method in src/domain/repositories/IHighlightRepository.ts (已存在)
 
 ### BrowserStorage Batch Query Methods
 
-- [ ] T008 [P] Implement restoreAllVideos() method in src/infrastructure/storage/BrowserStorage.ts (query IndexedDB + SessionStorage)
-- [ ] T009 [P] Implement restoreAllTranscripts() method in src/infrastructure/storage/BrowserStorage.ts
-- [ ] T010 [P] Implement restoreAllHighlights() method in src/infrastructure/storage/BrowserStorage.ts
+- [X] T008 [P] Implement restoreAllVideos() method in src/infrastructure/storage/BrowserStorage.ts (query IndexedDB + SessionStorage)
+- [X] T009 [P] Implement restoreAllTranscripts() method in src/infrastructure/storage/BrowserStorage.ts
+- [X] T010 [P] Implement restoreAllHighlights() method in src/infrastructure/storage/BrowserStorage.ts
 
 ### Repository Implementation Extensions
 
-- [ ] T011 [P] Implement VideoRepositoryImpl.findAll() with auto-restore from BrowserStorage in src/infrastructure/repositories/VideoRepositoryImpl.ts
-- [ ] T012 [P] Implement TranscriptRepositoryImpl.findByVideoId() with auto-restore from BrowserStorage in src/infrastructure/repositories/TranscriptRepositoryImpl.ts
-- [ ] T013 [P] Implement HighlightRepositoryImpl.findByVideoId() with auto-restore from BrowserStorage in src/infrastructure/repositories/HighlightRepositoryImpl.ts
+- [X] T011 [P] Implement VideoRepositoryImpl.findAll() with auto-restore from BrowserStorage in src/infrastructure/repositories/VideoRepositoryImpl.ts
+- [X] T012 [P] Implement TranscriptRepositoryImpl.findByVideoId() with auto-restore from BrowserStorage in src/infrastructure/repositories/TranscriptRepositoryImpl.ts (已存在)
+- [X] T013 [P] Implement HighlightRepositoryImpl.findByVideoId() with auto-restore from BrowserStorage in src/infrastructure/repositories/HighlightRepositoryImpl.ts (已存在)
 
 ### RestoreSessionUseCase
 
-- [ ] T014 Implement RestoreSessionUseCase.execute() method in src/application/use-cases/RestoreSessionUseCase.ts (coordinates Video/Transcript/Highlight repositories, returns { video, transcript, highlights, needsReupload } or null)
+- [X] T014 Implement RestoreSessionUseCase.execute() method in src/application/use-cases/RestoreSessionUseCase.ts (coordinates Video/Transcript/Highlight repositories, returns { video, transcript, highlights, needsReupload } or null)
 
 ### DI Container Registration
 
-- [ ] T015 Register RestoreSessionUseCase in di/container.ts with VideoRepositoryImpl, TranscriptRepositoryImpl, and HighlightRepositoryImpl dependencies
+- [X] T015 Register RestoreSessionUseCase in di/container.ts with VideoRepositoryImpl, TranscriptRepositoryImpl, and HighlightRepositoryImpl dependencies
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 

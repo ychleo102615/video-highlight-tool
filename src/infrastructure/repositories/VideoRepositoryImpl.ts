@@ -148,11 +148,44 @@ export class VideoRepositoryImpl implements IVideoRepository {
   }
 
   /**
-   * 獲取所有視頻 (擴展方法,用於列表顯示)
+   * 查找所有視頻 (實作 IVideoRepository 介面)
    *
    * @returns Promise<Video[]> - 所有視頻陣列
+   *
+   * 流程:
+   * 1. 若記憶體 Map 不為空,直接返回
+   * 2. 若記憶體 Map 為空,從 BrowserStorage 恢復所有視頻
+   * 3. 轉換 PersistenceDTO[] → Entity[]
+   * 4. 填充記憶體 Map
+   * 5. 返回 Entity 陣列
+   *
+   * 錯誤處理:
+   * - BrowserStorage 錯誤不影響主流程,返回空陣列
+   * - DTO 轉換錯誤發出 console.warn 並跳過該項
    */
   async findAll(): Promise<Video[]> {
-    return Array.from(this.videos.values());
+    try {
+      // 1. 若記憶體不為空,直接返回
+      if (this.videos.size > 0) {
+        return Array.from(this.videos.values());
+      }
+
+      // 2. 從 BrowserStorage 恢復所有視頻
+      const persistenceDtos = await this.browserStorage.restoreAllVideos();
+
+      // 3. 轉換並填充記憶體
+      const videos = persistenceDtos.map((dto) => {
+        const video = DTOMapper.videoPersistenceDtoToEntity(dto);
+        this.videos.set(video.id, video);
+        return video;
+      });
+
+      return videos;
+    } catch (error) {
+      console.warn('VideoRepository: 查找所有視頻時發生錯誤', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return []; // 優雅降級,返回空陣列
+    }
   }
 }
