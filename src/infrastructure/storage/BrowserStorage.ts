@@ -105,6 +105,9 @@ export class BrowserStorage {
           name: video.metadata.name,
           size: video.metadata.size,
           duration: video.metadata.duration,
+          width: video.metadata.width,
+          height: video.metadata.height,
+          mimeType: video.metadata.mimeType,
         };
         sessionStorage.setItem(`video_meta_${video.id}`, JSON.stringify(meta));
         return;
@@ -139,9 +142,9 @@ export class BrowserStorage {
             name: meta.name,
             size: meta.size,
             duration: meta.duration,
-            width: 0, // 大視頻恢復時無法獲取
-            height: 0,
-            mimeType: 'video/mp4', // 預設值
+            width: meta.width || 0,
+            height: meta.height || 0,
+            mimeType: meta.mimeType || 'video/mp4',
           },
           savedAt: 0,
           sessionId: this.sessionId,
@@ -177,9 +180,9 @@ export class BrowserStorage {
             name: meta.name,
             size: meta.size,
             duration: meta.duration,
-            width: 0,
-            height: 0,
-            mimeType: 'video/mp4',
+            width: meta.width || 0,
+            height: meta.height || 0,
+            mimeType: meta.mimeType || 'video/mp4',
           },
           savedAt: 0,
           sessionId: this.sessionId,
