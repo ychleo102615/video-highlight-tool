@@ -102,9 +102,9 @@ description: 'Task list for session cleanup feature implementation'
 
 ### Implementation for User Story 2
 
-- [ ] T020 [US2] 在 src/presentation/components/AppHeader.vue 的 DeleteButton 旁新增說明文字 (小字:「系統會在應用啟動時自動清理超過 24 小時的會話資料」)
-- [ ] T021 [US2] 手動測試:驗證說明文字在 Desktop 和 Mobile 版本的可讀性 (字體大小、顏色、位置)
-- [ ] T022 [US2] 手動測試:驗證說明文字與按鈕的間距與對齊 (RWD 檢查)
+- [X] T020 [US2] 在 src/presentation/components/AppHeader.vue 的 DeleteButton 旁新增說明文字 (小字:「系統會在應用啟動時自動清理超過 24 小時的會話資料」)
+- [X] T021 [US2] 手動測試:驗證說明文字在 Desktop 和 Mobile 版本的可讀性 (字體大小、顏色、位置)
+- [X] T022 [US2] 手動測試:驗證說明文字與按鈕的間距與對齊 (RWD 檢查)
 
 **Checkpoint**: User Story 2 完成,使用者可透過 UI 了解自動清理機制
 

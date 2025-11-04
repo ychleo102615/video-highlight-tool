@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue';
+import { computed, ref } from 'vue';
 import { NNotificationProvider, NDialogProvider } from 'naive-ui';
 import VideoUpload from '@/presentation/components/upload/VideoUpload.vue';
 import EditingArea from '@/presentation/components/editing/EditingArea.vue';
@@ -65,11 +65,11 @@ function handleSeekToTime(time: number) {
       <!-- Header -->
       <header class="bg-white shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div class="flex items-center justify-between">
-            <h1 class="text-3xl font-bold text-gray-900">視頻高光編輯工具</h1>
-            <div class="flex items-center gap-4">
+          <div class="flex items-center justify-between gap-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">視頻高光編輯工具</h1>
+            <div class="flex items-center gap-3">
               <DeleteButton size="small" />
-              <p class="text-xs text-gray-500">
+              <p class="hidden md:block text-xs text-gray-500 max-w-xs">
                 系統會在應用啟動時自動清理超過 24 小時的會話資料
               </p>
             </div>
