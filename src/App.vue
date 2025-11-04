@@ -50,30 +50,6 @@ function handleSeekToTime(time: number) {
   }, 100);
 }
 
-/**
- * 處理瀏覽器關閉/重新整理提示
- * 當有視頻上傳時提示使用者
- */
-function handleBeforeUnload(e: BeforeUnloadEvent) {
-  if (videoStore.hasVideo) {
-    e.preventDefault();
-    // 現代瀏覽器會忽略自訂訊息，顯示預設提示
-    // e.returnValue = ''
-  }
-}
-
-// ========================================
-// Lifecycle
-// ========================================
-
-onMounted(() => {
-  // 註冊瀏覽器關閉/重新整理提示
-  window.addEventListener('beforeunload', handleBeforeUnload);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('beforeunload', handleBeforeUnload);
-});
 </script>
 
 <template>
