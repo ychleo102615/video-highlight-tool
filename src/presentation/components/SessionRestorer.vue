@@ -21,6 +21,20 @@ const notification = useNotification();
 // 在組件掛載時執行會話恢復
 onMounted(async () => {
   try {
+    // T011 (User Story 3): 檢查 pendingCleanup 標記
+    // 如果標記存在，表示上次關閉時預計要清除資料
+    // User Story 1 將實作完整的延遲清除邏輯
+    // User Story 3 僅確保有此標記時不嘗試恢復會話
+    const hasPendingCleanup = sessionStorage.getItem('pendingCleanup') === 'true';
+
+    if (hasPendingCleanup) {
+      // 有待清除標記，不執行恢復
+      // User Story 1 將在這裡實作實際的清除邏輯
+      console.log('[SessionRestorer] Pending cleanup detected, skipping session restore');
+      return;
+    }
+
+    // 正常流程：嘗試恢復會話
     const sessionState = await videoStore.restoreSession();
 
     // 根據返回結果顯示通知

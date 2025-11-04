@@ -58,11 +58,11 @@ description: 'Task list for 會話清除功能 (Session Cleanup)'
 
 ### Implementation for User Story 3
 
-- [ ] T007 [US3] Create useSessionCleanup composable skeleton in src/presentation/composables/useSessionCleanup.ts
-- [ ] T008 [US3] Implement beforeunload event handler with isClosing flag in useSessionCleanup.ts
-- [ ] T009 [US3] Implement load event handler to clear isClosing flag on page refresh in useSessionCleanup.ts
-- [ ] T010 [US3] Integrate useSessionCleanup into App.vue to establish global event listeners
-- [ ] T011 [US3] Add logic to App.vue onMounted to check pendingCleanup flag before session restore
+- [X] T007 [US3] Create useSessionCleanup composable skeleton in src/presentation/composables/useSessionCleanup.ts
+- [X] T008 [US3] Implement beforeunload event handler with isClosing flag in useSessionCleanup.ts
+- [X] T009 [US3] Implement load event handler to clear isClosing flag on page refresh in useSessionCleanup.ts
+- [X] T010 [US3] Integrate useSessionCleanup into App.vue to establish global event listeners
+- [X] T011 [US3] Add logic to App.vue onMounted to check pendingCleanup flag before session restore
 
 **Checkpoint**: 重整時不觸發清除邏輯，session-restore 功能保持正常
 

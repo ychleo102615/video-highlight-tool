@@ -9,6 +9,7 @@ import SessionRestorer from '@/presentation/components/SessionRestorer.vue';
 import { useVideoStore } from '@/presentation/stores/videoStore';
 import { useTranscriptStore } from '@/presentation/stores/transcriptStore';
 import { useHighlightStore } from '@/presentation/stores/highlightStore';
+import { useSessionCleanup } from '@/presentation/composables/useSessionCleanup';
 
 // ========================================
 // Stores
@@ -16,6 +17,13 @@ import { useHighlightStore } from '@/presentation/stores/highlightStore';
 const videoStore = useVideoStore();
 const transcriptStore = useTranscriptStore();
 const highlightStore = useHighlightStore();
+
+// ========================================
+// Session Cleanup (User Story 3)
+// ========================================
+// T010: 整合 useSessionCleanup 以監聽瀏覽器事件
+// 確保重整時不觸發清除邏輯（保護 session-restore 功能）
+useSessionCleanup();
 
 // ========================================
 // Refs
