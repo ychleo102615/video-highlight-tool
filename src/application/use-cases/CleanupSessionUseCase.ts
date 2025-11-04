@@ -27,16 +27,17 @@ export class CleanupSessionUseCase {
    *
    * 清除內容:
    * 1. IndexedDB: videos, transcripts, highlights Object Store
-   * 2. SessionStorage: sessionId, pendingCleanup, isClosing
+   * 2. SessionStorage: sessionId, isClosing
+   * 3. LocalStorage: pendingCleanup (修復 v2: 改用 localStorage 持久化)
    *
    * 執行流程:
    * 1. 呼叫 sessionRepo.deleteAllSessionData()(原子性刪除)
-   * 2. 清除 SessionStorage(即使失敗也不影響主流程)
+   * 2. 清除 SessionStorage 和 LocalStorage(即使失敗也不影響主流程)
    * 3. 返回成功或拋出錯誤
    *
    * 錯誤處理:
    * - IndexedDB 刪除失敗 → 拋出 SessionCleanupError
-   * - SessionStorage 清除失敗 → 僅記錄警告(不拋出錯誤)
+   * - Storage 清除失敗 → 僅記錄警告(不拋出錯誤)
    *
    * 效能要求:
    * - 執行時間 < 1s(規格 SC-002)
@@ -51,11 +52,18 @@ export class CleanupSessionUseCase {
       // 2. 清除 SessionStorage(即使失敗也不影響主流程)
       try {
         sessionStorage.removeItem('sessionId');
-        sessionStorage.removeItem('pendingCleanup');
         sessionStorage.removeItem('isClosing');
       } catch (error) {
         // SessionStorage 清除失敗不影響主流程
         console.warn('Failed to clear SessionStorage:', error);
+      }
+
+      // 3. 修復 v2: 清除 localStorage 中的 pendingCleanup 標記
+      try {
+        localStorage.removeItem('pendingCleanup');
+      } catch (error) {
+        // LocalStorage 清除失敗不影響主流程
+        console.warn('Failed to clear localStorage:', error);
       }
     } catch (error) {
       // 如果已是 SessionCleanupError，直接拋出

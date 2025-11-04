@@ -29,8 +29,9 @@ const notification = useNotification();
 onMounted(async () => {
   try {
     // T011 (User Story 3) + T014 (User Story 1): 檢查 pendingCleanup 標記
+    // 修復 v2: 從 localStorage 讀取（分頁關閉後仍保留）
     // 如果標記存在，表示上次關閉時預計要清除資料
-    const hasPendingCleanup = sessionStorage.getItem('pendingCleanup') === 'true';
+    const hasPendingCleanup = localStorage.getItem('pendingCleanup') === 'true';
 
     if (hasPendingCleanup) {
       // T014: User Story 1 - 執行延遲清除邏輯

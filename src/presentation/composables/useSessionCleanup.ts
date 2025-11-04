@@ -5,13 +5,18 @@ import { onMounted, onUnmounted } from 'vue';
  *
  * 職責:
  * - 監聽瀏覽器事件以區分「分頁關閉」與「分頁重整」
- * - 透過 sessionStorage 標記管理清除邏輯
+ * - 透過 sessionStorage (暫存) 和 localStorage (持久化) 管理清除邏輯
  * - 確保重整時不觸發清除（保護 session-restore 功能）
  *
  * 技術方案:
- * - beforeunload: 設定 isClosing 標記
- * - load: 清除 isClosing 標記（表示是重整而非關閉）
- * - pagehide: 檢測真實的分頁關閉並設定 pendingCleanup 標記
+ * - beforeunload: 設定 isClosing 標記 (sessionStorage)
+ * - load: 清除所有清除標記（表示是重整而非關閉）
+ * - pagehide: 檢測真實的分頁關閉並設定 pendingCleanup 標記 (localStorage，持久化)
+ *
+ * 儲存策略:
+ * - isClosing: sessionStorage (僅當前會話，重整保留，關閉清除)
+ * - pendingCleanup: localStorage (持久化，關閉後依然存在，用於延遲清除)
+ * - sessionId: sessionStorage (session-restore 使用)
  *
  * User Story 3: 分頁重整時保留會話資料
  * - 確保重整時不會誤觸發清除邏輯
@@ -19,87 +24,86 @@ import { onMounted, onUnmounted } from 'vue';
  */
 export function useSessionCleanup() {
   // ========================================
-  // Event Handlers (將在後續任務中實作)
+  // Immediate Execution (修復 v3)
+  // ========================================
+  // 在 composable 初始化時立即檢查並清除 pendingCleanup
+  // 這必須在 SessionRestorer 檢查之前執行
+  try {
+    // 如果有 sessionId（表示是重整而非新開啟）
+    const hasSessionId = sessionStorage.getItem('sessionId');
+
+    if (hasSessionId) {
+      // 重整時清除可能被錯誤設定的 pendingCleanup 標記
+      localStorage.removeItem('pendingCleanup');
+      console.log('[useSessionCleanup] Page refreshed, pendingCleanup cleared');
+    }
+  } catch (error) {
+    console.warn('Failed to check/clear pendingCleanup on init:', error);
+  }
+
+  // ========================================
+  // Event Handlers
   // ========================================
 
   /**
    * T008 + T013: beforeunload 事件處理器
    * 設定 isClosing 標記，表示使用者即將離開頁面
-   * User Story 1: 顯示確認對話框提醒使用者即將清除資料
    *
    * 邏輯:
    * 1. 設定 sessionStorage.isClosing = 'true'
-   * 2. 如果是重整，load 事件會清除此標記
+   * 2. 如果是重整，composable 初始化時會清除 pendingCleanup
    * 3. 如果是關閉，pagehide 事件會設定 pendingCleanup 標記
-   * 4. 顯示瀏覽器原生確認對話框（User Story 1）
    *
-   * @param e - BeforeUnloadEvent
+   * 注意: 確認對話框由 App.vue 的 beforeunload handler 負責
+   *       (檢查 videoStore.hasVideo，避免無資料時也顯示確認)
+   *
+   * @param _e - BeforeUnloadEvent (未使用，僅用於型別)
    */
-  function handleBeforeUnload(e: BeforeUnloadEvent) {
+  function handleBeforeUnload(_e: BeforeUnloadEvent) {
     try {
-      // 設定 isClosing 標記（User Story 3）
+      // 設定 isClosing 標記
       sessionStorage.setItem('isClosing', 'true');
     } catch (error) {
       // SessionStorage 不可用時（如隱私模式），僅記錄警告
       console.warn('Failed to set isClosing flag:', error);
     }
-
-    // T013: User Story 1 - 顯示確認對話框
-    // 注意：現代瀏覽器會忽略自定義訊息，僅顯示預設訊息
-    // 但仍需呼叫 preventDefault() 和設定 returnValue 來觸發對話框
-    e.preventDefault();
-    e.returnValue = '關閉分頁將刪除此會話的所有資料，確定要繼續嗎？';
-
-    // 返回字串也可以觸發確認對話框（舊版瀏覽器相容）
-    return e.returnValue;
   }
 
   /**
-   * T009: load 事件處理器
-   * 清除 isClosing 標記，表示頁面重新載入（重整）
-   *
-   * 邏輯:
-   * 1. 頁面重新載入時，移除 isClosing 標記
-   * 2. 這表示使用者是重整而非關閉，不應觸發清除
-   * 3. session-restore 功能可正常運作
-   */
-  function handleLoad() {
-    try {
-      // 清除 isClosing 標記（如果存在）
-      sessionStorage.removeItem('isClosing');
-    } catch (error) {
-      // SessionStorage 不可用時（如隱私模式），僅記錄警告
-      console.warn('Failed to remove isClosing flag:', error);
-    }
-  }
-
-  /**
-   * T012: pagehide 事件處理器
+   * T012: pagehide 事件處理器（修復版 v2）
    * 偵測分頁真正關閉並設定 pendingCleanup 標記
    *
    * 邏輯:
-   * 1. 檢查 isClosing 標記是否仍存在（未被 load 清除）
+   * 1. 檢查 isClosing 標記是否仍存在（sessionStorage，未被 load 清除）
    * 2. 檢查 event.persisted 是否為 false（非 bfcache）
-   * 3. 如果兩者都符合，表示是真正的關閉，設定 pendingCleanup 標記
-   * 4. 下次應用啟動時，App.vue 會檢查此標記並執行延遲清除
+   * 3. 如果兩者都符合，表示是真正的關閉，設定 pendingCleanup 標記到 **localStorage**
+   * 4. 下次應用啟動時，SessionRestorer 會檢查此標記並執行延遲清除
+   *
+   * 儲存策略修復:
+   * - pendingCleanup 改用 **localStorage** 而非 sessionStorage
+   * - 原因: sessionStorage 在分頁關閉後會被清除，無法實現延遲清除
+   * - localStorage 持久化，分頁關閉後依然存在
    *
    * @param e - PageTransitionEvent
    */
   function handlePageHide(e: PageTransitionEvent) {
     try {
-      // 檢查 isClosing 標記是否存在
+      // 檢查 isClosing 標記是否存在 (sessionStorage)
       const isClosing = sessionStorage.getItem('isClosing') === 'true';
 
       // 如果 isClosing 為 true 且頁面不進入 bfcache（真正關閉）
       if (isClosing && !e.persisted) {
-        // 設定 pendingCleanup 標記，下次啟動時執行延遲清除
-        sessionStorage.setItem('pendingCleanup', 'true');
+        // **修復 v2**: 設定 pendingCleanup 標記到 localStorage（持久化）
+        // 分頁關閉後這個標記會保留，下次啟動時執行延遲清除
+        localStorage.setItem('pendingCleanup', 'true');
 
         // 清除 isClosing 標記（已轉換為 pendingCleanup）
         sessionStorage.removeItem('isClosing');
+
+        console.log('[useSessionCleanup] Tab closing detected, pendingCleanup set to localStorage');
       }
     } catch (error) {
-      // SessionStorage 不可用時（如隱私模式），僅記錄警告
+      // Storage 不可用時（如隱私模式），僅記錄警告
       console.warn('Failed to set pendingCleanup flag:', error);
     }
   }
@@ -112,8 +116,6 @@ export function useSessionCleanup() {
     // 註冊全域事件監聽器
     // T008: beforeunload - 設定 isClosing 標記
     window.addEventListener('beforeunload', handleBeforeUnload);
-    // T009: load - 清除 isClosing 標記（重整時）
-    window.addEventListener('load', handleLoad);
     // T012: pagehide - 偵測分頁關閉並設定 pendingCleanup 標記
     window.addEventListener('pagehide', handlePageHide);
   });
@@ -121,7 +123,6 @@ export function useSessionCleanup() {
   onUnmounted(() => {
     // 清除全域事件監聽器
     window.removeEventListener('beforeunload', handleBeforeUnload);
-    window.removeEventListener('load', handleLoad);
     window.removeEventListener('pagehide', handlePageHide);
   });
 
