@@ -117,9 +117,9 @@ src/
 │   │   ├── AppHeader.vue         # 修改(加入 DeleteButton) ⭐
 │   │   └── DeleteButton.vue      # 新增 ⭐
 │   └── stores/
-│       ├── videoStore.ts         # 擴展 deleteSession() action ⭐
-│       ├── transcriptStore.ts    # 現有(需支援 $reset())
-│       └── highlightStore.ts     # 現有(需支援 $reset())
+│       ├── videoStore.ts         # 擴展 deleteSession() action + 手動實作 $reset() ⭐
+│       ├── transcriptStore.ts    # 手動實作 $reset() ⭐
+│       └── highlightStore.ts     # 手動實作 $reset() ⭐
 │
 ├── di/
 │   └── container.ts              # 註冊 DeleteSessionUseCase ⭐

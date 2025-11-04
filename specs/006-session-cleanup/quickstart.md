@@ -338,18 +338,27 @@ const isDisabled = computed(() => !videoStore.video);
 
 **檢查清單**:
 ```typescript
-// 1. 確認 stores 有 $reset 方法
-console.log(typeof videoStore.$reset); // 應為 'function'
+// 1. 確認每個 store 都有 $reset 方法
+console.log(typeof videoStore.$reset);      // 應為 'function'
+console.log(typeof transcriptStore.$reset); // 應為 'function'
+console.log(typeof highlightStore.$reset);  // 應為 'function'
 
-// 2. 確認 Pinia Plugin 已註冊
-// 檢查 main.ts:
-const pinia = createPinia();
-pinia.use(createResetPlugin()); // ← 必須存在
+// 2. 檢查 $reset 實作是否正確
+// 在 videoStore.ts 中應有:
+function $reset() {
+  video.value = null;
+  isUploading.value = false;
+}
 
 // 3. 手動觸發重置測試
 videoStore.$reset();
+console.log(videoStore.video); // 應為 null
+
 transcriptStore.$reset();
+console.log(transcriptStore.transcript); // 應為 null
+
 highlightStore.$reset();
+console.log(highlightStore.highlights); // 應為 []
 ```
 
 ### 問題 3: IndexedDB 記錄未刪除

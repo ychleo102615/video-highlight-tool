@@ -79,61 +79,82 @@ async deleteSession(sessionId: string): Promise<void> {
 | 方案 | 適用 | 優點 | 缺點 |
 |------|------|------|------|
 | **內建 $reset()** | Options Syntax | 自動、簡潔 | 僅限選項 API |
-| **手動實作** | Setup Syntax | 細粒度控制 | 易遺漏、維護複雜 |
-| **Pinia Plugin** | 所有 Setup Stores | 自動、統一、易維護 | 多一個依賴 |
+| **手動實作** | Setup Syntax (簡單狀態) | 簡單直觀、無依賴 | 每個 store 需實作 |
+| **Pinia Plugin** | Setup Syntax (複雜嵌套物件) | 自動、統一 | 需額外依賴、過度設計 |
 
-### 決策: Pinia Plugin 自動 $reset()
+### 決策: 手動實作 $reset()
 
 **理由**:
-1. **專案現狀**: 所有 stores 使用 Setup Syntax(videoStore, transcriptStore, highlightStore)
-2. **複雜物件**: Entity 結構需要深層複製(cloneDeep)
-3. **自動適應**: 新增狀態時無需修改 $reset() 邏輯
-4. **統一行為**: 所有 stores 的重置邏輯一致
+1. **狀態簡單**: 所有狀態都是基本型別(null、boolean、空陣列)
+2. **無需深層複製**: 直接賦值即可,無引用共享問題
+3. **符合 YAGNI 原則**: 不需要複雜的 Plugin 機制
+4. **易於理解**: 一眼就能看懂重置邏輯
+5. **無額外依賴**: 不需要 lodash-es
 
 **實作方案**:
 ```typescript
-// src/plugins/pinia-reset-plugin.ts
-import { cloneDeep } from 'lodash-es';
+// videoStore.ts
+export const useVideoStore = defineStore('video', () => {
+  const video = ref<Video | null>(null);
+  const isUploading = ref(false);
 
-export function createResetPlugin() {
-  return ({ store }: { store: any }) => {
-    const initialState = cloneDeep(store.$state);
-    store.$reset = () => store.$patch(cloneDeep(initialState));
-  };
-}
+  function $reset() {
+    video.value = null;
+    isUploading.value = false;
+  }
 
-// main.ts
-const pinia = createPinia();
-pinia.use(createResetPlugin());
+  return { video, isUploading, $reset };
+});
+
+// transcriptStore.ts
+export const useTranscriptStore = defineStore('transcript', () => {
+  const transcript = ref<Transcript | null>(null);
+  const currentSentenceId = ref<string | null>(null);
+
+  function $reset() {
+    transcript.value = null;
+    currentSentenceId.value = null;
+  }
+
+  return { transcript, currentSentenceId, $reset };
+});
+
+// highlightStore.ts
+export const useHighlightStore = defineStore('highlight', () => {
+  const highlights = ref<Highlight[]>([]);
+  const selectedSentenceIds = ref<string[]>([]);
+
+  function $reset() {
+    highlights.value = [];
+    selectedSentenceIds.value = [];
+  }
+
+  return { highlights, selectedSentenceIds, $reset };
+});
 ```
 
 **重置順序**: 根據依賴關係,從深層到根層
 ```typescript
 // 正確順序(依賴方到獨立方)
-highlightStore.$reset();  // ← 依賴 transcript 句子
-await nextTick();
-transcriptStore.$reset(); // ← 依賴 video 資料
-await nextTick();
-videoStore.$reset();      // ← 獨立
+highlightStore.$reset();    // ← 依賴 transcript 句子
+transcriptStore.$reset();   // ← 依賴 video 資料
+videoStore.$reset();        // ← 獨立
+
+// 不需要 nextTick(),因為都是簡單的同步賦值
 ```
 
-**副作用處理**: 使用 isResetting flag 避免 watcher 在重置時觸發
+**何時需要 Plugin**: 只有當狀態包含複雜嵌套物件時才需要 Plugin
 ```typescript
-const isResetting = ref(false);
+// ❌ 簡單狀態 - 不需要 Plugin (我們的情況)
+const user = ref(null)
+const items = ref([])
 
-watch(video, () => {
-  if (isResetting.value) return;
-  // 正常業務邏輯
-});
-
-function $reset() {
-  isResetting.value = true;
-  // 重置邏輯
-  nextTick(() => { isResetting.value = false; });
-}
+// ✅ 複雜嵌套 - 才需要 Plugin
+const settings = ref({
+  theme: { colors: { primary: '#000' } },
+  layout: { sidebar: { width: 200 } }
+})
 ```
-
-**替代方案考量**: 手動實作 $reset() 維護成本高,易遺漏新狀態
 
 ---
 
