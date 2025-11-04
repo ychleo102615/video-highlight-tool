@@ -58,6 +58,13 @@ export function useVideoPlayer(): UseVideoPlayerReturn {
   let rafId: number | null = null;
 
   /**
+   * 片段間隔閾值（秒）
+   * 如果兩個片段的間隔小於此值，則不跳轉，讓視頻自然播放
+   * 這可以讓連續的句子播放更流暢
+   */
+  const SEGMENT_GAP_THRESHOLD = 0.2; // 200ms
+
+  /**
    * 初始化 video.js 播放器
    * @param videoUrl 視頻 URL
    * @param segmentList 要播放的片段列表
@@ -82,7 +89,9 @@ export function useVideoPlayer(): UseVideoPlayerReturn {
       preload: 'metadata',
       controlBar: {
         remainingTimeDisplay: false,
-        playbackRateMenuButton: false
+        playbackRateMenuButton: false,
+        pictureInPictureToggle: false,
+        fullscreenToggle: false
       }
     });
 
@@ -192,7 +201,15 @@ export function useVideoPlayer(): UseVideoPlayerReturn {
         if (currentSegmentIndex < segments.length) {
           const nextSegment = segments[currentSegmentIndex];
           if (nextSegment) {
-            player.value?.currentTime(nextSegment.startTime);
+            // 計算與下一個片段的間隔
+            const gap = nextSegment.startTime - currentSegment.endTime;
+
+            // 如果間隔小於閾值，讓視頻自然播放（不跳轉）
+            // 這可以讓連續的句子播放更流暢
+            if (gap > SEGMENT_GAP_THRESHOLD) {
+              player.value?.currentTime(nextSegment.startTime);
+            }
+            // 否則不做任何事，讓視頻繼續播放到下一個片段
           }
         } else {
           // 所有片段播放完畢，暫停並重置
