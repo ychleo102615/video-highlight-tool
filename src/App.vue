@@ -6,6 +6,7 @@ import EditingArea from '@/presentation/components/editing/EditingArea.vue';
 import PreviewArea from '@/presentation/components/preview/PreviewArea.vue';
 import SplitLayout from '@/presentation/components/layout/SplitLayout.vue';
 import SessionRestorer from '@/presentation/components/SessionRestorer.vue';
+import DeleteButton from '@/presentation/components/DeleteButton.vue';
 import { useVideoStore } from '@/presentation/stores/videoStore';
 import { useTranscriptStore } from '@/presentation/stores/transcriptStore';
 import { useHighlightStore } from '@/presentation/stores/highlightStore';
@@ -64,7 +65,15 @@ function handleSeekToTime(time: number) {
       <!-- Header -->
       <header class="bg-white shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <h1 class="text-3xl font-bold text-gray-900">視頻高光編輯工具</h1>
+          <div class="flex items-center justify-between">
+            <h1 class="text-3xl font-bold text-gray-900">視頻高光編輯工具</h1>
+            <div class="flex items-center gap-4">
+              <DeleteButton size="small" />
+              <p class="text-xs text-gray-500">
+                系統會在應用啟動時自動清理超過 24 小時的會話資料
+              </p>
+            </div>
+          </div>
         </div>
       </header>
 

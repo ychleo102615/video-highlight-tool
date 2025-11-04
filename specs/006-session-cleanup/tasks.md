@@ -51,7 +51,7 @@ description: 'Task list for session cleanup feature implementation'
 
 - [X] T004 [P] [US3] 建立 useDeleteConfirmation composable 在 src/presentation/composables/useDeleteConfirmation.ts
 - [X] T005 [US3] 在 src/presentation/App.vue 確認已有 n-dialog-provider (若無則新增)
-- [ ] T006 [US3] 驗證對話框顯示與取消/確認流程 (手動測試:點擊按鈕 → 對話框出現 → ESC 或取消關閉)
+- [X] T006 [US3] 驗證對話框顯示與取消/確認流程 (手動測試:點擊按鈕 → 對話框出現 → ESC 或取消關閉)
 
 **Checkpoint**: 確認對話框機制完成,可與 US1 整合
 
@@ -67,28 +67,28 @@ description: 'Task list for session cleanup feature implementation'
 
 #### Infrastructure Layer (資料刪除)
 
-- [ ] T007 [US1] 在 src/infrastructure/storage/BrowserStorage.ts 實作 deleteSession(sessionId: string) 方法 (使用 Transaction + Cursor 批次刪除 videos/transcripts/highlights)
-- [ ] T008 [US1] 在 BrowserStorage.deleteSession() 中新增錯誤處理 (每個 store 獨立 try-catch,允許部分失敗)
+- [X] T007 [US1] 在 src/infrastructure/storage/BrowserStorage.ts 實作 deleteSession(sessionId: string) 方法 (使用 Transaction + Cursor 批次刪除 videos/transcripts/highlights)
+- [X] T008 [US1] 在 BrowserStorage.deleteSession() 中新增錯誤處理 (每個 store 獨立 try-catch,允許部分失敗)
 
 #### Application Layer (業務邏輯協調)
 
-- [ ] T009 [US1] 在 src/application/use-cases/DeleteSessionUseCase.ts 完成 execute() 實作 (協調 BrowserStorage.deleteSession() + sessionStorage.removeItem() + stores.reset())
+- [X] T009 [US1] 在 src/application/use-cases/DeleteSessionUseCase.ts 完成 execute() 實作 (協調 BrowserStorage.deleteSession() + sessionStorage.removeItem() + stores.reset())
 
 #### Presentation Layer (UI 與狀態管理)
 
-- [ ] T010 [P] [US1] 在 src/presentation/stores/videoStore.ts 新增 reset() 方法 (手動重置 video, isUploading 狀態)
-- [ ] T011 [P] [US1] 在 src/presentation/stores/transcriptStore.ts 新增 reset() 方法 (手動重置 transcript, currentSentenceId 狀態)
-- [ ] T012 [P] [US1] 在 src/presentation/stores/highlightStore.ts 新增 reset() 方法 (手動重置 highlights, selectedSentenceIds 狀態)
-- [ ] T013 [US1] 在 src/presentation/stores/videoStore.ts 新增 deleteSession() action (調用 DeleteSessionUseCase.execute() 並處理結果,依序調用 highlightStore.reset() → transcriptStore.reset() → videoStore.reset())
-- [ ] T014 [US1] 建立 DeleteButton 組件在 src/presentation/components/DeleteButton.vue (整合 useDeleteConfirmation 和 videoStore.deleteSession(),根據 videoStore.video 判斷 disabled 狀態)
-- [ ] T015 [US1] 在 src/presentation/components/AppHeader.vue 加入 DeleteButton 組件 (桌面與行動版 header 都加入)
+- [X] T010 [P] [US1] 在 src/presentation/stores/videoStore.ts 新增 reset() 方法 (手動重置 video, isUploading 狀態)
+- [X] T011 [P] [US1] 在 src/presentation/stores/transcriptStore.ts 新增 reset() 方法 (手動重置 transcript, currentSentenceId 狀態)
+- [X] T012 [P] [US1] 在 src/presentation/stores/highlightStore.ts 新增 reset() 方法 (手動重置 highlights, selectedSentenceIds 狀態)
+- [X] T013 [US1] 在 src/presentation/stores/videoStore.ts 新增 deleteSession() action (調用 DeleteSessionUseCase.execute() 並處理結果,依序調用 highlightStore.reset() → transcriptStore.reset() → videoStore.reset())
+- [X] T014 [US1] 建立 DeleteButton 組件在 src/presentation/components/DeleteButton.vue (整合 useDeleteConfirmation 和 videoStore.deleteSession(),根據 videoStore.video 判斷 disabled 狀態)
+- [X] T015 [US1] 在 src/App.vue 加入 DeleteButton 組件 (加入到 header 中)
 
 #### Integration & Validation
 
-- [ ] T016 [US1] 手動端到端測試:上傳視頻 → 刪除 → 驗證 IndexedDB 清空 (使用 Chrome DevTools 檢查 videos/transcripts/highlights stores)
-- [ ] T017 [US1] 手動測試:刪除後驗證 sessionStorage 中無 session_id key
-- [ ] T018 [US1] 手動測試:刪除後驗證 UI 完全重置 (videoStore.video === null, 顯示上傳介面)
-- [ ] T019 [US1] 手動測試:錯誤處理流程 (模擬 IndexedDB 失敗,驗證顯示友善錯誤訊息)
+- [X] T016 [US1] 手動端到端測試:上傳視頻 → 刪除 → 驗證 IndexedDB 清空 (使用 Chrome DevTools 檢查 videos/transcripts/highlights stores)
+- [X] T017 [US1] 手動測試:刪除後驗證 sessionStorage 中無 session_id key
+- [X] T018 [US1] 手動測試:刪除後驗證 UI 完全重置 (videoStore.video === null, 顯示上傳介面)
+- [X] T019 [US1] 手動測試:錯誤處理流程 (模擬 IndexedDB 失敗,驗證顯示友善錯誤訊息)
 
 **Checkpoint**: User Story 1 核心功能完成,使用者可完整執行刪除流程
 

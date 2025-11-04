@@ -128,6 +128,16 @@ export const useTranscriptStore = defineStore('transcript', () => {
     transcript.value = newTranscript;
   }
 
+  /**
+   * 重置 store 到初始狀態（用於會話刪除）
+   */
+  function reset(): void {
+    transcript.value = null;
+    isProcessing.value = false;
+    playingSentenceId.value = null;
+    error.value = null;
+  }
+
   // ========================================
   // Return
   // ========================================
@@ -146,6 +156,7 @@ export const useTranscriptStore = defineStore('transcript', () => {
     processTranscript,
     setPlayingSentenceId,
     getSentenceAtTime,
-    setTranscript
+    setTranscript,
+    reset
   };
 });

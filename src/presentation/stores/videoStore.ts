@@ -7,6 +7,8 @@ import type {
   RestoreSessionUseCase,
   RestoreSessionResult
 } from '@/application/use-cases/RestoreSessionUseCase';
+import type { IDeleteSessionUseCase } from '@/application/use-cases/DeleteSessionUseCase';
+import type { DeleteSessionResultDTO } from '@/application/dto/DeleteSessionResultDTO';
 import { container } from '@/di/container';
 // Store contracts 型別已在檔案中直接實作，不需要額外導入
 // import type {
@@ -42,6 +44,7 @@ export const useVideoStore = defineStore('video', () => {
     'UploadVideoWithMockTranscriptUseCase'
   );
   const restoreSessionUseCase = container.resolve<RestoreSessionUseCase>('RestoreSessionUseCase');
+  const deleteSessionUseCase = container.resolve<IDeleteSessionUseCase>('DeleteSessionUseCase');
 
   // ========================================
   // Actions
@@ -103,6 +106,56 @@ export const useVideoStore = defineStore('video', () => {
   }
 
   /**
+   * 重置 store 到初始狀態（用於會話刪除）
+   */
+  function reset(): void {
+    video.value = null;
+    isUploading.value = false;
+    uploadProgress.value = 0;
+    error.value = null;
+  }
+
+  /**
+   * 刪除當前會話的所有資料
+   * User Story 1: 手動刪除當前會話資料
+   * - 調用 DeleteSessionUseCase 刪除 IndexedDB 和 sessionStorage
+   * - 依序重置所有 stores (highlight → transcript → video)
+   * - 返回刪除結果供 UI 顯示通知
+   *
+   * @returns Promise<DeleteSessionResultDTO> - 刪除結果
+   */
+  async function deleteSession(): Promise<DeleteSessionResultDTO> {
+    try {
+      // 1. 執行刪除 Use Case (刪除 IndexedDB 和 sessionStorage)
+      const result = await deleteSessionUseCase.execute();
+
+      // 2. 若刪除失敗,直接返回錯誤結果
+      if (!result.success) {
+        return result;
+      }
+
+      // 3. 刪除成功後,依序重置所有 stores (依賴方到獨立方)
+      const highlightStore = useHighlightStore();
+      highlightStore.reset();
+
+      const transcriptStore = useTranscriptStore();
+      transcriptStore.reset();
+
+      reset();
+
+      // 4. 返回成功結果
+      return { success: true };
+    } catch (err) {
+      // 5. 捕獲意外錯誤
+      console.error('Unexpected error in videoStore.deleteSession:', err);
+      return {
+        success: false,
+        error: '刪除會話時發生未預期的錯誤'
+      };
+    }
+  }
+
+  /**
    * 恢復會話
    * User Story 1: 小視頻完整恢復
    * - 在應用啟動時自動執行
@@ -155,6 +208,8 @@ export const useVideoStore = defineStore('video', () => {
     // Actions
     uploadVideo,
     clearVideo,
-    restoreSession
+    restoreSession,
+    reset,
+    deleteSession
   };
 });

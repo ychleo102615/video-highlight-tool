@@ -201,6 +201,16 @@ export const useHighlightStore = defineStore('highlight', () => {
     }
   }
 
+  /**
+   * 重置 store 到初始狀態（用於會話刪除）
+   */
+  function reset(): void {
+    currentHighlight.value = null;
+    isLoading.value = false;
+    error.value = null;
+    pendingToggles.clear();
+  }
+
   // ========================================
   // Return
   // ========================================
@@ -221,6 +231,7 @@ export const useHighlightStore = defineStore('highlight', () => {
     createHighlight,
     toggleSentence,
     isSentenceSelected,
-    setHighlights
+    setHighlights,
+    reset
   };
 });
