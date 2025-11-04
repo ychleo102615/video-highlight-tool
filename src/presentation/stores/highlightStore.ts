@@ -201,6 +201,24 @@ export const useHighlightStore = defineStore('highlight', () => {
     }
   }
 
+  /**
+   * T017: 清除會話 (User Story 1)
+   * 清除 Store 中的所有會話狀態（記憶體）
+   *
+   * 職責:
+   * - 僅清除記憶體中的狀態
+   * - 不直接操作 IndexedDB（由 CleanupSessionUseCase 負責）
+   *
+   * 呼叫時機:
+   * - SessionRestorer 執行延遲清除後
+   * - 手動刪除會話後（User Story 2）
+   */
+  function clearSession(): void {
+    currentHighlight.value = null;
+    isLoading.value = false;
+    error.value = null;
+  }
+
   // ========================================
   // Return
   // ========================================
@@ -221,6 +239,7 @@ export const useHighlightStore = defineStore('highlight', () => {
     createHighlight,
     toggleSentence,
     isSentenceSelected,
-    setHighlights
+    setHighlights,
+    clearSession
   };
 });

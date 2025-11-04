@@ -76,14 +76,14 @@ description: 'Task list for 會話清除功能 (Session Cleanup)'
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] Implement pagehide event handler in useSessionCleanup.ts to detect tab close
-- [ ] T013 [US1] Add pendingCleanup flag setting logic in beforeunload handler
-- [ ] T014 [US1] Implement delayed cleanup logic in App.vue to execute CleanupSessionUseCase on startup when pendingCleanup flag is detected
-- [ ] T015 [P] [US1] Add clearSession() method to videoStore in src/presentation/stores/videoStore.ts
-- [ ] T016 [P] [US1] Add clearSession() method to transcriptStore in src/presentation/stores/transcriptStore.ts
-- [ ] T017 [P] [US1] Add clearSession() method to highlightStore in src/presentation/stores/highlightStore.ts
-- [ ] T018 [US1] Integrate Store clearSession() calls in App.vue delayed cleanup flow
-- [ ] T019 [US1] Add error handling for failed delayed cleanup with pendingCleanup flag preservation
+- [X] T012 [US1] Implement pagehide event handler in useSessionCleanup.ts to detect tab close
+- [X] T013 [US1] Add pendingCleanup flag setting logic in beforeunload handler
+- [X] T014 [US1] Implement delayed cleanup logic in App.vue to execute CleanupSessionUseCase on startup when pendingCleanup flag is detected
+- [X] T015 [P] [US1] Add clearSession() method to videoStore in src/presentation/stores/videoStore.ts
+- [X] T016 [P] [US1] Add clearSession() method to transcriptStore in src/presentation/stores/transcriptStore.ts
+- [X] T017 [P] [US1] Add clearSession() method to highlightStore in src/presentation/stores/highlightStore.ts
+- [X] T018 [US1] Integrate Store clearSession() calls in App.vue delayed cleanup flow
+- [X] T019 [US1] Add error handling for failed delayed cleanup with pendingCleanup flag preservation
 
 **Checkpoint**: 關閉分頁時能設定標記，重新開啟時自動清除資料並返回初始畫面
 

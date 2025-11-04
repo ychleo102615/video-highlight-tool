@@ -138,6 +138,25 @@ export const useVideoStore = defineStore('video', () => {
     return sessionState;
   }
 
+  /**
+   * T015: 清除會話 (User Story 1)
+   * 清除 Store 中的所有會話狀態（記憶體）
+   *
+   * 職責:
+   * - 僅清除記憶體中的狀態
+   * - 不直接操作 IndexedDB（由 CleanupSessionUseCase 負責）
+   *
+   * 呼叫時機:
+   * - SessionRestorer 執行延遲清除後
+   * - 手動刪除會話後（User Story 2）
+   */
+  function clearSession(): void {
+    video.value = null;
+    isUploading.value = false;
+    uploadProgress.value = 0;
+    error.value = null;
+  }
+
   // ========================================
   // Return
   // ========================================
@@ -155,6 +174,7 @@ export const useVideoStore = defineStore('video', () => {
     // Actions
     uploadVideo,
     clearVideo,
-    restoreSession
+    restoreSession,
+    clearSession
   };
 });

@@ -23,28 +23,35 @@ export function useSessionCleanup() {
   // ========================================
 
   /**
-   * T008: beforeunload 事件處理器
+   * T008 + T013: beforeunload 事件處理器
    * 設定 isClosing 標記，表示使用者即將離開頁面
+   * User Story 1: 顯示確認對話框提醒使用者即將清除資料
    *
    * 邏輯:
    * 1. 設定 sessionStorage.isClosing = 'true'
    * 2. 如果是重整，load 事件會清除此標記
-   * 3. 如果是關閉，下次啟動時檢查此標記判斷是否需清除
+   * 3. 如果是關閉，pagehide 事件會設定 pendingCleanup 標記
+   * 4. 顯示瀏覽器原生確認對話框（User Story 1）
    *
-   * @param e - BeforeUnloadEvent (User Story 1 將使用此參數設定 returnValue)
+   * @param e - BeforeUnloadEvent
    */
   function handleBeforeUnload(e: BeforeUnloadEvent) {
     try {
-      // 設定 isClosing 標記
+      // 設定 isClosing 標記（User Story 3）
       sessionStorage.setItem('isClosing', 'true');
     } catch (error) {
       // SessionStorage 不可用時（如隱私模式），僅記錄警告
       console.warn('Failed to set isClosing flag:', error);
     }
 
-    // User Story 3: 不顯示確認對話框（專注於重整保護）
-    // User Story 1 將使用 e.preventDefault() 和 e.returnValue 添加確認邏輯
-    void e; // 明確標記參數將在 User Story 1 使用
+    // T013: User Story 1 - 顯示確認對話框
+    // 注意：現代瀏覽器會忽略自定義訊息，僅顯示預設訊息
+    // 但仍需呼叫 preventDefault() 和設定 returnValue 來觸發對話框
+    e.preventDefault();
+    e.returnValue = '關閉分頁將刪除此會話的所有資料，確定要繼續嗎？';
+
+    // 返回字串也可以觸發確認對話框（舊版瀏覽器相容）
+    return e.returnValue;
   }
 
   /**
@@ -66,6 +73,37 @@ export function useSessionCleanup() {
     }
   }
 
+  /**
+   * T012: pagehide 事件處理器
+   * 偵測分頁真正關閉並設定 pendingCleanup 標記
+   *
+   * 邏輯:
+   * 1. 檢查 isClosing 標記是否仍存在（未被 load 清除）
+   * 2. 檢查 event.persisted 是否為 false（非 bfcache）
+   * 3. 如果兩者都符合，表示是真正的關閉，設定 pendingCleanup 標記
+   * 4. 下次應用啟動時，App.vue 會檢查此標記並執行延遲清除
+   *
+   * @param e - PageTransitionEvent
+   */
+  function handlePageHide(e: PageTransitionEvent) {
+    try {
+      // 檢查 isClosing 標記是否存在
+      const isClosing = sessionStorage.getItem('isClosing') === 'true';
+
+      // 如果 isClosing 為 true 且頁面不進入 bfcache（真正關閉）
+      if (isClosing && !e.persisted) {
+        // 設定 pendingCleanup 標記，下次啟動時執行延遲清除
+        sessionStorage.setItem('pendingCleanup', 'true');
+
+        // 清除 isClosing 標記（已轉換為 pendingCleanup）
+        sessionStorage.removeItem('isClosing');
+      }
+    } catch (error) {
+      // SessionStorage 不可用時（如隱私模式），僅記錄警告
+      console.warn('Failed to set pendingCleanup flag:', error);
+    }
+  }
+
   // ========================================
   // Lifecycle Hooks
   // ========================================
@@ -76,12 +114,15 @@ export function useSessionCleanup() {
     window.addEventListener('beforeunload', handleBeforeUnload);
     // T009: load - 清除 isClosing 標記（重整時）
     window.addEventListener('load', handleLoad);
+    // T012: pagehide - 偵測分頁關閉並設定 pendingCleanup 標記
+    window.addEventListener('pagehide', handlePageHide);
   });
 
   onUnmounted(() => {
     // 清除全域事件監聽器
     window.removeEventListener('beforeunload', handleBeforeUnload);
     window.removeEventListener('load', handleLoad);
+    window.removeEventListener('pagehide', handlePageHide);
   });
 
   // ========================================
