@@ -33,9 +33,9 @@ description: 'Task list for session cleanup feature implementation'
 
 **⚠️ CRITICAL**: 此階段完成前無法開始任何 User Story
 
-- [ ] T001 [P] 建立 DeleteSessionResultDTO 在 src/application/dto/DeleteSessionResultDTO.ts
-- [ ] T002 建立 DeleteSessionUseCase 在 src/application/use-cases/DeleteSessionUseCase.ts (定義介面,暫不實作邏輯)
-- [ ] T003 在 src/di/container.ts 註冊 DeleteSessionUseCase
+- [X] T001 [P] 建立 DeleteSessionResultDTO 在 src/application/dto/DeleteSessionResultDTO.ts
+- [X] T002 建立 DeleteSessionUseCase 在 src/application/use-cases/DeleteSessionUseCase.ts (定義介面,暫不實作邏輯)
+- [X] T003 在 src/di/container.ts 註冊 DeleteSessionUseCase
 
 **Checkpoint**: Application Layer 基礎建立完成,可開始 User Story 實作
 
@@ -49,8 +49,8 @@ description: 'Task list for session cleanup feature implementation'
 
 ### Implementation for User Story 3
 
-- [ ] T004 [P] [US3] 建立 useDeleteConfirmation composable 在 src/presentation/composables/useDeleteConfirmation.ts
-- [ ] T005 [US3] 在 src/presentation/App.vue 確認已有 n-dialog-provider (若無則新增)
+- [X] T004 [P] [US3] 建立 useDeleteConfirmation composable 在 src/presentation/composables/useDeleteConfirmation.ts
+- [X] T005 [US3] 在 src/presentation/App.vue 確認已有 n-dialog-provider (若無則新增)
 - [ ] T006 [US3] 驗證對話框顯示與取消/確認流程 (手動測試:點擊按鈕 → 對話框出現 → ESC 或取消關閉)
 
 **Checkpoint**: 確認對話框機制完成,可與 US1 整合

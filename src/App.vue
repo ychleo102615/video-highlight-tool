@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted } from 'vue';
-import { NNotificationProvider } from 'naive-ui';
+import { NNotificationProvider, NDialogProvider } from 'naive-ui';
 import VideoUpload from '@/presentation/components/upload/VideoUpload.vue';
 import EditingArea from '@/presentation/components/editing/EditingArea.vue';
 import PreviewArea from '@/presentation/components/preview/PreviewArea.vue';
@@ -55,8 +55,10 @@ function handleSeekToTime(time: number) {
 <template>
   <!-- 通知系統容器 -->
   <n-notification-provider>
-    <!-- 會話恢復組件（無 UI，僅執行邏輯） -->
-    <SessionRestorer />
+    <!-- 對話框容器 -->
+    <n-dialog-provider>
+      <!-- 會話恢復組件（無 UI，僅執行邏輯） -->
+      <SessionRestorer />
 
     <div class="app min-h-screen bg-gray-50">
       <!-- Header -->
@@ -97,6 +99,7 @@ function handleSeekToTime(time: number) {
         </SplitLayout>
       </main>
     </div>
+    </n-dialog-provider>
   </n-notification-provider>
 </template>
 

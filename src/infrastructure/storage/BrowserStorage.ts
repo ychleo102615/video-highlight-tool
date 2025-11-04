@@ -293,4 +293,40 @@ export class BrowserStorage {
       console.warn(`Failed to cleanup ${storeName}:`, error);
     }
   }
+
+  // ==================== Session Management ====================
+
+  /**
+   * 刪除指定 sessionId 的所有資料
+   *
+   * 使用 Transaction + Cursor 批次刪除策略:
+   * - 利用 sessionId 索引快速定位記錄
+   * - 使用 cursor 遍歷刪除,記憶體效率高
+   * - 每個 store 獨立 transaction,允許部分失敗
+   *
+   * @param sessionId - 要刪除的會話 ID
+   * @throws 若任何 store 刪除失敗則拋出錯誤
+   */
+  async deleteSession(sessionId: string): Promise<void> {
+    const stores = ['videos', 'transcripts', 'highlights'] as const;
+
+    for (const storeName of stores) {
+      try {
+        const tx = this.db.transaction(storeName, 'readwrite');
+        const index = tx.store.index('sessionId');
+
+        // 使用 cursor 遍歷並刪除所有匹配的記錄
+        let cursor = await index.openCursor(sessionId);
+        while (cursor) {
+          await cursor.delete();
+          cursor = await cursor.continue();
+        }
+
+        await tx.done;
+      } catch (error) {
+        console.error(`Failed to delete ${storeName} for session ${sessionId}:`, error);
+        throw error;
+      }
+    }
+  }
 }

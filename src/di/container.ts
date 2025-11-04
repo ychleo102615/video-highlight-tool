@@ -244,4 +244,11 @@ export async function registerInfrastructureDependencies(): Promise<void> {
         container.resolve('IHighlightRepository')
       )
   );
+
+  // DeleteSessionUseCase: 刪除會話
+  const { DeleteSessionUseCase } = await import('@/application/use-cases/DeleteSessionUseCase');
+  container.register(
+    'DeleteSessionUseCase',
+    () => new DeleteSessionUseCase(container.resolve('BrowserStorage'))
+  );
 }
