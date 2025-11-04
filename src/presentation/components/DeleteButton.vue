@@ -13,6 +13,7 @@
 import { computed } from 'vue';
 import { NButton } from 'naive-ui';
 import { useVideoStore } from '@/presentation/stores/videoStore';
+import { useTranscriptStore } from '@/presentation/stores/transcriptStore';
 import { useDeleteConfirmation } from '@/presentation/composables/useDeleteConfirmation';
 import { useNotification } from '@/presentation/composables/useNotification';
 
@@ -27,13 +28,14 @@ const props = withDefaults(defineProps<Props>(), {
 
 // Store
 const videoStore = useVideoStore();
+const transcriptStore = useTranscriptStore();
 
 // Composables
 const { confirmDelete } = useDeleteConfirmation();
 const notification = useNotification();
 
 // Computed
-const isDisabled = computed(() => !videoStore.video);
+const isDisabled = computed(() => !videoStore.video || transcriptStore.isProcessing);
 
 // Methods
 async function handleDelete() {
