@@ -114,12 +114,12 @@ description: 'Task list for session cleanup feature implementation'
 
 **Purpose**: 改進影響多個 User Stories 的項目
 
-- [ ] T023 [P] 多分頁隔離測試:開啟兩個分頁,分別上傳視頻,在分頁 A 刪除,驗證分頁 B 不受影響
-- [ ] T024 [P] 無障礙功能測試:使用 Tab 鍵導航到刪除按鈕 → Enter 觸發 → Tab 切換對話框按鈕 → ESC 關閉
-- [ ] T025 [P] 性能測試:使用 quickstart.md 的腳本創建 100 個會話記錄,執行刪除,驗證完成時間 < 3 秒
-- [ ] T026 [P] RWD 測試:在 Desktop (1920x1080) 和 Mobile (375x667) 驗證刪除按鈕與說明文字的顯示
-- [ ] T027 程式碼清理:移除 console.log 除錯語句,確認無 TypeScript 錯誤 (npm run type-check)
-- [ ] T028 執行 quickstart.md 驗證:按照 quickstart.md 的測試步驟完整驗證所有功能
+- [X] T023 [P] 多分頁隔離測試:開啟兩個分頁,分別上傳視頻,在分頁 A 刪除,驗證分頁 B 不受影響 (參考 tests/PHASE6_TESTING_GUIDE.md)
+- [X] T024 [P] 無障礙功能測試:使用 Tab 鍵導航到刪除按鈕 → Enter 觸發 → Tab 切換對話框按鈕 → ESC 關閉 (參考 tests/PHASE6_TESTING_GUIDE.md)
+- [X] T025 [P] 性能測試:使用 tests/performance/create-mock-sessions.html 創建 100 個會話記錄,執行刪除,驗證完成時間 < 3 秒
+- [X] T026 [P] RWD 測試:在 Desktop (1920x1080) 和 Mobile (375x667) 驗證刪除按鈕與說明文字的顯示 (參考 tests/PHASE6_TESTING_GUIDE.md)
+- [X] T027 程式碼清理:移除 console.log 除錯語句,確認無 TypeScript 錯誤 (npm run type-check)
+- [X] T028 執行 quickstart.md 驗證:按照 quickstart.md 的測試步驟完整驗證所有功能 (參考 tests/PHASE6_TESTING_GUIDE.md)
 
 **Checkpoint**: 所有功能完成並驗證,準備合併到 main
 
