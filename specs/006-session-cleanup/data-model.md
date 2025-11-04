@@ -244,7 +244,7 @@ export interface HighlightPersistenceDTO {
 | **IndexedDB 不可用** | BrowserStorage.db 為 undefined | 返回錯誤,提示瀏覽器不支援 |
 | **部分 store 刪除失敗** | try-catch 捕獲 transaction 錯誤 | 記錄 warning,繼續刪除其他 stores |
 | **sessionId 不存在** | sessionStorage.getItem() 返回 null | 返回錯誤,提示無活躍會話 |
-| **Store 重置失敗** | store.$reset() 拋出錯誤 | 嘗試手動重新賦值初始值 |
+| **Store 重置失敗** | store.reset() 拋出錯誤 | 嘗試手動重新賦值初始值 |
 
 ---
 
@@ -278,9 +278,9 @@ export interface HighlightPersistenceDTO {
          ├──→ sessionStorage.removeItem(SESSION_ID_KEY)
          │
          └──→ 重置 Stores
-              ├─ highlightStore.$reset()
-              ├─ transcriptStore.$reset()
-              └─ videoStore.$reset()
+              ├─ highlightStore.reset()
+              ├─ transcriptStore.reset()
+              └─ videoStore.reset()
 ```
 
 ---

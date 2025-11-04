@@ -58,7 +58,7 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 - ✅ **RWD**: DeleteButton 在 Desktop 和 Mobile 版本的 header 中顯示,按鈕大小與間距符合各平台觸控標準
 
 - ✅ **單向數據流**:
-  - 流程: DeleteButton 點擊 → videoStore.deleteSession() → DeleteSessionUseCase.execute() → BrowserStorage.deleteSession() → stores.$reset()
+  - 流程: DeleteButton 點擊 → videoStore.deleteSession() → DeleteSessionUseCase.execute() → BrowserStorage.deleteSession() → stores.reset()
   - Store 為單一數據源,組件不直接操作狀態
 
 - ✅ **依賴注入**: DeleteSessionUseCase 透過建構函式接收 BrowserStorage 依賴,在 di-container.ts 中註冊
@@ -117,9 +117,9 @@ src/
 │   │   ├── AppHeader.vue         # 修改(加入 DeleteButton) ⭐
 │   │   └── DeleteButton.vue      # 新增 ⭐
 │   └── stores/
-│       ├── videoStore.ts         # 擴展 deleteSession() action + 手動實作 $reset() ⭐
-│       ├── transcriptStore.ts    # 手動實作 $reset() ⭐
-│       └── highlightStore.ts     # 手動實作 $reset() ⭐
+│       ├── videoStore.ts         # 擴展 deleteSession() action + 手動實作 reset() ⭐
+│       ├── transcriptStore.ts    # 手動實作 reset() ⭐
+│       └── highlightStore.ts     # 手動實作 reset() ⭐
 │
 ├── di/
 │   └── container.ts              # 註冊 DeleteSessionUseCase ⭐
