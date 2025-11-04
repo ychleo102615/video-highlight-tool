@@ -24,22 +24,18 @@ import { onMounted, onUnmounted } from 'vue';
  */
 export function useSessionCleanup() {
   // ========================================
-  // Immediate Execution (修復 v3)
+  // 移除錯誤的「立即執行」邏輯（修復 v4）
   // ========================================
-  // 在 composable 初始化時立即檢查並清除 pendingCleanup
-  // 這必須在 SessionRestorer 檢查之前執行
-  try {
-    // 如果有 sessionId（表示是重整而非新開啟）
-    const hasSessionId = sessionStorage.getItem('sessionId');
-
-    if (hasSessionId) {
-      // 重整時清除可能被錯誤設定的 pendingCleanup 標記
-      localStorage.removeItem('pendingCleanup');
-      console.log('[useSessionCleanup] Page refreshed, pendingCleanup cleared');
-    }
-  } catch (error) {
-    console.warn('Failed to check/clear pendingCleanup on init:', error);
-  }
+  // 原因：
+  // 1. sessionStorage.sessionId 可能在分頁關閉後仍然存在（瀏覽器行為不一致）
+  // 2. 導致誤判為「刷新」而清除 pendingCleanup
+  // 3. SessionRestorer 已經負責檢查和處理 pendingCleanup
+  // 4. 重整時不應該有 pendingCleanup（因為 load 事件會清除 isClosing，pagehide 不會設定）
+  //
+  // 新策略：
+  // - useSessionCleanup 只負責事件處理（beforeunload, load, pagehide）
+  // - SessionRestorer 負責啟動時的檢查和清除
+  // - 如果重整時出現 pendingCleanup，也應該執行清除（防禦性程式設計）
 
   // ========================================
   // Event Handlers
@@ -66,6 +62,27 @@ export function useSessionCleanup() {
     } catch (error) {
       // SessionStorage 不可用時（如隱私模式），僅記錄警告
       console.warn('Failed to set isClosing flag:', error);
+    }
+  }
+
+  /**
+   * T009: load 事件處理器（重新添加 - 修復 v4）
+   * 清除 isClosing 標記，表示頁面重新載入（重整）
+   *
+   * 邏輯:
+   * 1. 頁面重新載入時，移除 isClosing 標記
+   * 2. 這表示使用者是重整而非關閉，不應觸發清除
+   * 3. pagehide 檢查時不會設定 pendingCleanup
+   * 4. session-restore 功能可正常運作
+   */
+  function handleLoad() {
+    try {
+      // 清除 isClosing 標記（如果存在）
+      sessionStorage.removeItem('isClosing');
+      console.log('[useSessionCleanup] Page loaded, isClosing cleared (refresh detected)');
+    } catch (error) {
+      // SessionStorage 不可用時（如隱私模式），僅記錄警告
+      console.warn('Failed to remove isClosing flag:', error);
     }
   }
 
@@ -116,6 +133,8 @@ export function useSessionCleanup() {
     // 註冊全域事件監聽器
     // T008: beforeunload - 設定 isClosing 標記
     window.addEventListener('beforeunload', handleBeforeUnload);
+    // T009: load - 清除 isClosing 標記（重整時）
+    window.addEventListener('load', handleLoad);
     // T012: pagehide - 偵測分頁關閉並設定 pendingCleanup 標記
     window.addEventListener('pagehide', handlePageHide);
   });
@@ -123,6 +142,7 @@ export function useSessionCleanup() {
   onUnmounted(() => {
     // 清除全域事件監聽器
     window.removeEventListener('beforeunload', handleBeforeUnload);
+    window.removeEventListener('load', handleLoad);
     window.removeEventListener('pagehide', handlePageHide);
   });
 

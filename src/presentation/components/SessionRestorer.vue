@@ -32,6 +32,7 @@ onMounted(async () => {
     // 修復 v2: 從 localStorage 讀取（分頁關閉後仍保留）
     // 如果標記存在，表示上次關閉時預計要清除資料
     const hasPendingCleanup = localStorage.getItem('pendingCleanup') === 'true';
+    console.log('[SessionRestorer] hasPendingCleanup:', hasPendingCleanup);
 
     if (hasPendingCleanup) {
       // T014: User Story 1 - 執行延遲清除邏輯
