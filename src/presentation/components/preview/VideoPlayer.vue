@@ -1,56 +1,121 @@
 <template>
-  <div class="video-player-container relative w-full">
-    <!-- 錯誤狀態 -->
-    <div
-      v-if="hasError"
-      class="absolute inset-0 flex flex-col items-center justify-center bg-red-50 z-20 p-6"
-    >
-      <div class="text-red-600 text-center">
-        <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        <p class="text-lg font-semibold mb-2">視頻播放器錯誤</p>
-        <p class="text-sm text-gray-600">{{ errorMessage }}</p>
-        <button
-          @click="
-            hasError = false;
-            errorMessage = '';
-          "
-          class="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-        >
-          重試
-        </button>
+  <div class="video-player-wrapper">
+    <div class="video-player-container relative w-full">
+      <!-- 錯誤狀態 -->
+      <div
+        v-if="hasError"
+        class="absolute inset-0 flex flex-col items-center justify-center bg-red-50 z-20 p-6"
+      >
+        <div class="text-red-600 text-center">
+          <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <p class="text-lg font-semibold mb-2">視頻播放器錯誤</p>
+          <p class="text-sm text-gray-600">{{ errorMessage }}</p>
+          <button
+            @click="
+              hasError = false;
+              errorMessage = '';
+            "
+            class="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+          >
+            重試
+          </button>
+        </div>
+      </div>
+
+      <!-- Video.js 播放器 -->
+      <video v-show="!hasError" ref="videoElement" class="video-js vjs-big-play-centered"></video>
+
+      <!-- 文字疊加層 -->
+      <TranscriptOverlay
+        v-if="!hasError"
+        :current-text="currentTranscriptText"
+        :visible="showTranscript"
+      />
+
+      <!-- 載入狀態 -->
+      <div
+        v-if="isLoading && !hasError"
+        class="absolute inset-0 flex items-center justify-center bg-black/50 z-10"
+      >
+        <NSpin size="large" />
       </div>
     </div>
 
-    <!-- Video.js 播放器 -->
-    <video v-show="!hasError" ref="videoElement" class="video-js vjs-big-play-centered"></video>
-
-    <!-- 文字疊加層 -->
-    <TranscriptOverlay
-      v-if="!hasError"
-      :current-text="currentTranscriptText"
-      :visible="showTranscript"
-    />
-
-    <!-- 載入狀態 -->
+    <!-- 自定義控制列 -->
     <div
-      v-if="isLoading && !hasError"
-      class="absolute inset-0 flex items-center justify-center bg-black/50 z-10"
+      v-if="!hasError && !isLoading"
+      class="custom-controls flex items-center justify-center gap-4 py-4 bg-gray-50 border-t border-gray-200"
     >
-      <NSpin size="large" />
+      <!-- 上一個片段按鈕 -->
+      <NButton
+        circle
+        size="large"
+        @click="goToPreviousSegment"
+        title="上一個片段"
+        :disabled="!videoElement"
+      >
+        <template #icon>
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M8.445 14.832A1 1 0 0010 14v-2.798l5.445 3.63A1 1 0 0017 14V6a1 1 0 00-1.555-.832L10 8.798V6a1 1 0 00-1.555-.832l-6 4a1 1 0 000 1.664l6 4z"
+            />
+          </svg>
+        </template>
+      </NButton>
+
+      <!-- 播放/暫停按鈕 -->
+      <NButton
+        circle
+        size="large"
+        type="primary"
+        @click="togglePlay"
+        :title="isPlaying ? '暫停' : '播放'"
+        :disabled="!videoElement"
+      >
+        <template #icon>
+          <!-- 播放圖標 -->
+          <svg v-if="!isPlaying" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"
+            />
+          </svg>
+          <!-- 暫停圖標 -->
+          <svg v-else class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M5.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75A.75.75 0 007.25 3h-1.5zM12.75 3a.75.75 0 00-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 00.75-.75V3.75a.75.75 0 00-.75-.75h-1.5z" />
+          </svg>
+        </template>
+      </NButton>
+
+      <!-- 下一個片段按鈕 -->
+      <NButton
+        circle
+        size="large"
+        @click="goToNextSegment"
+        title="下一個片段"
+        :disabled="!videoElement"
+      >
+        <template #icon>
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              d="M4.555 5.168A1 1 0 003 6v8a1 1 0 001.555.832L10 11.202V14a1 1 0 001.555.832l6-4a1 1 0 000-1.664l-6-4A1 1 0 0010 6v2.798l-5.445-3.63z"
+            />
+          </svg>
+        </template>
+      </NButton>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted, onErrorCaptured, computed } from 'vue';
-import { NSpin } from 'naive-ui';
+import { NSpin, NButton } from 'naive-ui';
 import { useVideoPlayer } from '@/presentation/composables/useVideoPlayer';
 import { useTranscriptStore } from '@/presentation/stores/transcriptStore';
 import TranscriptOverlay from './TranscriptOverlay.vue';
@@ -91,6 +156,8 @@ const {
   play,
   pause,
   togglePlay,
+  goToPreviousSegment,
+  goToNextSegment,
   initializePlayer,
   updateSegments,
   disposePlayer
@@ -251,5 +318,26 @@ defineExpose({
   .video-player-container .video-js .vjs-progress-control {
     min-height: 44px;
   }
+
+  /**
+   * 移動端自定義控制列按鈕優化
+   */
+  .custom-controls button {
+    min-width: 48px;
+    min-height: 48px;
+  }
+}
+
+/**
+ * 自定義控制列樣式
+ */
+.video-player-wrapper {
+  width: 100%;
+}
+
+.custom-controls {
+  background: linear-gradient(to bottom, #f9fafb, #f3f4f6);
+  border-top: 1px solid #e5e7eb;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
 }
 </style>

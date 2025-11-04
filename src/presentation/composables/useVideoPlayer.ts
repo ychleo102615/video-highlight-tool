@@ -36,6 +36,10 @@ export interface UseVideoPlayerReturn {
   pause: () => void;
   /** 切換播放/暫停 */
   togglePlay: () => void;
+  /** 跳到上一個片段 */
+  goToPreviousSegment: () => void;
+  /** 跳到下一個片段 */
+  goToNextSegment: () => void;
   /** 初始化視頻播放器（用於片段播放） */
   initializePlayer: (videoUrl: string, segments: TimeSegment[]) => void;
   /** 更新片段列表（不重新初始化播放器） */
@@ -84,15 +88,9 @@ export function useVideoPlayer(): UseVideoPlayerReturn {
 
     // 初始化 video.js 播放器
     player.value = videojs(videoElement.value, {
-      controls: true,
-      fluid: true,
-      preload: 'metadata',
-      controlBar: {
-        remainingTimeDisplay: false,
-        playbackRateMenuButton: false,
-        pictureInPictureToggle: false,
-        fullscreenToggle: false
-      }
+      controls: false, // 關閉所有控制欄
+      fluid: false,
+      preload: 'metadata'
     });
 
     // 設定視頻來源
@@ -119,6 +117,19 @@ export function useVideoPlayer(): UseVideoPlayerReturn {
 
     // 監聽時間更新事件（實作片段播放邏輯）
     player.value.on('timeupdate', handleTimeUpdate);
+
+    // 添加點擊畫面播放/暫停功能
+    player.value.on('click', () => {
+      if (player.value) {
+        if (player.value.paused()) {
+          player.value.play()?.catch((error) => {
+            console.error('播放失敗:', error);
+          });
+        } else {
+          player.value.pause();
+        }
+      }
+    });
 
     // 如果有片段，跳轉到第一個片段的起點
     if (segments.length > 0 && segments[0]) {
@@ -312,6 +323,7 @@ export function useVideoPlayer(): UseVideoPlayerReturn {
       player.value.off('play');
       player.value.off('pause');
       player.value.off('loadedmetadata');
+      player.value.off('click');
 
       // 清理播放器實例
       player.value.dispose();
@@ -332,6 +344,56 @@ export function useVideoPlayer(): UseVideoPlayerReturn {
     segments = [];
   }
 
+  /**
+   * 跳到上一個片段
+   */
+  function goToPreviousSegment() {
+    if (!player.value || segments.length === 0) return;
+
+    // 如果在當前片段的開頭附近（< 1 秒），跳到上一個片段
+    // 否則跳到當前片段的開頭
+    const currentSegment = segments[currentSegmentIndex];
+    if (!currentSegment) return;
+
+    const time = player.value?.currentTime() || 0;
+    const isNearStart = time - currentSegment.startTime < 1;
+
+    if (isNearStart && currentSegmentIndex > 0) {
+      // 跳到上一個片段
+      currentSegmentIndex--;
+      const previousSegment = segments[currentSegmentIndex];
+      if (previousSegment) {
+        seekTo(previousSegment.startTime);
+      }
+    } else {
+      // 跳到當前片段的開頭
+      seekTo(currentSegment.startTime);
+    }
+  }
+
+  /**
+   * 跳到下一個片段
+   */
+  function goToNextSegment() {
+    if (!player.value || segments.length === 0) return;
+
+    // 跳到下一個片段
+    if (currentSegmentIndex < segments.length - 1) {
+      currentSegmentIndex++;
+      const nextSegment = segments[currentSegmentIndex];
+      if (nextSegment) {
+        seekTo(nextSegment.startTime);
+      }
+    } else {
+      // 已經是最後一個片段，回到第一個片段
+      currentSegmentIndex = 0;
+      const firstSegment = segments[0];
+      if (firstSegment) {
+        seekTo(firstSegment.startTime);
+      }
+    }
+  }
+
   // 組件卸載時清理播放器
   onUnmounted(() => {
     disposePlayer();
@@ -346,6 +408,8 @@ export function useVideoPlayer(): UseVideoPlayerReturn {
     play,
     pause,
     togglePlay,
+    goToPreviousSegment,
+    goToNextSegment,
     initializePlayer,
     updateSegments,
     disposePlayer
