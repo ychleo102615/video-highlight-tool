@@ -48,16 +48,16 @@ const containerClasses = computed(() => {
 
   // 播放中狀態（最高優先級）
   if (props.isPlaying) {
-    return `${baseClasses} border-2 border-blue-600 bg-blue-100 shadow-md`;
+    return `${baseClasses} border-2 border-yellow-600 bg-yellow-100 shadow-md`;
   }
 
   // 選中狀態
   if (props.isSelected) {
-    return `${baseClasses} border border-l-4 border-blue-500 bg-blue-50 hover:bg-blue-100`;
+    return `${baseClasses} border border-l-4 border-blue-500 bg-blue-50 hover:bg-blue-100 hover:border-blue-600`;
   }
 
   // 未選中狀態
-  return `${baseClasses} border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300`;
+  return `${baseClasses} border border-gray-200 bg-white hover:bg-gray-100 hover:border-gray-400`;
 });
 
 /**
