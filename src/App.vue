@@ -63,7 +63,7 @@ function handleSeekToTime(time: number) {
 
     <div class="app min-h-screen bg-gray-50">
       <!-- Header -->
-      <header class="bg-white shadow-sm">
+      <header class="bg-white shadow-sm border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div class="flex items-center justify-between gap-4">
             <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">視頻高光編輯工具</h1>

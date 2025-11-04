@@ -51,7 +51,7 @@
     <!-- 自定義控制列 -->
     <div
       v-if="!hasError && !isLoading"
-      class="custom-controls flex items-center justify-center gap-4 py-4 bg-gray-50 border-t border-gray-200"
+      class="custom-controls flex items-center justify-center gap-4 py-3 bg-gray-50 border-t border-gray-200"
     >
       <!-- 上一個片段按鈕 -->
       <NButton
@@ -303,7 +303,7 @@ defineExpose({
  * 移動端觸控目標優化
  * 增大 video.js 控制按鈕的點擊區域，確保 ≥ 44x44px
  */
-@media (max-width: 1024px) {
+@media (max-width: 767px) {
   .video-player-container .video-js .vjs-control {
     min-width: 44px;
     min-height: 44px;
@@ -320,7 +320,7 @@ defineExpose({
   }
 
   /**
-   * 移動端自定義控制列按鈕優化
+   * 手機端自定義控制列按鈕優化
    */
   .custom-controls button {
     min-width: 48px;

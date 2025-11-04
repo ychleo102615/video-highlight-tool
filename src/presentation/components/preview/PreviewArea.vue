@@ -1,7 +1,7 @@
 <template>
-  <div class="preview-area flex flex-col h-full bg-gray-50">
+  <div class="preview-area flex flex-col h-full bg-gray-50 max-md:max-h-[600px]">
     <!-- 標題區 -->
-    <div class="preview-header px-6 py-4 bg-white border-b border-gray-200">
+    <div class="preview-header px-6 py-4 bg-white border-b border-gray-200 max-md:flex max-md:justify-between">
       <h2 class="text-xl font-semibold text-gray-800">預覽區</h2>
       <p class="text-sm text-gray-500 mt-1">
         <span v-if="hasSelectedSentences"> 已選擇 {{ selectedSentenceCount }} 個句子 </span>
@@ -149,24 +149,19 @@ watch(
 </script>
 
 <style scoped>
+/**
+ * 預覽區樣式
+ * 高度由父容器（SplitLayout）控制，內部使用 flex 佈局自然填滿
+ */
 .preview-area {
-  /* 響應式高度 */
-  @media (max-width: 768px) {
-    /* 移動端：佔據 50vh */
-    height: 50vh;
-  }
-
-  @media (min-width: 1024px) {
-    /* 桌面端：佔據 50% 寬度 */
-    height: 100vh;
-  }
+  /* 使用 flex 佈局，讓內容區域自動填滿剩餘空間 */
 }
 
 .preview-header {
-  flex-shrink: 0;
+  flex-shrink: 0; /* 標題區固定大小 */
 }
 
 .preview-content {
-  flex-grow: 1;
+  flex-grow: 1; /* 內容區自動填滿剩餘空間 */
 }
 </style>
