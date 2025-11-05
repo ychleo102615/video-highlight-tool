@@ -117,7 +117,8 @@ async function handleTimeClick(event: Event) {
     <!-- 時間戳按鈕（移動端增大觸控目標） -->
     <button
       type="button"
-      class="inline-flex items-center gap-1.5 px-3 py-2 lg:px-2 lg:py-1 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors min-h-[44px] lg:min-h-[32px] min-w-[44px] lg:min-w-0"
+      class="inline-flex items-center gap-1.5 px-3 py-2 lg:px-2 lg:py-1 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors min-h-[44px] lg:min-h-[32px] min-w-[44px] lg:min-w-0 cursor-pointer"
+      :class="{ 'hover:bg-yellow-50 hover:text-yellow-600': isPlaying }"
       @click="handleTimeClick"
     >
       <ClockIcon class="w-4 h-4" />
