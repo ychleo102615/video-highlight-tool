@@ -15,6 +15,7 @@
 | 樣式方案 | Tailwind   | v4      |                                                                    |
 
 ### Clean Architecture 四層架構
+
 ```
 Infrastructure Layer          Presentation Layer
 (技術基礎設施)                    (UI 展示層)
@@ -25,27 +26,136 @@ Infrastructure Layer          Presentation Layer
 ```
 
 ### Domain Layer（領域層）
+
 #### 聚合根 Aggregate Roots
+
 核心業務實體：
+
 - Video
 - Transcript
 - Highlight
 
-#### 儲存庫介面 Repository Interfaces
-用於持久化操作的抽象介面：
-- VideoRepository
-- TranscriptRepository
-- HighlightRepository
+每個聚合根對應一個儲存庫介面。
+
+#### 領域模型結構圖
+
+```mermaid
+classDiagram
+    %% 聚合根
+    class Video {
+        <<Aggregate Root>>
+        +string id
+        +File file
+        +VideoMetadata metadata
+        +string? url
+    }
+
+    class Transcript {
+        <<Aggregate Root>>
+        +string id
+        +string videoId
+        +ReadonlyArray~Section~ sections
+        +string fullText
+    }
+
+    class Highlight {
+        <<Aggregate Root>>
+        +string id
+        +string videoId
+        +string name
+        -Set~string~ selectedSentenceIds
+        -string[] selectionOrder
+    }
+
+    %% Transcript 聚合內的 Entity
+    class Section {
+        <<Entity>>
+        +string id
+        +string title
+        +ReadonlyArray~Sentence~ sentences
+    }
+
+    class Sentence {
+        <<Entity>>
+        +string id
+        +string text
+        +TimeRange timeRange
+        +boolean isHighlightSuggestion
+    }
+
+    %% 值物件
+    class TimeStamp {
+        <<Value Object>>
+        +number milliseconds
+    }
+
+    class TimeRange {
+        <<Value Object>>
+        +TimeStamp start
+        +TimeStamp end
+    }
+
+    class VideoMetadata {
+        <<Value Object>>
+        +number duration
+        +number width
+        +number height
+        +string format
+    }
+
+    %% 聚合關係
+    Video "1" --> "1" VideoMetadata : contains
+    Transcript "1" --> "*" Section : contains
+    Section "1" --> "*" Sentence : contains
+    Sentence "1" --> "1" TimeRange : has
+    Section "1" --> "1" TimeRange : derives
+    TimeRange "1" --> "2" TimeStamp : composed of
+
+    %% 聚合間的關聯（通過 ID 引用）
+    Transcript ..> Video : videoId references
+    Highlight ..> Video : videoId references
+    Highlight ..> Sentence : references by ID
+
+    %% 樣式定義
+    style Video fill:#e1f5ff,stroke:#01579b,stroke-width:3px
+    style Transcript fill:#e1f5ff,stroke:#01579b,stroke-width:3px
+    style Highlight fill:#e1f5ff,stroke:#01579b,stroke-width:3px
+    style Section fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style Sentence fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style TimeStamp fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    style TimeRange fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    style VideoMetadata fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+```
+
+**圖例說明：**
+
+- 🔵 **藍色框**：聚合根（Aggregate Root），具有獨立的生命週期
+- 🟠 **橙色框**：實體（Entity），屬於某個聚合，不能獨立存在
+- 🟣 **紫色框**：值物件（Value Object），不可變，通過值比較相等性
+
+**關鍵設計原則：**
+
+1. **聚合邊界清晰**：Transcript 聚合包含 Section 和 Sentence，統一管理生命週期
+2. **跨聚合引用使用 ID**：Highlight 通過 `videoId` 和 `sentenceIds` 引用，避免直接持有對象
+3. **不可變性**：Transcript 的 sections 和 sentences 使用 `ReadonlyArray` 保護
+4. **職責分離**：Sentence 不包含 `isSelected` 狀態，該狀態由 Highlight 管理
 
 ### Application Layer（應用層）
-#### 用例 Use Cases
-- UploadVideoUseCase (UploadVideoWithMockTranscriptUseCase)
-- ProcessTranscriptUseCase
-- CreateHighlightUseCase（支援根據 AI 建議初始化選中句子）
-- ToggleSentenceInHighlightUseCase
-- RestoreSessionUseCase
-- DeleteSessionUseCase
 
+#### 用例 Use Cases
+
+- UploadVideoUseCase (UploadVideoWithMockTranscriptUseCase)
+  - 用於模擬上傳影片
+- ProcessTranscriptUseCase
+  - 用於模擬呼叫 AI API 處理並生成字幕與高光建議
+- CreateHighlightUseCase
+  - 建立高光剪輯（支援根據 AI 建議初始化選中句子）
+- ToggleSentenceInHighlightUseCase
+  - 切換句子在高光中的選中狀態
+- RestoreSessionUseCase
+  - 恢復使用者上次編輯的會話
+- DeleteSessionUseCase
+  - 刪除使用者的編輯會話
 
 ## 編輯區、預覽區同步功能
 
