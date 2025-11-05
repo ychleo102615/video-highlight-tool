@@ -30,7 +30,14 @@
       </div>
 
       <!-- Video.js 播放器 -->
-      <video v-show="!hasError" ref="videoElement" class="video-js vjs-big-play-centered"></video>
+      <video
+        v-show="!hasError"
+        ref="videoElement"
+        class="video-js vjs-big-play-centered"
+        playsinline
+        webkit-playsinline
+        x5-playsinline
+      ></video>
 
       <!-- 文字疊加層 -->
       <TranscriptOverlay
@@ -177,18 +184,22 @@ const showTranscript = computed(() => {
 });
 
 /**
- * 事件處理函數：視頻載入完成
+ * 視頻載入完成回調
+ * 由 useVideoPlayer 在 video.js player 事件觸發時調用
  */
-function handleLoadedData() {
+function handleLoadComplete() {
   isLoading.value = false;
 }
 
 /**
- * 事件處理函數：視頻載入錯誤
+ * 視頻載入錯誤回調
+ * 由 useVideoPlayer 在 video.js player 錯誤事件觸發時調用
  */
-function handleError(e: Event) {
-  console.error('VideoPlayer: video loading error', e);
+function handleLoadError(error: any) {
+  console.error('[VideoPlayer] Load error callback triggered', error);
   isLoading.value = false;
+  hasError.value = true;
+  errorMessage.value = error?.message || '視頻載入失敗，請檢查視頻格式或網絡連接';
 }
 
 /**
@@ -196,26 +207,18 @@ function handleError(e: Event) {
  */
 function setupPlayer() {
   if (!props.videoUrl || props.segments.length === 0) {
-    console.warn('VideoPlayer: videoUrl or segments is empty');
+    console.warn('[VideoPlayer] videoUrl or segments is empty');
     isLoading.value = false;
     return;
   }
 
   isLoading.value = true;
 
-  // 初始化播放器和片段播放
-  initializePlayer(props.videoUrl, props.segments);
-
-  // 監聽 loadeddata 事件（只在初始化時添加一次）
-  if (videoElement.value) {
-    // 移除舊的監聽器，避免重複添加
-    videoElement.value.removeEventListener('loadeddata', handleLoadedData);
-    videoElement.value.removeEventListener('error', handleError);
-
-    // 添加新的監聽器
-    videoElement.value.addEventListener('loadeddata', handleLoadedData);
-    videoElement.value.addEventListener('error', handleError);
-  }
+  // 初始化播放器和片段播放，傳遞回調函數
+  initializePlayer(props.videoUrl, props.segments, {
+    onLoadComplete: handleLoadComplete,
+    onLoadError: handleLoadError
+  });
 }
 
 // 監聽 videoUrl 變化，重新初始化播放器
@@ -260,12 +263,6 @@ onMounted(() => {
 
 // 組件卸載時清理播放器
 onUnmounted(() => {
-  // 移除事件監聽器
-  if (videoElement.value) {
-    videoElement.value.removeEventListener('loadeddata', handleLoadedData);
-    videoElement.value.removeEventListener('error', handleError);
-  }
-
   disposePlayer();
 });
 

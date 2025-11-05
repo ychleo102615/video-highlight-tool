@@ -19,6 +19,13 @@ interface TimeSegment {
   endTime: number; // 秒數
 }
 
+export interface UseVideoPlayerCallbacks {
+  /** 視頻載入完成回調 */
+  onLoadComplete?: () => void;
+  /** 視頻載入錯誤回調 */
+  onLoadError?: (error: any) => void;
+}
+
 export interface UseVideoPlayerReturn {
   /** 視頻 DOM 元素 ref */
   videoElement: Ref<HTMLVideoElement | null>;
@@ -41,7 +48,7 @@ export interface UseVideoPlayerReturn {
   /** 跳到下一個片段 */
   goToNextSegment: () => void;
   /** 初始化視頻播放器（用於片段播放） */
-  initializePlayer: (videoUrl: string, segments: TimeSegment[]) => void;
+  initializePlayer: (videoUrl: string, segments: TimeSegment[], callbacks?: UseVideoPlayerCallbacks) => void;
   /** 更新片段列表（不重新初始化播放器） */
   updateSegments: (newSegments: TimeSegment[]) => void;
   /** 清理播放器 */
@@ -72,10 +79,12 @@ export function useVideoPlayer(): UseVideoPlayerReturn {
    * 初始化 video.js 播放器
    * @param videoUrl 視頻 URL
    * @param segmentList 要播放的片段列表
+   * @param callbacks 回調函數
    */
-  function initializePlayer(videoUrl: string, segmentList: TimeSegment[]) {
+  function initializePlayer(videoUrl: string, segmentList: TimeSegment[], callbacks?: UseVideoPlayerCallbacks) {
     if (!videoElement.value) {
       console.warn('Video element not found');
+      callbacks?.onLoadError?.('Video element not found');
       return;
     }
 
@@ -90,7 +99,16 @@ export function useVideoPlayer(): UseVideoPlayerReturn {
     player.value = videojs(videoElement.value, {
       controls: false, // 關閉所有控制欄
       fluid: false,
-      preload: 'metadata'
+      preload: 'auto', // iOS 需要 'auto' 或 'metadata'
+      playsinline: true, // iOS Safari 必需：允許內聯播放
+      html5: {
+        nativeTextTracks: false,
+        nativeAudioTracks: false,
+        nativeVideoTracks: false,
+        hls: {
+          overrideNative: true
+        }
+      }
     });
 
     // 設定視頻來源
@@ -104,6 +122,23 @@ export function useVideoPlayer(): UseVideoPlayerReturn {
       if (player.value) {
         duration.value = player.value.duration() || 0;
       }
+    });
+
+    // 監聽 canplay 事件（iOS 通常先觸發此事件）
+    player.value.on('canplay', () => {
+      callbacks?.onLoadComplete?.();
+    });
+
+    // 監聽 loadeddata 事件
+    player.value.on('loadeddata', () => {
+      callbacks?.onLoadComplete?.();
+    });
+
+    // 監聽錯誤事件
+    player.value.on('error', () => {
+      const error = player.value?.error();
+      console.error('[useVideoPlayer] Video error:', error);
+      callbacks?.onLoadError?.(error);
     });
 
     // 監聽播放狀態變化
@@ -323,6 +358,9 @@ export function useVideoPlayer(): UseVideoPlayerReturn {
       player.value.off('play');
       player.value.off('pause');
       player.value.off('loadedmetadata');
+      player.value.off('canplay');
+      player.value.off('loadeddata');
+      player.value.off('error');
       player.value.off('click');
 
       // 清理播放器實例
