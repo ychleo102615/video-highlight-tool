@@ -17,7 +17,6 @@ export interface VideoPersistenceDTO {
     mimeType: string; // MIME 類型
     name: string; // 檔案名稱
   };
-  url?: string; // blob URL (不持久化,運行時生成)
 
   // Persistence 元資料
   savedAt: number; // 儲存時間戳 (毫秒)

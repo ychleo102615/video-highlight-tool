@@ -41,8 +41,6 @@ export class DTOMapper {
         mimeType: video.metadata.format,
         name: video.file.name
       },
-      // blob URL 不持久化,因為刷新後會失效
-      url: undefined,
       savedAt: Date.now(),
       sessionId: sessionId
     };
