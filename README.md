@@ -1,6 +1,7 @@
 # 影片高光編輯器
 
-[部署連結](https://ychleo102615.github.io/video-highlight-tool/)
+- [部署連結](https://ychleo102615.github.io/video-highlight-tool/)
+- [測試資料](#測試資料)
 
 ## 📋 文件大綱
 
