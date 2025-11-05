@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git rev-parse:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(tree:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npx eslint:*)",
+      "Bash(git fetch:*)",
+      "Bash(.specify/scripts/bash/update-agent-context.sh:*)",
+      "Bash(.specify/scripts/bash/check-prerequisites.sh:*)",
+      "Bash(.specify/scripts/bash/setup-plan.sh:*)",
+      "Bash(mkdir:*)",
+      "Bash(.specify/scripts/bash/create-new-feature.sh:*)",
+      "Bash(timeout 10 npm run dev:*)",
+      "Bash(npm run build:*)",
+      "Bash(xargs cat:*)",
+      "Bash(if [ -d \"/Users/leo101317/Projects/vue/video-highlight-tool/specs/005-session-restore/checklists\" ])",
+      "Bash(then ls \"/Users/leo101317/Projects/vue/video-highlight-tool/specs/005-session-restore/checklists\"/*.md)",
+      "Bash(else echo \"No checklists directory\")",
+      "Bash(fi)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

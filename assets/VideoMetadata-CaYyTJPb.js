@@ -1,0 +1,1 @@
+class s{constructor(t,i,o,r){if(this.duration=t,this.width=i,this.height=o,this.format=r,t<=0)throw new Error("Video duration must be positive");if(i<=0||o<=0)throw new Error("Video dimensions must be positive");if(!r.startsWith("video/"))throw new Error("Invalid video format")}get aspectRatio(){return this.width/this.height}}export{s as V};

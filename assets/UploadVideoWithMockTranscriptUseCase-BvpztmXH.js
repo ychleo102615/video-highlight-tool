@@ -1,0 +1,1 @@
+class c{constructor(t,e){this.uploadVideoUseCase=t,this.mockDataProvider=e}async execute(t,e,a){const o=await this.uploadVideoUseCase.execute(t,a),s=await e.text();return this.mockDataProvider.setMockData(o.id,s),o}}export{c as UploadVideoWithMockTranscriptUseCase};
