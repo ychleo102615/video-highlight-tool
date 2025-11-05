@@ -411,6 +411,7 @@ class DeleteSessionUseCase {
 
 ## Follow Up
 
+- timeline 縮放功能
 - 編輯狀態輸出功能
 - 高光片段依序預覽功能
 - 串接真實 API

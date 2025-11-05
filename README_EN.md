@@ -23,15 +23,15 @@
 
 ### Core Framework and Tools
 
-| Technology       | Choice     | Version | Rationale                                                                     |
-| ---------------- | ---------- | ------- | ----------------------------------------------------------------------------- |
-| Frontend Framework | Vue 3      | ^3.5.0  | Composition API better suited for complex state management, aligns with Clean Architecture |
-| Development Language | TypeScript | ^5.0.0  | Strong typing ensures code quality, reduces bug rate                          |
-| Build Tool       | Vite       | ^6.0.0  | Fast development experience, excellent HMR                                    |
-| State Management | Pinia      | ^2.2.0  | Vue 3 official recommendation, clean API                                      |
-| UI Framework     | Naive UI   | ^2.40.0 | TypeScript-friendly, rich components, modern design                           |
-| Video Processing | video.js   | ^8.0.0  | Feature-complete, excellent cross-browser compatibility                       |
-| Styling Solution | Tailwind   | ^4.1.16 | New Oxide engine with faster compilation, zero-config, native CSS support, smaller bundle |
+| Technology           | Choice     | Version | Rationale                                                                                  |
+| -------------------- | ---------- | ------- | ------------------------------------------------------------------------------------------ |
+| Frontend Framework   | Vue 3      | ^3.5.0  | Composition API better suited for complex state management, aligns with Clean Architecture |
+| Development Language | TypeScript | ^5.0.0  | Strong typing ensures code quality, reduces bug rate                                       |
+| Build Tool           | Vite       | ^6.0.0  | Fast development experience, excellent HMR                                                 |
+| State Management     | Pinia      | ^2.2.0  | Vue 3 official recommendation, clean API                                                   |
+| UI Framework         | Naive UI   | ^2.40.0 | TypeScript-friendly, rich components, modern design                                        |
+| Video Processing     | video.js   | ^8.0.0  | Feature-complete, excellent cross-browser compatibility                                    |
+| Styling Solution     | Tailwind   | ^4.1.16 | New Oxide engine with faster compilation, zero-config, native CSS support, smaller bundle  |
 
 ### Clean Architecture Four-Layer Structure
 
@@ -302,11 +302,11 @@ const playingSentenceId = computed(() => transcriptStore.playingSentenceId);
 
 Vue's reactivity system automatically handles UI updates.
 
-| Operation               | Result                                                          | Related Files                            |
-| ----------------------- | --------------------------------------------------------------- | ---------------------------------------- |
-| Video plays to sentence | Editing area highlights sentence and auto-scrolls into view     | PreviewArea.vue:100, EditingArea.vue:117 |
-| Click timestamp in editing area | Video seeks to corresponding time and starts playing       | PreviewArea.vue:141, VideoPlayer.vue:245 |
-| Play to unselected sentence | Editing area clears highlight (because playingSentenceId is null) | PreviewArea.vue:103                      |
+| Operation                       | Result                                                            | Related Files                            |
+| ------------------------------- | ----------------------------------------------------------------- | ---------------------------------------- |
+| Video plays to sentence         | Editing area highlights sentence and auto-scrolls into view       | PreviewArea.vue:100, EditingArea.vue:117 |
+| Click timestamp in editing area | Video seeks to corresponding time and starts playing              | PreviewArea.vue:141, VideoPlayer.vue:245 |
+| Play to unselected sentence     | Editing area clears highlight (because playingSentenceId is null) | PreviewArea.vue:103                      |
 
 ## Custom Key Feature: Persistence Design
 
@@ -415,6 +415,7 @@ Ensures users understand data lifecycle and avoid confusion about data loss.
 
 ## Follow Up
 
+- Timeline scale function
 - Editing state export functionality
 - Sequential preview of highlight clips
 - Integration with real API
