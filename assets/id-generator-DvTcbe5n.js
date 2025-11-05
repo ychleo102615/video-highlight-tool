@@ -1,0 +1,1 @@
+import{c as I,V as o,T as s,H as i}from"./index-DYgSsspj.js";function n(t,e=9){const r=Date.now(),a=Math.random().toString(36).substring(2,2+e);return`${t}${r}_${a}`}function u(){return n(I)}function c(){return n(o)}function _(){return n(s)}function d(){return n(i)}export{c as a,_ as b,d as c,u as g};
