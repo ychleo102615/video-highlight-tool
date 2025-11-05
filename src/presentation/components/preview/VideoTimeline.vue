@@ -67,23 +67,6 @@ const segmentBlocks = computed(() => {
 });
 
 /**
- * 處理時間軸點擊事件
- * 點擊時直接跳轉到該位置對應的時間
- */
-function handleTimelineClick(event: MouseEvent) {
-  const target = event.currentTarget as HTMLElement;
-  const rect = target.getBoundingClientRect();
-  const clickX = event.clientX - rect.left;
-  const clickPercent = clickX / rect.width;
-
-  // 計算點擊位置對應的時間
-  const seekTime = clickPercent * props.totalDuration;
-
-  // 直接跳轉到點擊位置的時間
-  emit('seek', seekTime);
-}
-
-/**
  * 處理片段區塊點擊事件
  * 根據點擊位置在片段內的相對位置，計算精確的跳轉時間
  */
@@ -128,8 +111,7 @@ function formatTime(seconds: number): string {
 
     <!-- 時間軸主體（手機增加高度以便於點擊） -->
     <div
-      class="timeline-track relative h-16 md:h-12 bg-gray-200 rounded-lg cursor-pointer overflow-hidden"
-      @click="handleTimelineClick"
+      class="timeline-track relative h-16 md:h-12 bg-gray-200 rounded-lg overflow-hidden"
     >
       <!-- 高光片段區塊 -->
       <transition-group name="segment-fade">
