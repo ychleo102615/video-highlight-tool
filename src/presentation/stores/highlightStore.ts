@@ -104,17 +104,26 @@ export const useHighlightStore = defineStore('highlight', () => {
   // ========================================
 
   /**
-   * 建立高光（使用 AI 建議的句子作為預設選擇）
+   * 建立高光
    * @param videoId 視頻 ID
    * @param name 高光名稱
+   * @param useAISuggestions 是否使用 AI 建議的句子初始化（可選，預設為 false）
    */
-  async function createHighlight(videoId: string, name: string): Promise<void> {
+  async function createHighlight(
+    videoId: string,
+    name: string,
+    useAISuggestions?: boolean
+  ): Promise<void> {
     try {
       isLoading.value = true;
       error.value = null;
 
       // 呼叫 Use Case 建立高光
-      const highlight = await createHighlightUseCase.execute({ videoId, name });
+      const highlight = await createHighlightUseCase.execute({
+        videoId,
+        name,
+        useAISuggestions
+      });
       currentHighlight.value = highlight;
     } catch (err) {
       error.value = (err as Error).message;

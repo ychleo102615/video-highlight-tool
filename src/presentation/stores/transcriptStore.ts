@@ -79,19 +79,9 @@ export const useTranscriptStore = defineStore('transcript', () => {
       const processedTranscript = await processTranscriptUseCase.execute(videoId);
       transcript.value = processedTranscript;
 
-      // 轉錄處理完成後,建立預設高光（使用 AI 建議的句子）
+      // 轉錄處理完成後，建立預設高光（使用 AI 建議的句子）
       const highlightStore = useHighlightStore();
-      await highlightStore.createHighlight(videoId, '預設高光');
-
-      // 將所有 AI 建議的句子加入高光
-      const suggestedSentences = allSentences.value.filter(
-        (sentence) => sentence.isHighlightSuggestion
-      );
-
-      // 批次加入建議的句子
-      for (const sentence of suggestedSentences) {
-        await highlightStore.toggleSentence(sentence.id);
-      }
+      await highlightStore.createHighlight(videoId, '預設高光', true);
     } catch (err) {
       error.value = (err as Error).message;
       throw err;

@@ -220,7 +220,8 @@ export async function registerInfrastructureDependencies(): Promise<void> {
     () =>
       new CreateHighlightUseCase(
         container.resolve('IHighlightRepository'),
-        container.resolve('IVideoRepository')
+        container.resolve('IVideoRepository'),
+        container.resolve('ITranscriptRepository')
       )
   );
 

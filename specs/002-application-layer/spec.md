@@ -43,18 +43,20 @@
 
 ### User Story 3 - 建立高光版本 (Priority: P2)
 
-開發者需要能夠透過應用層服務為指定的視頻建立新的高光版本，驗證視頻存在性，並初始化一個空的高光實體。
+開發者需要能夠透過應用層服務為指定的視頻建立新的高光版本，驗證視頻存在性，並可選擇性地根據 AI 建議自動初始化選中的句子。
 
 **Why this priority**: 這是高光編輯功能的入口點,但可以在有視頻和轉錄後再實作。用戶可以先看到轉錄內容，再建立高光。
 
-**Independent Test**: 可以透過建立 CreateHighlightUseCase 並注入 mock repositories 來獨立測試，驗證視頻驗證邏輯和高光實體建立。
+**Independent Test**: 可以透過建立 CreateHighlightUseCase 並注入 mock repositories 來獨立測試，驗證視頻驗證邏輯、高光實體建立和從轉錄中收集 AI 建議的邏輯。
 
 **Acceptance Scenarios**:
 
-1. **Given** 系統中存在一個視頻，**When** 執行 CreateHighlightUseCase 並提供視頻 ID 和高光名稱，**Then** 成功建立一個新的 Highlight 實體（初始狀態：無選中句子）
-2. **Given** 提供的視頻 ID 不存在，**When** 執行 CreateHighlightUseCase，**Then** 系統拋出 VideoNotFoundError
-3. **Given** 提供的高光名稱為空字串，**When** 執行 CreateHighlightUseCase，**Then** 系統拋出驗證錯誤
-4. **Given** 同一個視頻已經有一個高光版本，**When** 執行 CreateHighlightUseCase 建立第二個高光，**Then** 成功建立，兩個高光獨立存在
+1. **Given** 系統中存在一個視頻，**When** 執行 CreateHighlightUseCase 並提供視頻 ID 和高光名稱（useAISuggestions: false 或未提供），**Then** 成功建立一個新的 Highlight 實體（初始狀態：無選中句子）
+2. **Given** 系統中存在一個視頻和轉錄，**When** 執行 CreateHighlightUseCase 並提供 useAISuggestions: true，**Then** 成功建立一個新的 Highlight 實體，且 AI 建議的句子已被標記為選中
+3. **Given** 系統中存在一個視頻但沒有轉錄，**When** 執行 CreateHighlightUseCase 並提供 useAISuggestions: true，**Then** 成功建立一個空的 Highlight 實體（靜默失敗，不拋出錯誤）
+4. **Given** 提供的視頻 ID 不存在，**When** 執行 CreateHighlightUseCase，**Then** 系統拋出 VideoNotFoundError
+5. **Given** 提供的高光名稱為空字串，**When** 執行 CreateHighlightUseCase，**Then** 系統拋出驗證錯誤
+6. **Given** 同一個視頻已經有一個高光版本，**When** 執行 CreateHighlightUseCase 建立第二個高光，**Then** 成功建立，兩個高光獨立存在
 
 ---
 
@@ -75,29 +77,10 @@
 
 ---
 
-### User Story 5 - 生成高光預覽 (Priority: P3)
-
-開發者需要能夠透過應用層服務生成高光預覽數據，協調 Highlight 和 Transcript 兩個聚合，並提供排序選項。
-
-**Why this priority**: 這是最終的輸出功能，用於生成預覽。雖然重要，但用戶可以先完成句子選擇，最後再生成預覽。
-
-**Independent Test**: 可以透過建立 GenerateHighlightUseCase 並注入 mock repositories 來獨立測試，驗證跨聚合協調、排序邏輯和時長計算。
-
-**Acceptance Scenarios**:
-
-1. **Given** 存在一個高光（已選中 3 個句子）和對應的轉錄，**When** 執行 GenerateHighlightUseCase（sortBy: 'time'），**Then** 返回按時間順序排序的句子列表、時間範圍和總時長
-2. **Given** 存在一個高光（已選中 3 個句子），**When** 執行 GenerateHighlightUseCase（sortBy: 'selection'），**Then** 返回按選擇順序排序的句子列表
-3. **Given** 提供的高光 ID 不存在，**When** 執行 GenerateHighlightUseCase，**Then** 系統拋出 HighlightNotFoundError
-4. **Given** 高光存在但對應的轉錄不存在，**When** 執行 GenerateHighlightUseCase，**Then** 系統拋出 TranscriptNotFoundError
-5. **Given** 高光存在但沒有選中任何句子，**When** 執行 GenerateHighlightUseCase，**Then** 返回空的句子列表和零時長
-
----
-
 ### Edge Cases
 
 - 當 UploadVideoUseCase 執行期間文件儲存服務中斷時，如何確保系統狀態一致性？
 - 當 ProcessTranscriptUseCase 執行期間 AI 服務返回格式錯誤的數據時，如何處理？
-- 當 GenerateHighlightUseCase 請求的句子 ID 在轉錄中不存在時（數據不一致），如何處理？
 - 當並發執行多個 ToggleSentenceInHighlightUseCase 時，如何確保狀態一致性？
 - 當視頻文件元數據提取失敗時（如損壞的視頻），UploadVideoUseCase 應該如何處理？
 
@@ -117,18 +100,14 @@
 - **FR-010**: ProcessTranscriptUseCase MUST 驗證視頻存在性，不存在時拋出 VideoNotFoundError
 - **FR-011**: CreateHighlightUseCase MUST 驗證視頻存在性，不存在時拋出 VideoNotFoundError
 - **FR-012**: CreateHighlightUseCase MUST 驗證高光名稱不為空
-- **FR-013**: CreateHighlightUseCase MUST 建立初始狀態的 Highlight Entity（selectedSentenceIds 為空）
+- **FR-013**: CreateHighlightUseCase MUST 建立 Highlight Entity，並支援可選的 useAISuggestions 參數（boolean）用於指示是否從轉錄中收集 AI 建議的句子
+- **FR-013-1**: CreateHighlightUseCase 當 useAISuggestions 為 true 時，MUST 從轉錄中過濾 isHighlightSuggestion 為 true 的句子，並批次將這些句子 ID 加入到 Highlight Entity 中
+- **FR-013-2**: CreateHighlightUseCase 當 useAISuggestions 為 true 但轉錄不存在時，SHOULD 靜默失敗並建立空的 Highlight（不拋出錯誤）
 - **FR-014**: ToggleSentenceInHighlightUseCase MUST 從 repository 獲取 Highlight 實體
 - **FR-015**: ToggleSentenceInHighlightUseCase MUST 調用 `highlight.toggleSentence(sentenceId)` 方法切換狀態
 - **FR-016**: ToggleSentenceInHighlightUseCase MUST 將變更持久化至 repository
 - **FR-017**: ToggleSentenceInHighlightUseCase MUST 在 Highlight 不存在時拋出 HighlightNotFoundError
-- **FR-018**: GenerateHighlightUseCase MUST 從 repository 獲取 Highlight 和對應的 Transcript
-- **FR-019**: GenerateHighlightUseCase MUST 調用 `highlight.getSelectedSentences(transcript, sortBy)` 獲取選中的句子
-- **FR-020**: GenerateHighlightUseCase MUST 支援兩種排序方式：'selection'（選擇順序）和 'time'（時間順序）
-- **FR-021**: GenerateHighlightUseCase MUST 計算時間範圍（TimeRange[]）和總時長（number）
-- **FR-022**: GenerateHighlightUseCase MUST 在 Highlight 不存在時拋出 HighlightNotFoundError
-- **FR-023**: GenerateHighlightUseCase MUST 在 Transcript 不存在時拋出 TranscriptNotFoundError
-- **FR-024**: 所有 Use Cases MUST 透過依賴注入接收 repositories 和 ports
+- **FR-018**: 所有 Use Cases MUST 透過依賴注入接收 repositories 和 ports
 
 ### Key Entities
 
@@ -136,7 +115,7 @@
 - **VideoDTO**: 數據傳輸物件，包含視頻元數據（duration, width, height, format）
 - **VideoMetadataDTO**: 數據傳輸物件，包含視頻元數據（duration, width, height, format）
 - **Port Interfaces**: ITranscriptGenerator（轉錄生成服務）、IFileStorage（文件儲存服務）、IVideoProcessor（視頻處理服務）
-- **Use Cases**: UploadVideoUseCase, ProcessTranscriptUseCase, CreateHighlightUseCase, ToggleSentenceInHighlightUseCase, GenerateHighlightUseCase
+- **Use Cases**: UploadVideoUseCase, ProcessTranscriptUseCase, CreateHighlightUseCase, ToggleSentenceInHighlightUseCase
 
 ## Success Criteria _(mandatory)_
 

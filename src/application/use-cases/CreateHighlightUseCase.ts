@@ -7,6 +7,7 @@
 import { Highlight } from '../../domain/aggregates/Highlight';
 import type { IHighlightRepository } from '../../domain/repositories/IHighlightRepository';
 import type { IVideoRepository } from '../../domain/repositories/IVideoRepository';
+import type { ITranscriptRepository } from '../../domain/repositories/ITranscriptRepository';
 import { VideoNotFoundError, InvalidHighlightNameError } from '../errors';
 import { generateHighlightId } from '../../config/id-generator';
 
@@ -19,6 +20,9 @@ export interface CreateHighlightInput {
 
   /** 高光名稱 */
   name: string;
+
+  /** 是否使用 AI 建議初始化選中的句子（可選，預設為 false） */
+  useAISuggestions?: boolean;
 }
 
 /**
@@ -27,17 +31,32 @@ export interface CreateHighlightInput {
  * 職責：
  * - 驗證視頻存在性
  * - 驗證高光名稱不為空
- * - 建立 Highlight Entity（初始狀態：無選中句子）
+ * - 建立 Highlight Entity
+ * - 如果 useAISuggestions 為 true，從轉錄中收集 AI 建議的句子並初始化
  * - 透過 IHighlightRepository 持久化
  *
  * @example
  * ```typescript
- * const useCase = new CreateHighlightUseCase(highlightRepository, videoRepository);
- * const highlight = await useCase.execute({
+ * const useCase = new CreateHighlightUseCase(
+ *   highlightRepository,
+ *   videoRepository,
+ *   transcriptRepository
+ * );
+ *
+ * // 建立空的高光
+ * const highlight1 = await useCase.execute({
  *   videoId: 'video_001',
  *   name: '精華版'
  * });
- * console.log(`Highlight created: ${highlight.id}`);
+ *
+ * // 建立帶有 AI 建議句子的高光
+ * const highlight2 = await useCase.execute({
+ *   videoId: 'video_001',
+ *   name: '預設高光',
+ *   useAISuggestions: true
+ * });
+ *
+ * console.log(`Highlight created: ${highlight1.id}`);
  * ```
  */
 export class CreateHighlightUseCase {
@@ -46,10 +65,12 @@ export class CreateHighlightUseCase {
    *
    * @param highlightRepository - 高光儲存庫
    * @param videoRepository - 視頻儲存庫
+   * @param transcriptRepository - 轉錄儲存庫（用於收集 AI 建議）
    */
   constructor(
     private readonly highlightRepository: IHighlightRepository,
-    private readonly videoRepository: IVideoRepository
+    private readonly videoRepository: IVideoRepository,
+    private readonly transcriptRepository: ITranscriptRepository
   ) {}
 
   /**
@@ -70,14 +91,33 @@ export class CreateHighlightUseCase {
       throw new VideoNotFoundError(input.videoId);
     }
 
-    // 3. 建立 Highlight Entity（初始無選中句子）
+    // 3. 建立 Highlight Entity
     const highlightId = generateHighlightId();
     const highlight = new Highlight(highlightId, input.videoId, input.name);
 
-    // 4. 持久化
+    // 4. 如果需要使用 AI 建議，從轉錄中收集並加入
+    if (input.useAISuggestions) {
+      const transcript = await this.transcriptRepository.findByVideoId(input.videoId);
+
+      // 如果有轉錄，收集 AI 建議的句子
+      if (transcript) {
+        const suggestedSentenceIds = transcript.sections
+          .flatMap((section) => section.sentences)
+          .filter((sentence) => sentence.isHighlightSuggestion)
+          .map((sentence) => sentence.id);
+
+        // 批次加入建議的句子
+        for (const sentenceId of suggestedSentenceIds) {
+          highlight.addSentence(sentenceId);
+        }
+      }
+      // 如果沒有轉錄，靜默失敗，建立空的高光
+    }
+
+    // 5. 持久化
     await this.highlightRepository.save(highlight);
 
-    // 5. 返回結果
+    // 6. 返回結果
     return highlight;
   }
 
